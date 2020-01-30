@@ -1,0 +1,35 @@
+{
+  "name": "xfdcloser",
+  "version": "4.0.0",
+  "description": "Wikipedia userscript that helps assess pages for WikiProjects",
+  "homepage": "https://github.com/evad37/xfdcloser",
+  "browser": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:es5": "jshint index.js \"index-sandbox.js\"",
+    "lint:es6": "eslint index.js \"index-sandbox.js\" \"xfdcloser-src/**\"",
+    "lint:fix": "eslint index.js \"index-sandbox.js\" \"xfdcloser-src/**\" --fix",
+    "lint": "npm run lint:es6 && npm run lint:es5",
+    "build:bundle": "browserify xfdcloser-src/App.js --debug -t babelify --outfile dist/core.js",
+    "build:minify": "uglifyjs dist/core.js --compress -b ascii_only=true,beautify=false --output dist/core.min.js",
+    "build": "npm run lint && npm run build:bundle && npm run build:minify"
+  },
+  "author": {
+    "name": "Evad37",
+    "url": "https://en.wikipedia.org/wiki/User:Evad37"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evad37/xfdcloser.git"
+  },
+  "license": "(MIT OR CC-BY-4.0)",
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.0",
+    "eslint": "^6.5.1",
+    "jshint": "^2.10.2",
+    "uglify-js": "^3.6.3"
+  }
+}
