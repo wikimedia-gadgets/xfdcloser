@@ -12,7 +12,8 @@
     "lint": "npm run lint:es6 && npm run lint:es5",
     "build:bundle": "browserify xfdcloser-src/App.js --debug -t babelify --outfile dist/core.js",
     "build:minify": "uglifyjs dist/core.js --compress -b ascii_only=true,beautify=false --output dist/core.min.js",
-    "build": "npm run lint && npm run build:bundle && npm run build:minify"
+    "build:concat": "concat-cli -f \"core-comment-top.js\" dist/core.min.js \"core-comment-bottom.js\" -o dist/core.min.js",
+    "build": "npm run lint && npm run build:bundle && npm run build:minify && npm run build:concat"
   },
   "author": {
     "name": "Evad37",
@@ -28,6 +29,7 @@
     "@babel/preset-env": "^7.6.3",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
+    "concat-cli": "^4.0.0",
     "eslint": "^6.5.1",
     "jshint": "^2.10.2",
     "uglify-js": "^3.6.3"
