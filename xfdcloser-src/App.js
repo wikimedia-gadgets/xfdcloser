@@ -1,8 +1,6 @@
 import config from "./config";
 import ShowHideTag from "./ShowHideTag";
-const Discussion = { // TODO: replace this stub with an import of an actual class
-	"newFromHeadlineSpan": () => false
-};
+import Discussion from "./Discussion";
 
 // <nowiki>
 

@@ -45,8 +45,10 @@ let config = {
 		"discussions": []
 	},
 	// Venue object based on current page
-	xfd: Venue.newFromPageName(mwConfig.wgPageName)
+	venue: Venue.newFromPageName(mwConfig.wgPageName)
 };
+// Deprecated property xfd:
+config.xfd = config.venue;
 
 // Adjust some settings if running in sandbox mode
 if (window.XFDC_SANDBOX) config = window.XFDC_MAKE_SANDBOX_CONFIG(config);
