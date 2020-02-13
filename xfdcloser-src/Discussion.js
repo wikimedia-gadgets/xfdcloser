@@ -8,6 +8,7 @@ import {
 	multiButtonConfirm,
 	dmyDateString
 } from "./util";
+import windowManager from "./windowManager";
 const Dialog = () => {}; // TODO: replace this stub with an import of an actual class
 Dialog.prototype.setup = () => console.log("Dialog setup function");
 const InputData = () => {}; // TODO: replace this stub with an import of an actual class
@@ -38,6 +39,7 @@ var Discussion = function(discussionConfig) {
 		deferred: {} // For later tracking of jQuery Deferred objects
 	};
 	$.extend(this, defaultConfig, discussionConfig);
+	this.windowManager = windowManager;
 };
 
 // Construct from headline span element
@@ -266,12 +268,15 @@ Discussion.prototype.setStatus = function($status) {
  * @returns {Boolean} True if dialog was opened, false if another dialog is already open
  */
 Discussion.prototype.openDialog = function(isRelisting) {
-	if (document.getElementById("xfdc-dialog")) {
-		// Another dialog is already open
+	let currentWindow = windowManager.getCurrentWindow();
+	if (currentWindow && ( currentWindow.isOpened() || currentWindow.isOpening() ) ) {
+		// Another dialog window is already open
 		return false;
 	}
-	this.dialog = new Dialog(this, !!isRelisting);
-	this.dialog.setup();
+	windowManager.openWindow("main", {
+		venue: config.venue,
+		type: isRelisting ? "relist" : "close"
+	});
 	return true;
 };
 // Mark as finished
