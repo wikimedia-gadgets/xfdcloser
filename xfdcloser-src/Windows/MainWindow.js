@@ -68,15 +68,10 @@ MainWindow.prototype.initialize = function () {
 
 	/* --- CONTENT AREA --- */
 
-	// Pages added dynamically upon opening, so just need a layout with an empty list
-	this.resultForm = new ResultFormWidget({
-		preferences: this.preferences,
-		venue: appConfig.venue
-	});
+	// Pages added dynamically upon opening, so just need a layout
 	this.resultLayout = new OO.ui.PanelLayout( {
 		padded: false,
-		expanded: false,
-		$content: this.resultForm.$element
+		expanded: false
 	} );
 
 	// Preferences, filled in with current prefs upon loading.
@@ -196,16 +191,22 @@ MainWindow.prototype.getBodyHeight = function () {
 // of opening
 MainWindow.prototype.getSetupProcess = function ( data ) {
 	data = data || {};
+	data.preferences = $.extend({}, defaultPrefs, data.preferences||{});
 	return MainWindow.super.prototype.getSetupProcess.call( this, data )
 		.next( () => {
 			this.makeDraggable();
-			// Set up preferences
-			this.setPreferences(data.preferences);
-			this.prefsForm.setPrefValues(data.preferences);
 			// Set up result form
+			// TODO: differentiate between close and relist
+			this.resultForm = new ResultFormWidget({
+				sectionHeader: data.discussion.sectionHeader,
+				isBasicMode: data.discussion.isBasicMode(),
+				pages: data.discussion.pages || []
+			});
+			// Add to layout and update
+			this.resultLayout.$element.append( this.resultForm.$element );
 			this.actions.setMode("edit");
-			this.resultForm.setPages(data.pages);
-			this.resultForm.setType(data.type);
+			// Set up preferences
+			this.setPreferences(data.preferences || {});
 			// Force a size update to ensure eveything fits okay
 			this.updateSize();
 		}, this );
@@ -278,7 +279,8 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 MainWindow.prototype.getTeardownProcess = function ( data ) {
 	return MainWindow.super.prototype.getTeardownProcess.call( this, data )
 		.first( () => {
-			this.resultForm.clearAll();
+			this.resultLayout.$element.empty();
+			this.resultForm = null;
 
 			this.$element.find(".oo-ui-window-frame").css("transform","");
 			this.$element.find(".oo-ui-processDialog-location").off(".xfdcMainWin");
@@ -290,6 +292,7 @@ MainWindow.prototype.setPreferences = function(prefs) {
 	this.preferences = $.extend({}, defaultPrefs, prefs);
 	// Apply preferences to existing items in the window:
 	this.resultForm.setPreferences(this.preferences);
+	this.prefsForm.setPrefValues(this.preferences);
 };
 
 export default MainWindow;
