@@ -29,7 +29,7 @@ function ResultFormWidget( config ) {
 		})
 		: new NoteWidget({
 			title: `Discussion: ${config.sectionHeader} (${config.pages.length} ${config.pages.length === 1 ? "page" : "pages"})`,
-			noteContent: "<ul>" + config.pages.map(page => "<li>" + page.getPrefixedText() + "</li>") + "</ul>"
+			noteContent: "<ul>" + config.pages.map(page => "<li>" + page.getPrefixedText() + "</li>").join("") + "</ul>"
 		});
 	this.fieldset.addItems([
 	]);
@@ -65,8 +65,6 @@ function ResultFormWidget( config ) {
 			align:"top"
 		} )
 	]);
-
-	this.$element.append("Result form goes here");
 }
 OO.inheritClass( ResultFormWidget, OO.ui.Widget );
 
