@@ -276,6 +276,7 @@ Discussion.prototype.openDialog = function(isRelisting) {
 	windowManager.openWindow("main", {
 		discussion: this,
 		venue: config.venue,
+		user: config.user,
 		type: isRelisting ? "relist" : "close"
 	});
 	return true;

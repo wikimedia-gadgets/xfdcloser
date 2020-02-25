@@ -200,7 +200,9 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 			this.resultForm = new ResultFormWidget({
 				sectionHeader: data.discussion.sectionHeader,
 				isBasicMode: data.discussion.isBasicMode(),
-				pages: data.discussion.pages || []
+				pages: data.discussion.pages || [],
+				venue: data.venue.type,
+				user: data.user 
 			});
 			// Add to layout and update
 			this.resultLayout.$element.append( this.resultForm.$element );

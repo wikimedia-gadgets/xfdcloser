@@ -1,4 +1,5 @@
 import NoteWidget from "./NoteWidget";
+import ResultWidget from "./ResultWidget";
 // <nowiki>
 
 /**
@@ -20,7 +21,7 @@ function ResultFormWidget( config ) {
 	this.$element.append( this.fieldset.$element );
 
 	// Top stuff
-	let discussionNote = config.isBasicMode
+	this.discussionNote = config.isBasicMode
 		? new NoteWidget({
 			title: `Discussion: ${config.sectionHeader} (basic mode only)`,
 			noteContent: "Nominated pages were not detected."
@@ -30,13 +31,24 @@ function ResultFormWidget( config ) {
 			noteContent: "<ul>" + config.pages.map(page => "<li>" + page.getPrefixedText() + "</li>") + "</ul>"
 		});
 	this.fieldset.addItems([
-		new OO.ui.FieldLayout( discussionNote, {
+		new OO.ui.FieldLayout( this.discussionNote, {
 			//label: 'Notice',
 			align:"top"
 		} )
 	]);
 
 	// Result - single result
+	this.resultWidget = new ResultWidget({
+		pages: config.pages,
+		venue: config.venue,
+		isSysop: config.user.isSysop
+	});
+	this.fieldset.addItems([
+		new OO.ui.FieldLayout( this.resultWidget, {
+			//label: "Result",
+			align:"top"
+		} )
+	]);
 
 	// Result - multiple results
 
