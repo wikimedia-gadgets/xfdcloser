@@ -1,5 +1,6 @@
 import NoteWidget from "./NoteWidget";
 import ResultWidget from "./ResultWidget";
+import RationaleWidget from "./RationaleWidget";
 // <nowiki>
 
 /**
@@ -31,10 +32,6 @@ function ResultFormWidget( config ) {
 			noteContent: "<ul>" + config.pages.map(page => "<li>" + page.getPrefixedText() + "</li>") + "</ul>"
 		});
 	this.fieldset.addItems([
-		new OO.ui.FieldLayout( this.discussionNote, {
-			//label: 'Notice',
-			align:"top"
-		} )
 	]);
 
 	// Result - single result
@@ -43,21 +40,31 @@ function ResultFormWidget( config ) {
 		venue: config.venue,
 		isSysop: config.user.isSysop
 	});
-	this.fieldset.addItems([
-		new OO.ui.FieldLayout( this.resultWidget, {
-			//label: "Result",
-			align:"top"
-		} )
-	]);
 
 	// Result - multiple results
 
 	// Rationale
+	this.rationale = new RationaleWidget({});
 
 	// Options
 
 	// Preview
 
+
+	
+	this.fieldset.addItems([
+		new OO.ui.FieldLayout( this.discussionNote, {
+			//label: 'Notice',
+			align:"top"
+		} ),
+		new OO.ui.FieldLayout( this.resultWidget, {
+			label: $("<strong>").text("Result"),
+			align:"top"
+		} ),
+		new OO.ui.FieldLayout( this.rationale, {
+			align:"top"
+		} )
+	]);
 
 	this.$element.append("Result form goes here");
 }
