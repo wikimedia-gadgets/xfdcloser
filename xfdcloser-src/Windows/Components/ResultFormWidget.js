@@ -1,6 +1,7 @@
 import NoteWidget from "./NoteWidget";
 import ResultWidget from "./ResultWidget";
 import RationaleWidget from "./RationaleWidget";
+import OptionsGroupWidget from "./OptionsGroupWidget";
 // <nowiki>
 
 /**
@@ -47,7 +48,10 @@ function ResultFormWidget( config ) {
 	this.rationale = new RationaleWidget({});
 
 	// Options
-
+	this.options = new OptionsGroupWidget({
+		venue: config.venue,
+		isSysop: config.user.isSysop
+	});
 	// Preview
 
 
@@ -63,8 +67,13 @@ function ResultFormWidget( config ) {
 		} ),
 		new OO.ui.FieldLayout( this.rationale, {
 			align:"top"
+		} ),
+		new OO.ui.FieldLayout( this.options, {
+			align:"top"
 		} )
 	]);
+
+	this.resultWidget.connect(this, {"resultSelect": "onResultSelect"});
 }
 OO.inheritClass( ResultFormWidget, OO.ui.Widget );
 
@@ -72,6 +81,10 @@ ResultFormWidget.prototype.clearAll = () => console.log("ResultFormWidget", "cle
 ResultFormWidget.prototype.setPreferences = () => console.log("ResultFormWidget", "setPreferences"); //TODO: Replace stub with working function
 ResultFormWidget.prototype.setPages = () => console.log("ResultFormWidget", "setPages"); //TODO: Replace stub with working function
 ResultFormWidget.prototype.setType = () => console.log("ResultFormWidget", "setType"); //TODO: Replace stub with working function
+
+ResultFormWidget.prototype.onResultSelect = function(resultData) {
+	this.options.showOptions(resultData);
+};
 
 export default ResultFormWidget;
 // </nowiki>

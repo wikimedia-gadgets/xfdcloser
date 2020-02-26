@@ -3,51 +3,66 @@ const resultsData = [
 	{
 		result: "keep",
 		allowSpeedy: true,
-		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"]
+		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+		actions: ["keepActions", "noActions"]
 	},
 	{
 		result: "delete",
 		allowSpeedy: true,
 		allowSoft: true,
 		sysopOnly: true,
-		venues: ["afd", "cfd", "ffd", "mfd", "rfd"]
+		venues: ["afd", "cfd", "ffd", "mfd", "rfd"],
+		actions: ["deleteActions", "noActions"]
 	},
 	{
 		result: "delete",
 		allowSpeedy: true,
 		allowSoft: true,
-		venues: ["tfd"]
+		venues: ["tfd"],
+		actions: ["deleteActions", "holdingCellActions", "noActions"]
 	},
 	{
 		result: "redirect",
 		requireTarget: true,
 		allowSoft: true,
 		allowDeleteFirst: true,
-		venues: ["afd", "cfd", "mfd", "tfd"]
+		venues: ["afd", "cfd", "mfd", "tfd"],
+		actions: ["redirectActions", "noActions"]
 	},
 	{
 		result: "retarget",
 		requireTarget: true,
 		allowSoft: true,
 		allowDeleteFirst: true,
-		venues: ["rfd"]
+		venues: ["rfd"],
+		actions: ["redirectActions", "noActions"]
 	},
 	{
 		result: "disambiguate",
-		venues: ["rfd"]
+		venues: ["rfd"],
+		actions: ["keepActions", "noActions"]
 	},
 	{
 		result: "merge",
 		requireTarget: true,
-		venues: ["afd", "cfd", "mfd", "tfd"]
+		venues: ["afd", "cfd", "mfd"],
+		actions: ["keepActions", "noActions"]
+	},
+	{
+		result: "merge",
+		requireTarget: true,
+		venues: ["tfd"],
+		actions: ["holdingCellActions", "noActions"]
 	},
 	{
 		result: "no consensus",
-		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"]
+		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+		actions: ["keepActions", "noActions"]
 	},
 	{
 		result: "custom",
-		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"]
+		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+		actions: ["noActions"]
 	}
 ];
 
@@ -138,7 +153,10 @@ ResultWidget.prototype.onResultSelect = function(result) {
 	);
 	this.targetTitle.toggle(!!data.requireTarget);
 	this.customResult.toggle(data.result === "custom");
+	
+	this.emit("resultSelect", result.data);
 };
+
 
 export default ResultWidget;
 export {resultsData};
