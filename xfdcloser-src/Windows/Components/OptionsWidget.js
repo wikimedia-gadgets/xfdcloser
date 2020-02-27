@@ -100,6 +100,7 @@ const options = [
  * @param {Object} config.resultData data object for result
  * @param {String} config.venue code for venue, e.g. "afd"
  * @param {Boolean} config.isSysop
+ * @param {jQuery} config.$overlay element for overlays
  */
 function OptionsWidget(config) {
 	// Configuration initialization
@@ -116,10 +117,13 @@ function OptionsWidget(config) {
 		label: config.label || "Options"
 	} );
 
-	this.actions = new OO.ui.DropdownInputWidget( {
-		options: actions
-			.filter(action => config.resultData.actions.includes(action.data))
-			.map(action => new OO.ui.MenuOptionWidget(action))
+	this.actions = new OO.ui.DropdownWidget( {
+		$overlay: config.$overlay,
+		menu: {
+			items: actions
+				.filter(action => config.resultData.actions.includes(action.data))
+				.map(action => new OO.ui.MenuOptionWidget(action))
+		}
 	} );
 
 	this.options = options
@@ -139,8 +143,11 @@ function OptionsWidget(config) {
 				widget = new OO.ui.ToggleSwitchWidget();
 				break;
 			case "dropdown":
-				widget = new OO.ui.DropdownInputWidget({
-					"options": option.items
+				widget = new OO.ui.DropdownWidget({
+					$overlay: config.$overlay,
+					menu: {
+						items: option.items.map(item =>  new OO.ui.MenuOptionWidget(item))
+					}
 				});
 				break;
 			case "rcatMulitSelect":

@@ -11,7 +11,9 @@ import OptionsGroupWidget from "./OptionsGroupWidget";
  * @param {String} config.sectionHeader Discussion section header
  * @param {Boolean} config.isBasicMode
  * @param {mw.Title[]} config.pages mw.Title objects for each nominated page
- * 
+ * @param {Object} config.user Object with {String}sig, {string}name, {boolean}isSysop
+ * @param {String} config.venue code for venue, e.g. "afd"
+ * @param {jQuery} $overlay element for overlays
  */
 function ResultFormWidget( config ) {
 	// Configuration initialization
@@ -50,7 +52,8 @@ function ResultFormWidget( config ) {
 	// Options
 	this.options = new OptionsGroupWidget({
 		venue: config.venue,
-		isSysop: config.user.isSysop
+		isSysop: config.user.isSysop,
+		$overlay: config.$overlay
 	});
 	// Preview
 

@@ -1,4 +1,5 @@
 import OptionsWidget from "./OptionsWidget";
+import config from "../../config";
 // <nowiki>
 
 /**
@@ -6,6 +7,7 @@ import OptionsWidget from "./OptionsWidget";
  * @param {Object} config
  * @param {String} config.venue code for venue, e.g. "afd"
  * @param {Boolean} config.isSysop
+ * @param {jQuery} config.$overlay element for overlays
  */
 function OptionsGroupWidget(config) {
 	// Configuration initialization
@@ -40,9 +42,10 @@ OptionsGroupWidget.prototype.showOptions = function(results) {
 	results.forEach(result => {
 		if (!this.items.find(item => item.getData().result === result)) {
 			this.addItems(new OptionsWidget({
-				"resultData": result,
-				"venue": this.venue,
-				"isSysop": this.isSysop
+				resultData: result,
+				venue: this.venue,
+				isSysop: this.isSysop,
+				$overlay: config.$overlay
 			}));
 		}
 	});

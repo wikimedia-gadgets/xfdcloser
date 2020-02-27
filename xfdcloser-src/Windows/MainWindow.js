@@ -202,7 +202,8 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 				isBasicMode: data.discussion.isBasicMode(),
 				pages: data.discussion.pages || [],
 				venue: data.venue.type,
-				user: data.user 
+				user: data.user,
+				$overlay: this.$overlay 
 			});
 			// Add to layout and update
 			this.resultLayout.$element.append( this.resultForm.$element );
