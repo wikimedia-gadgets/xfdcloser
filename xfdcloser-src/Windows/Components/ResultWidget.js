@@ -157,6 +157,10 @@ ResultWidget.prototype.onResultSelect = function(result) {
 	this.emit("resultSelect", result.data);
 };
 
+ResultWidget.prototype.getSelectedResultData = function() {
+	const selectedResult = this.resultButtonSelect.findSelectedItem();
+	return  selectedResult && selectedResult.getData();
+};
 
 export default ResultWidget;
 export {resultsData};

@@ -300,11 +300,11 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 
 	} else if ( action === "multimode") {
 		this.actions.setMode("multimodeActive");
-		console.log("Multimode Active");
+		this.resultForm.toggleMultimode(true);
 
 	} else if ( action === "singlemode") {
 		this.actions.setMode("multimodeAvailable");
-		console.log("Single mode Active");
+		this.resultForm.toggleMultimode(false);
 
 	} else if (!action && this.resultForm.changed) {
 		// Confirm closing of dialog if there have been changes 

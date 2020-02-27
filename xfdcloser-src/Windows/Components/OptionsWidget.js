@@ -108,7 +108,7 @@ function OptionsWidget(config) {
 	// Call parent constructor
 	OptionsWidget.super.call( this, config );
 	this.data = {
-		"result": config.resultData
+		"resultData": config.resultData
 	};
 	this.venue = config.venue;
 	this.isSysop = config.isSysop;
