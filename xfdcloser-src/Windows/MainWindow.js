@@ -24,7 +24,7 @@ MainWindow.static.actions = [
 		label: "X", // not using an icon since color becomes inverted, i.e. white on light-grey
 		title: "Cancel",
 		flags: "primary",
-		modes: ["edit", "diff", "preview"] // available when current mode isn't "prefs"
+		modes: ["normal", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
 	},
 	// Safe (top left)
 	{
@@ -32,7 +32,7 @@ MainWindow.static.actions = [
 		flags: "safe",
 		icon: "settings",
 		title: "Preferences",
-		modes: ["edit", "diff", "preview"] // available when current mode isn't "prefs"
+		modes: ["normal", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
 	},
 	// Others (bottom)
 	{
@@ -40,8 +40,18 @@ MainWindow.static.actions = [
 		accessKey: "s",
 		label: new OO.ui.HtmlSnippet("<span style='padding:0 1em;'>Save</span>"),
 		flags: ["primary", "progressive"],
-		modes: ["edit", "diff", "preview"] // available when current mode isn't "prefs"
-	},	
+		modes: ["normal", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
+	},
+	{
+		action: "multimode",
+		label: "Multiple results...",
+		modes: ["multimodeAvailable"]
+	},
+	{
+		action: "singlemode",
+		label: "Single result...",
+		modes: ["multimodeActive"]
+	},
 	// "prefs" mode only
 	{
 		action: "savePrefs",
@@ -189,12 +199,32 @@ MainWindow.prototype.getBodyHeight = function () {
 
 // Use getSetupProcess() to set up the window with data passed to it at the time 
 // of opening
+/**
+ * @param {Object} data
+ * @param {Discussion} data.discussion
+ * @param {Venue} data.venue
+ * @param {Object} data.user user data based on mw.config values
+ * @param {String} data.type "relist" or "close"
+ */
 MainWindow.prototype.getSetupProcess = function ( data ) {
 	data = data || {};
 	data.preferences = $.extend({}, defaultPrefs, data.preferences||{});
 	return MainWindow.super.prototype.getSetupProcess.call( this, data )
 		.next( () => {
 			this.makeDraggable();
+
+			// Set mode
+			if (
+				data.type === "close" &&
+				!data.discussion.isBasicMode() &&
+				data.discussion.pages &&
+				data.discussion.pages.length > 1
+			) {
+				this.actions.setMode("multimodeAvailable");
+			} else {
+				this.actions.setMode("normal");
+			}
+
 			// Set up result form
 			// TODO: differentiate between close and relist
 			this.resultForm = new ResultFormWidget({
@@ -207,7 +237,7 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 			});
 			// Add to layout and update
 			this.resultLayout.$element.append( this.resultForm.$element );
-			this.actions.setMode("edit");
+
 			// Set up preferences
 			this.setPreferences(data.preferences || {});
 			// Force a size update to ensure eveything fits okay
@@ -267,6 +297,14 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 				tasks: [/* TODO */]
 			})
 		);
+
+	} else if ( action === "multimode") {
+		this.actions.setMode("multimodeActive");
+		console.log("Multimode Active");
+
+	} else if ( action === "singlemode") {
+		this.actions.setMode("multimodeAvailable");
+		console.log("Single mode Active");
 
 	} else if (!action && this.resultForm.changed) {
 		// Confirm closing of dialog if there have been changes 
