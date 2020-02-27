@@ -77,6 +77,7 @@ function ResultFormWidget( config ) {
 	]);
 
 	this.resultWidget.connect(this, {"resultSelect": "onResultSelect"});
+	this.options.connect(this, {"resize": "onResize"});
 }
 OO.inheritClass( ResultFormWidget, OO.ui.Widget );
 
@@ -87,6 +88,11 @@ ResultFormWidget.prototype.setType = () => console.log("ResultFormWidget", "setT
 
 ResultFormWidget.prototype.onResultSelect = function(resultData) {
 	this.options.showOptions(resultData);
+	this.onResize();
+};
+
+ResultFormWidget.prototype.onResize = function() {
+	this.emit("resize");
 };
 
 export default ResultFormWidget;

@@ -49,6 +49,8 @@ OptionsGroupWidget.prototype.showOptions = function(results) {
 			}));
 		}
 	});
+	// Emit resize event
+	this.emit("resize");
 };
 
 export default OptionsGroupWidget;

@@ -212,6 +212,8 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 			this.setPreferences(data.preferences || {});
 			// Force a size update to ensure eveything fits okay
 			this.updateSize();
+
+			this.resultForm.connect(this, {"resize": "updateSize"});
 		}, this );
 };
 
