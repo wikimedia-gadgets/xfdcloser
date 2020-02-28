@@ -15,9 +15,11 @@ function MultiResultGroupWidget(config) {
 	config = config || {};
 	// Call parent constructor
 	MultiResultGroupWidget.super.call( this, config );
+	this.$group = $("<div>");
+	this.$element.append(this.$group);
 	// Mixin constructor
 	OO.ui.mixin.GroupElement.call( this, $.extend( {
-		$group: this.$element
+		$group: this.$group
 	}, config ) );
 	
 	const relevantResultData = resultsData.filter(resultData => {
@@ -34,6 +36,14 @@ function MultiResultGroupWidget(config) {
 			$overlay: config.$overlay
 		}))
 	);
+
+	this.resultSummary = new OO.ui.TextInputWidget({
+		validate: "non-empty"
+	});
+	this.resultSummaryField = new OO.ui.FieldLayout( this.resultSummary, {
+		label: $("<strong>").text("Result summary"),
+	} );
+	this.$element.append(this.resultSummaryField.$element);
 	
 	this.aggregate( {
 		change: "resultChange"
