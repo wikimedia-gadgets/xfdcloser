@@ -9,6 +9,7 @@
 function MultiResultItemWidget(config) {
 	// Call the parent constructor
 	MultiResultItemWidget.super.call( this, config );
+	this.page = config.page;
 
 	this.resultDropdown = new OO.ui.DropdownWidget( {
 		menu: {
@@ -68,6 +69,13 @@ MultiResultItemWidget.prototype.onResultChoose = function(result) {
 
 MultiResultItemWidget.prototype.getSelectedResultData = function() {
 	const selectedResult = this.resultDropdown.getMenu().findSelectedItem();
+	const data = selectedResult && selectedResult.getData();
+	if (data && data.requireTarget) {
+		data.target = this.targetTitle.getValue().trim();
+	}
+	if (data && (data.result === "custom")) {
+		data.customResult = this.customResult.getValue().trim();
+	}
 	return selectedResult && selectedResult.getData();
 };
 

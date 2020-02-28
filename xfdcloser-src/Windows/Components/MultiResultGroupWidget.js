@@ -67,5 +67,12 @@ MultiResultGroupWidget.prototype.onResultChange = function() {
 	this.emit("resultSelect", uniqueResultsData);
 };
 
+MultiResultGroupWidget.prototype.getResultsByPage = function() {
+	return this.items.map(item => ({
+		page: item.page,
+		data: item.getSelectedResultData()
+	}) );
+};
+
 export default MultiResultGroupWidget;
 // </nowiki>

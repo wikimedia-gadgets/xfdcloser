@@ -11,20 +11,21 @@ function RationaleWidget( config ) {
 	config = config || {};
 	// Call parent constructor
 	RationaleWidget.super.call( this, config );
+	this.isMultimode = false;
 
 	this.label = new OO.ui.LabelWidget( {
 		label: $("<strong>").text(config.relisting ? "Relist comment" : "Rationale")
 	} );
 	this.$element.append(this.label.$element);
 
-	if (config.multimode) {
-		this.copyButton = new OO.ui.ButtonWidget( {
-			label: "Copy from above",
-			framed: false
-		} );
-		this.copyButton.$element.css({"float":"right"});
-		this.$element.append(this.copyButton.$element);
-	}
+	this.copyButton = new OO.ui.ButtonWidget( {
+		label: "Copy from above",
+		framed: false
+	} );
+	this.copyButton.toggle(this.isMultimode);
+	this.copyButton.$element.css({"float":"right"});
+	this.$element.append(this.copyButton.$element);
+
 	
 	this.textbox = new OO.ui.MultilineTextInputWidget( {
 		rows: config.relisting ? 2 : 4
@@ -38,8 +39,25 @@ function RationaleWidget( config ) {
 		} );
 		this.$element.append(this.newSentenceOption.$element);
 	}
+
+	this.copyButton.connect(this, {"click": "onCopyClick"});
 }
 OO.inheritClass( RationaleWidget, OO.ui.Widget );
+
+/**
+ * @param {Boolean} isMultimode `true` to set multimode, `false` to set single-mode
+ */
+RationaleWidget.prototype.setMultimode = function(isMultimode) {
+	this.copyButton.toggle(!!isMultimode);
+};
+
+RationaleWidget.prototype.onCopyClick = function() {
+	this.emit("copyResultsClick");
+};
+
+RationaleWidget.prototype.prependRationale = function(text) {
+	this.textbox.setValue(text + this.textbox.getValue());
+};
 
 export default RationaleWidget;
 // </nowiki>

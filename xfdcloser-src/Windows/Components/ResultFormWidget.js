@@ -99,6 +99,7 @@ function ResultFormWidget( config ) {
 	}
 
 	this.resultWidget.connect(this, {"resultSelect": "onResultSelect"});
+	this.rationale.connect(this, {"copyResultsClick": "onCopyResultsClick"});
 	this.options.connect(this, {"resize": "onResize"});
 }
 OO.inheritClass( ResultFormWidget, OO.ui.Widget );
@@ -107,6 +108,25 @@ ResultFormWidget.prototype.clearAll = () => console.log("ResultFormWidget", "cle
 ResultFormWidget.prototype.setPreferences = () => console.log("ResultFormWidget", "setPreferences"); //TODO: Replace stub with working function
 ResultFormWidget.prototype.setPages = () => console.log("ResultFormWidget", "setPages"); //TODO: Replace stub with working function
 ResultFormWidget.prototype.setType = () => console.log("ResultFormWidget", "setType"); //TODO: Replace stub with working function
+
+ResultFormWidget.prototype.onCopyResultsClick = function() {
+	if (!this.isMultimode) {
+		return;
+	}
+	const results = this.multiResultWidget.getResultsByPage()
+		.map(result => {
+			const data = result.data;
+			if (!data) {
+				return  `*''' ''' ${result.page}\n`;
+			}
+			const resultText = data.result === "custom"
+				? (data.customResult || " ")
+				: extraJs.toSentenceCase(data.result);
+			const suffix = data.requireTarget ? ` to [[${result.data.target}]]`	: "";
+			return `*'''${resultText}''' [[${result.page}]]${suffix}\n`;
+		}).join("");
+	this.rationale.prependRationale(results);
+};
 
 ResultFormWidget.prototype.onResultSelect = function(resultData) {
 	this.options.showOptions(resultData, this.isMultimode);
@@ -124,6 +144,7 @@ ResultFormWidget.prototype.toggleMultimode = function(show) {
 	this.isMultimode = !!show;
 	this.multiResultWidgetField.toggle(!!show);
 	this.resultWidgetField.toggle(!show);
+	this.rationale.setMultimode(!!show);
 	if (show) {
 		// Trigger options update by calling multiResultWidget's onResultChange
 		this.multiResultWidget.onResultChange();
