@@ -13,11 +13,6 @@ function RationaleWidget( config ) {
 	RationaleWidget.super.call( this, config );
 	this.isMultimode = false;
 
-	this.label = new OO.ui.LabelWidget( {
-		label: $("<strong>").text(config.relisting ? "Relist comment" : "Rationale")
-	} );
-	this.$element.append(this.label.$element);
-
 	this.copyButton = new OO.ui.ButtonWidget( {
 		label: "Copy from above",
 		framed: false

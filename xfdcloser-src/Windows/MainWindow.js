@@ -233,6 +233,7 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 				pages: data.discussion.pages || [],
 				venue: data.venue.type,
 				user: data.user,
+				type: data.type,
 				$overlay: this.$overlay 
 			});
 			// Add to layout and update

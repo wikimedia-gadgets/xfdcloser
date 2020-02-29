@@ -12,6 +12,7 @@ import MultiResultGroupWidget from "./MultiResultGroupWidget";
  * @param {String} config.sectionHeader Discussion section header
  * @param {Boolean} config.isBasicMode
  * @param {mw.Title[]} config.pages mw.Title objects for each nominated page
+ * @param {String} config.type "close" or "relist" 
  * @param {Object} config.user Object with {String}sig, {string}name, {boolean}isSysop
  * @param {String} config.venue code for venue, e.g. "afd"
  * @param {jQuery} $overlay element for overlays
@@ -20,87 +21,110 @@ function ResultFormWidget( config ) {
 	// Configuration initialization
 	config = config || {};
 	// Call parent constructor
-	ResultFormWidget.super.call( this, config );
-
-	this.fieldset = new OO.ui.FieldsetLayout();
-	this.$element.append( this.fieldset.$element );
+	ResultFormWidget.super.call( this, config );	
 
 	// Top stuff
-	this.discussionNote = config.isBasicMode
-		? new NoteWidget({
-			title: `Discussion: ${config.sectionHeader} (basic mode only)`,
-			noteContent: "Nominated pages were not detected."
-		})
-		: new NoteWidget({
-			title: `Discussion: ${config.sectionHeader} (${config.pages.length} ${config.pages.length === 1 ? "page" : "pages"})`,
-			noteContent: "<ul>" + config.pages.map(page => "<li>" + page.getPrefixedText() + "</li>").join("") + "</ul>"
-		});
-	this.fieldset.addItems([
-	]);
+	this.notesFieldset = new OO.ui.FieldsetLayout(/* no label */);
+	this.$element.append( this.notesFieldset.$element );
+	this.topNotes = [
+		config.isBasicMode
+			? new NoteWidget({
+				title: `Discussion: ${config.sectionHeader} (basic mode only)`,
+				noteContent: "Nominated pages were not detected."
+			})
+			: new NoteWidget({
+				title: `Discussion: ${config.sectionHeader} (${config.pages.length} ${config.pages.length === 1 ? "page" : "pages"})`,
+				noteContent: "<ul>" + config.pages.map(page => "<li>" + page.getPrefixedText() + "</li>").join("") + "</ul>"
+			})
+	];
+	if (!config.user.isSysop && config.type==="close") {
+		this.topNotes.push( new NoteWidget({
+			title: "Take care to avoid innapropriate non-administrator closes",
+			content: $("<p>").append(
+				"See the ",
+				extraJs.makeLink("WP:NACD"),
+				" guideline for advice on appropriate and inappropriate closures."
+			)
+		}) );
+	}
+	this.notesFieldset.addItems(
+		this.topNotes.map(
+			noteWidget => new OO.ui.FieldLayout( noteWidget, {
+				/* no label, */
+				align:"top"
+			} )
+		)
+	);
 
-	// Result - single result
-	this.resultWidget = new ResultWidget({
-		pages: config.pages,
-		venue: config.venue,
-		isSysop: config.user.isSysop
-	});
-
-	// Rationale
-	this.rationale = new RationaleWidget({});
-
-	// Options
-	this.options = new OptionsGroupWidget({
-		venue: config.venue,
-		isSysop: config.user.isSysop,
-		$overlay: config.$overlay
-	});
-	// Preview
-
-
-	this.resultWidgetField = new OO.ui.FieldLayout( this.resultWidget, {
-		label: $("<strong>").text("Result"),
-		align:"top"
-	} );
-	
-	this.fieldset.addItems([
-		new OO.ui.FieldLayout( this.discussionNote, {
-			//label: 'Notice',
-			align:"top"
-		} ),
-		this.resultWidgetField,
-		new OO.ui.FieldLayout( this.rationale, {
-			align:"top"
-		} ),
-		new OO.ui.FieldLayout( this.options, {
-			align:"top"
-		} )
-	]);
-
-	// Result - multiple results
-	if (config.pages && config.pages.length > 1) {
-		this.multiResultWidget = new MultiResultGroupWidget({
+	// Result
+	if (config.type === "close") {
+		this.resultFieldset = new OO.ui.FieldsetLayout({label: "Result"});
+		this.$element.append(this.resultFieldset.$element);
+		this.resultWidget = new ResultWidget({
 			pages: config.pages,
 			venue: config.venue,
-			isSysop: config.isSysop,
-			$overlay: config.$overlay
+			isSysop: config.user.isSysop
 		});
-		this.multiResultWidgetField = new OO.ui.FieldLayout( this.multiResultWidget, {
-			label: $("<strong>").text("Result"),
+		this.resultWidget.connect(this, {"resultSelect": "onResultSelect"});
+		this.resultWidgetField = new OO.ui.FieldLayout( this.resultWidget, {
+			/* no label, */
 			align:"top"
 		} );
-		this.multiResultWidgetField.toggle(false);
+		this.resultFieldset.addItems( this.resultWidgetField );
 
-		this.fieldset.addItems(this.multiResultWidgetField, 1);
+		// Multiple results
+		if (config.pages && config.pages.length > 1) {
+			this.multiResultWidget = new MultiResultGroupWidget({
+				pages: config.pages,
+				venue: config.venue,
+				isSysop: config.isSysop,
+				$overlay: config.$overlay
+			});
+			this.multiResultWidget.connect(this, {
+				"resultSelect": "onResultSelect",
+				"resize": "onResize"
+			});
+			this.multiResultWidgetField = new OO.ui.FieldLayout( this.multiResultWidget, {
+				/* no label, */
+				align:"top"
+			} );
+			this.multiResultWidgetField.toggle(false);
+			this.resultFieldset.addItems(this.multiResultWidgetField, 1);
+		}
+	}	
 
-		this.multiResultWidget.connect(this, {
-			"resultSelect": "onResultSelect",
-			"resize": "onResize"
-		});
-	}
-
-	this.resultWidget.connect(this, {"resultSelect": "onResultSelect"});
+	// Rationale
+	this.rationaleFieldset = new OO.ui.FieldsetLayout({label: config.type === "relist" ? "Relist comment" : "Rationale"});
+	this.$element.append(this.rationaleFieldset.$element);
+	this.rationale = new RationaleWidget({
+		relisting: config.type === "relist"
+	});
 	this.rationale.connect(this, {"copyResultsClick": "onCopyResultsClick"});
-	this.options.connect(this, {"resize": "onResize"});
+	this.rationaleFieldset.addItems(
+		new OO.ui.FieldLayout( this.rationale, {
+			align:"top"
+		} )
+	);
+
+	// Preview - TODO
+
+
+	if (config.type === "close") {
+		// Options
+		this.optionsFieldset = new OO.ui.FieldsetLayout(/* no label */);
+		this.$element.append(this.optionsFieldset.$element);
+		this.options = new OptionsGroupWidget({
+			venue: config.venue,
+			isSysop: config.user.isSysop,
+			$overlay: config.$overlay
+		});
+		this.options.connect(this, {"resize": "onResize"});
+		this.optionsFieldset.addItems(
+			new OO.ui.FieldLayout( this.options, {
+				align:"top"
+			} )
+		);
+	}	
 }
 OO.inheritClass( ResultFormWidget, OO.ui.Widget );
 
