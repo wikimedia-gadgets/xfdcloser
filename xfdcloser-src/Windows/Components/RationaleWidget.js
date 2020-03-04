@@ -1,3 +1,4 @@
+import DelayedChangeMixin from "../Mixins/DelayedChangeWidget";
 // <nowiki>
 
 /**
@@ -9,8 +10,10 @@
 function RationaleWidget( config ) {
 	// Configuration initialization
 	config = config || {};
-	// Call parent constructor
+	// Call the parent and mixin constructors
 	RationaleWidget.super.call( this, config );
+	DelayedChangeMixin.call( this, config );
+
 	this.isMultimode = false;
 
 	this.copyButton = new OO.ui.ButtonWidget( {
@@ -32,14 +35,16 @@ function RationaleWidget( config ) {
 			label: "Result is a new sentence",
 			selected: true
 		} );
-		this.newSentenceOption.connect(this, {"change": "onNewSentenceOptionChange"});
+		this.newSentenceOption.connect(this, {"change": "emitChange"});
 		this.$element.append(this.newSentenceOption.$element);
 	}
 
 	this.copyButton.connect(this, {"click": "onCopyClick"});
-	this.textbox.connect(this, {"change": "onTextChange"});
+	this.textbox.connect(this, {"change": "emitDelayedChange"});
 }
+// Setup
 OO.inheritClass( RationaleWidget, OO.ui.Widget );
+OO.mixinClass( RationaleWidget, DelayedChangeMixin );
 
 /**
  * @param {Boolean} isMultimode `true` to set multimode, `false` to set single-mode
@@ -50,31 +55,6 @@ RationaleWidget.prototype.setMultimode = function(isMultimode) {
 
 RationaleWidget.prototype.onCopyClick = function() {
 	this.emit("copyResultsClick");
-};
-
-RationaleWidget.prototype.onTextChange = function() {
-	// Delay before emitting a change event (i.e. waiting until user has finished typing)
-	const delayMilliseconds = 800;
-
-	// If there's a timeout from a previous change, clear it
-	if (this.changeTimerID) {
-		clearTimeout(this.changeTimerID);
-	}
-
-	// Set a new timeout for emitting a change event
-	this.changeTimerID = setTimeout(
-		() => this.emit("change"),
-		delayMilliseconds
-	);
-};
-
-RationaleWidget.prototype.onNewSentenceOptionChange = function() {
-	// If there's a timeout from a previous change, clear it
-	if (this.changeTimerID) {
-		clearTimeout(this.changeTimerID);
-	}
-	// Emit a change event
-	this.emit("change");
 };
 
 RationaleWidget.prototype.prependRationale = function(text) {

@@ -66,6 +66,8 @@ const resultsData = [
 	}
 ];
 
+import DelayedChangeMixin from "../Mixins/DelayedChangeWidget";
+
 /**
  * 
  * @param {Object} config
@@ -74,8 +76,11 @@ const resultsData = [
  * @param {Boolean} config.isSysop 
  */
 function ResultWidget(config) {
-	// Call the parent constructor
+	// Configuration initialization
+	config = config || {};
+	// Call the parent and mixin constructors
 	ResultWidget.super.call( this, config );
+	DelayedChangeMixin.call( this, config );
 
 	this.resultButtonSelect = new OO.ui.ButtonSelectWidget( {
 		items: resultsData
@@ -142,8 +147,12 @@ function ResultWidget(config) {
 	this.optionsMultiselect.items.forEach(
 		option => option.connect(this, {"change": ["onOptionsChange", option]})
 	);
+	this.targetTitle.connect(this, {"change": "emitDelayedChange"});
+	this.customResult.connect(this, {"change": "emitDelayedChange"});
 }
+// Setup
 OO.inheritClass( ResultWidget, OO.ui.Widget );
+OO.mixinClass( ResultWidget, DelayedChangeMixin );
 
 ResultWidget.prototype.onResultSelect = function(result) {
 	const data = result.data;
@@ -158,7 +167,7 @@ ResultWidget.prototype.onResultSelect = function(result) {
 	this.customResult.toggle(data.result === "custom");
 	
 	this.emit("resultSelect", result.data);
-	this.emit("change");
+	this.emitChange();
 };
 
 ResultWidget.prototype.onOptionsChange = function(option) {
@@ -167,7 +176,7 @@ ResultWidget.prototype.onOptionsChange = function(option) {
 			.filter(o => o !== option)
 			.forEach(o => o.setSelected(false));
 	}
-	this.emit("change");
+	this.emitChange();
 };
 
 ResultWidget.prototype.getResultText = function() {
