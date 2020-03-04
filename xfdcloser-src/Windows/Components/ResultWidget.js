@@ -139,6 +139,9 @@ function ResultWidget(config) {
 	);
 
 	this.resultButtonSelect.connect(this, {"select": "onResultSelect"});
+	this.optionsMultiselect.items.forEach(
+		option => option.connect(this, {"change": ["onOptionsChange", option]})
+	);
 }
 OO.inheritClass( ResultWidget, OO.ui.Widget );
 
@@ -155,6 +158,55 @@ ResultWidget.prototype.onResultSelect = function(result) {
 	this.customResult.toggle(data.result === "custom");
 	
 	this.emit("resultSelect", result.data);
+	this.emit("change");
+};
+
+ResultWidget.prototype.onOptionsChange = function(option) {
+	if (option.isSelected()) {
+		this.optionsMultiselect.items
+			.filter(o => o !== option)
+			.forEach(o => o.setSelected(false));
+	}
+	this.emit("change");
+};
+
+ResultWidget.prototype.getResultText = function() {
+	const data = this.getSelectedResultData();
+	if (!data) return null;
+	if (data.result === "custom") {
+		return this.customResult.getValue().trim();
+	}
+	const selectedOption = this.optionsMultiselect.isVisible() &&
+		this.optionsMultiselect.findSelectedItems().filter(item => item.isVisible())[0];
+	if (selectedOption) {
+		const optionData = selectedOption.getData();
+		return (optionData.prefix || "") + data.result + (optionData.suffix || "");
+	}
+	return data.result;
+};
+
+/**
+ * @param {Object} mode
+ * @param {Boolean} mode.raw Omit wikilink brackets
+ */
+ResultWidget.prototype.getTargetWikitext = function(mode) {
+	const data  = this.getSelectedResultData();
+	if (!data || !data.requireTarget) {
+		return null;
+	}
+	const title = mw.Title.newFromText(this.targetTitle.getValue());
+	if (!title) {
+		return null;
+	}
+	var targetFrag = ( title.getFragment() ) ? "#" + title.getFragment() : "";
+	var targetNS = title.getNamespaceId();
+	if ( mode && mode.raw ) {
+		return title.getPrefixedText() + targetFrag;
+	} else if ( targetNS === 6 /* File */ || targetNS === 14 /* Category */  ) {
+		return "[[:" + title.getPrefixedText() + targetFrag + "]]";
+	} else {
+		return "[[" + title.getPrefixedText() + targetFrag + "]]";
+	}
 };
 
 ResultWidget.prototype.getSelectedResultData = function() {

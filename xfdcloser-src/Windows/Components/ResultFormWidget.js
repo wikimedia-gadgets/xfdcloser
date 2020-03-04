@@ -3,6 +3,7 @@ import ResultWidget from "./ResultWidget";
 import RationaleWidget from "./RationaleWidget";
 import OptionsGroupWidget from "./OptionsGroupWidget";
 import MultiResultGroupWidget from "./MultiResultGroupWidget";
+import PreviewWidget from "./PreviewWidget";
 // <nowiki>
 
 /**
@@ -21,7 +22,9 @@ function ResultFormWidget( config ) {
 	// Configuration initialization
 	config = config || {};
 	// Call parent constructor
-	ResultFormWidget.super.call( this, config );	
+	ResultFormWidget.super.call( this, config );
+	this.isMultimode = false;
+	this.isRelisting = config.type === "relist";
 
 	// Top stuff
 	this.notesFieldset = new OO.ui.FieldsetLayout(/* no label */);
@@ -65,7 +68,10 @@ function ResultFormWidget( config ) {
 			venue: config.venue,
 			isSysop: config.user.isSysop
 		});
-		this.resultWidget.connect(this, {"resultSelect": "onResultSelect"});
+		this.resultWidget.connect(this, {
+			"resultSelect": "onResultSelect",
+			"change": "updatePreview"
+		});
 		this.resultWidgetField = new OO.ui.FieldLayout( this.resultWidget, {
 			/* no label, */
 			align:"top"
@@ -99,15 +105,26 @@ function ResultFormWidget( config ) {
 	this.rationale = new RationaleWidget({
 		relisting: config.type === "relist"
 	});
-	this.rationale.connect(this, {"copyResultsClick": "onCopyResultsClick"});
+	this.rationale.connect(this, {
+		"copyResultsClick": "onCopyResultsClick",
+		"change": "updatePreview"
+	});
 	this.rationaleFieldset.addItems(
 		new OO.ui.FieldLayout( this.rationale, {
 			align:"top"
 		} )
 	);
 
-	// Preview - TODO
-
+	// Preview
+	this.previewFieldset = new OO.ui.FieldsetLayout({label: "Preview"});
+	this.$element.append(this.previewFieldset.$element);
+	this.preview = new PreviewWidget();
+	this.preview.connect(this, {"resize": "onResize"});
+	this.previewFieldset.addItems(
+		new OO.ui.FieldLayout( this.preview, {
+			align: "top"
+		})
+	);
 
 	if (config.type === "close") {
 		// Options
@@ -176,8 +193,25 @@ ResultFormWidget.prototype.toggleMultimode = function(show) {
 		// Trigger options update by calling this widget's onResultSelect with currently selected result's data
 		this.onResultSelect(this.resultWidget.getSelectedResultData() || []);
 	}
+	this.updatePreview();
 };
 
+ResultFormWidget.prototype.updatePreview = function() {
+	if (this.isRelisting) {
+		this.preview.setWikitext(`{{Relist|1=${this.rationale.getValue()}}}`);
+	} else if (this.isMultimode) {
+		// TODO
+	} else {
+		const target = this.resultWidget.getTargetWikitext();
+		const rationale = this.rationale.getValue("punctuated");
+		this.preview.setWikitext(
+			`The result of the discussion was '''${this.resultWidget.getResultText()}'''${ target
+				? `to  ${target}`
+				: ""
+			}${rationale || "."}`
+		);
+	}
+};
 
 export default ResultFormWidget;
 // </nowiki>
