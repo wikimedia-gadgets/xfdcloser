@@ -1,4 +1,5 @@
 import MultiResultItemWidget from "./MultiResultItemWidget";
+import DelayedChangeMixin from "../Mixins/DelayedChangeWidget";
 import {resultsData} from "./ResultWidget";
 // <nowiki>
 
@@ -17,10 +18,11 @@ function MultiResultGroupWidget(config) {
 	MultiResultGroupWidget.super.call( this, config );
 	this.$group = $("<div>");
 	this.$element.append(this.$group);
-	// Mixin constructor
+	// Mixin constructors
 	OO.ui.mixin.GroupElement.call( this, $.extend( {
 		$group: this.$group
 	}, config ) );
+	DelayedChangeMixin.call( this, config );
 	
 	const relevantResultData = resultsData.filter(resultData => {
 		if (resultData.sysopOnly && !config.isSysop) {
@@ -45,16 +47,14 @@ function MultiResultGroupWidget(config) {
 	} );
 	this.$element.append(this.resultSummaryField.$element);
 	
-	this.aggregate( {
-		change: "resultChange"
-	} );
-
-	this.connect( this, {
-		resultChange: "onResultChange"
-	} );
+	this.aggregate( {change: "resultChange"} );
+	this.connect( this, {"resultChange": "onResultChange"} );
+	this.resultSummary.connect( this, {"change": "emitDelayedChange"});
 }
+// Setup
 OO.inheritClass( MultiResultGroupWidget, OO.ui.Widget );
 OO.mixinClass( MultiResultGroupWidget, OO.ui.mixin.GroupElement );
+OO.mixinClass( MultiResultGroupWidget, DelayedChangeMixin );
 
 MultiResultGroupWidget.prototype.onResultChange = function() {
 	const uniqueResultsData = extraJs.uniqueArray(this.items
@@ -65,6 +65,7 @@ MultiResultGroupWidget.prototype.onResultChange = function() {
 		.map(resultDataString => JSON.parse(resultDataString));
 
 	this.emit("resultSelect", uniqueResultsData);
+	this.emitChange();
 };
 
 MultiResultGroupWidget.prototype.getResultsByPage = function() {
@@ -72,6 +73,10 @@ MultiResultGroupWidget.prototype.getResultsByPage = function() {
 		page: item.page,
 		data: item.getSelectedResultData()
 	}) );
+};
+
+MultiResultGroupWidget.prototype.getResultText = function() {
+	return this.resultSummary.getValue().trim();
 };
 
 export default MultiResultGroupWidget;

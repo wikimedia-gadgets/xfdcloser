@@ -88,7 +88,8 @@ function ResultFormWidget( config ) {
 			});
 			this.multiResultWidget.connect(this, {
 				"resultSelect": "onResultSelect",
-				"resize": "onResize"
+				"resize": "onResize",
+				"change": "updatePreview"
 			});
 			this.multiResultWidgetField = new OO.ui.FieldLayout( this.multiResultWidget, {
 				/* no label, */
@@ -199,18 +200,17 @@ ResultFormWidget.prototype.toggleMultimode = function(show) {
 ResultFormWidget.prototype.updatePreview = function() {
 	if (this.isRelisting) {
 		this.preview.setWikitext(`{{Relist|1=${this.rationale.getValue()}}}`);
-	} else if (this.isMultimode) {
-		// TODO
-	} else {
-		const target = this.resultWidget.getTargetWikitext();
-		const rationale = this.rationale.getValue("punctuated");
-		this.preview.setWikitext(
-			`The result of the discussion was '''${this.resultWidget.getResultText()}'''${ target
-				? `to  ${target}`
-				: ""
-			}${rationale || "."}`
-		);
+		return;
 	}
+	const resultText = this.isMultimode ? this.multiResultWidget.getResultText() : this.resultWidget.getResultText();
+	const resultWikitext = resultText ? `'''${resultText}'''` : "";
+	const target = !this.isMultimode && this.resultWidget.getTargetWikitext();
+	const targetWikitext =  target ? ` to  ${target}` : "";
+	const rationaleWikitext = this.rationale.getValue("punctuated") || ".";
+	
+	this.preview.setWikitext(
+		`The result of the discussion was ${resultWikitext}${targetWikitext}${rationaleWikitext}`
+	);
 };
 
 export default ResultFormWidget;
