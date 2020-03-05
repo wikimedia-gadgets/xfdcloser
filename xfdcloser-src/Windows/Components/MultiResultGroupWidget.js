@@ -1,6 +1,6 @@
 import MultiResultItemWidget from "./MultiResultItemWidget";
 import DelayedChangeMixin from "../Mixins/DelayedChangeWidget";
-import {resultsData} from "./ResultWidget";
+import {resultsData} from "../../data";
 // <nowiki>
 
 /**
