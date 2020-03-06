@@ -24,12 +24,11 @@ function MultiResultGroupWidget(config) {
 	}, config ) );
 	DelayedChangeMixin.call( this, config );
 	
-	const relevantResultData = resultsData.filter(resultData => {
-		if (resultData.sysopOnly && !config.isSysop) {
-			return false;
-		}
-		return resultData.venues.includes(config.venue);
-	});
+	const relevantResultData = resultsData
+		.filter(resultData => resultData.venues.includes(config.venue) &&
+			(resultData.sysopOnly ? config.isSysop : true) &&
+			(resultData.nonSysopOnly ? !config.isSysop : true)
+		);
 
 	this.addItems(
 		config.pages.map(page => new MultiResultItemWidget({

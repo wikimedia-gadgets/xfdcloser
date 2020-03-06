@@ -83,7 +83,7 @@ function ResultFormWidget( config ) {
 			this.multiResultWidget = new MultiResultGroupWidget({
 				pages: config.pages,
 				venue: config.venue,
-				isSysop: config.isSysop,
+				isSysop: config.user.isSysop,
 				$overlay: config.$overlay
 			});
 			this.multiResultWidget.connect(this, {
