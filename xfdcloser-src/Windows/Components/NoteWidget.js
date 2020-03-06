@@ -1,5 +1,11 @@
 // <nowiki>
 
+/**
+ * 
+ * @param {Object} config
+ * @param {String} config.title Text for note title
+ * @param {String|jQuery} config.noteContent Content for collapsible section of note 
+ */
 function NoteWidget(config) {
 	// Call the parent constructor
 	NoteWidget.super.call( this, config );

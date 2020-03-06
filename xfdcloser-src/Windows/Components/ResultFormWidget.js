@@ -37,13 +37,17 @@ function ResultFormWidget( config ) {
 			})
 			: new NoteWidget({
 				title: `Discussion: ${config.sectionHeader} (${config.pages.length} ${config.pages.length === 1 ? "page" : "pages"})`,
-				noteContent: "<ul>" + config.pages.map(page => "<li>" + page.getPrefixedText() + "</li>").join("") + "</ul>"
+				noteContent: $("<ul>").append(
+					config.pages.map( page => $("<li>").append(
+						extraJs.makeLink(page.getPrefixedText())
+					) )
+				)
 			})
 	];
 	if (!config.user.isSysop && config.type==="close") {
 		this.topNotes.push( new NoteWidget({
 			title: "Take care to avoid innapropriate non-administrator closes",
-			content: $("<p>").append(
+			noteContent: $("<span>").append(
 				"See the ",
 				extraJs.makeLink("WP:NACD"),
 				" guideline for advice on appropriate and inappropriate closures."
@@ -54,7 +58,8 @@ function ResultFormWidget( config ) {
 		this.topNotes.map(
 			noteWidget => new OO.ui.FieldLayout( noteWidget, {
 				/* no label, */
-				align:"top"
+				align:"top",
+				$element: $("<div>").css("margin-top", "5px")
 			} )
 		)
 	);
