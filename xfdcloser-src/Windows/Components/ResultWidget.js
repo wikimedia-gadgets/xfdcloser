@@ -18,7 +18,10 @@ function ResultWidget(config) {
 
 	this.resultButtonSelect = new OO.ui.ButtonSelectWidget( {
 		items: resultsData
-			.filter(resultData => resultData.venues.includes(config.venue))
+			.filter(resultData => resultData.venues.includes(config.venue) &&
+				(resultData.sysopOnly ? config.isSysop : true) &&
+				(resultData.nonSysopOnly ? !config.isSysop : true)
+			)
 			.map(resultData => new OO.ui.ButtonOptionWidget({
 				data: resultData,
 				label: resultData.result.slice(0,1).toUpperCase() + resultData.result.slice(1),

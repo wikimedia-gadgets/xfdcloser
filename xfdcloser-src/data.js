@@ -3,162 +3,261 @@
  */
 // <nowiki>
 const resultsData = [
+	// Keep
 	{
 		result: "keep",
 		allowSpeedy: true,
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
-		actions: ["keepActions", "noActions"]
+		actions: ["updatePages", "noActions"]
 	},
+
+	// Delete (not CFD/TFD)
 	{
 		result: "delete",
 		allowSpeedy: true,
 		allowSoft: true,
 		sysopOnly: true,
-		venues: ["afd", "cfd", "ffd", "mfd", "rfd"],
-		actions: ["deleteActions", "noActions"]
+		venues: ["afd", "ffd", "mfd", "rfd"],
+		actions: ["deletePages", "noActions"]
 	},
+	// Delete (CFD)
 	{
 		result: "delete",
 		allowSpeedy: true,
 		allowSoft: true,
-		venues: ["tfd"],
-		actions: ["deleteActions", "holdingCellActions", "noActions"]
+		sysopOnly: true,
+		venues: ["cfd"],
+		actions: ["noActions"]
 	},
+	// Delete (sysop, TFD)
+	{
+		result: "delete",
+		allowSpeedy: true,
+		allowSoft: true,
+		sysopOnly: true,
+		venues: ["tfd"],
+		actions: ["deletePages", "holdingCell", "noActions"]
+	},
+	// Delete (non-sysop, TFD)
+	{
+		result: "delete",
+		nonSysopOnly: true,
+		venues: ["tfd"],
+		actions: ["holdingCell", "noActions"]
+	},
+
+	// Redirect (sysop, not CFD/RFD)
 	{
 		result: "redirect",
 		requireTarget: true,
 		allowSoft: true,
 		allowDeleteFirst: true,
-		venues: ["afd", "cfd", "mfd", "tfd"],
-		actions: ["redirectActions", "noActions"]
+		sysopOnly: true,
+		venues: ["afd", "mfd", "tfd"],
+		actions: ["redirectAndUpdate", "noActions"]
 	},
+	// Redirect (non-sysop, not CFD/RFD)
+	{
+		result: "redirect",
+		requireTarget: true,
+		allowSoft: true,
+		nonSysopOnly: true,
+		venues: ["afd", "mfd", "tfd"],
+		actions: ["redirectAndUpdate", "noActions"]
+	},
+	// Redirect (CFD)
+	{
+		result: "redirect",
+		requireTarget: true,
+		venues: ["cfd"],
+		actions: ["noActions"]
+	},
+
+	// Rename (CFD)
+	{
+		result: "rename",
+		requireTarget: true,
+		venues: ["cfd"],
+		actions: ["noActions"]
+	},
+
+	// Retarget (sysop, RFD)
 	{
 		result: "retarget",
 		requireTarget: true,
 		allowSoft: true,
 		allowDeleteFirst: true,
+		sysopOnly: true,
 		venues: ["rfd"],
-		actions: ["redirectActions", "noActions"]
+		actions: ["redirectAndUpdate", "noActions"]
 	},
+	// Retarget (non-sysop, RFD)
+	{
+		result: "retarget",
+		requireTarget: true,
+		allowSoft: true,
+		nonSysopOnly: true,
+		venues: ["rfd"],
+		actions: ["redirectAndUpdate", "noActions"]
+	},
+
+	// Disambiguate (RFD)
 	{
 		result: "disambiguate",
 		venues: ["rfd"],
-		actions: ["keepActions", "noActions"]
+		actions: ["disambiguateAndUpdate", "noActions"]
 	},
+
+	// Merge (AFD/CFD/MFD)
 	{
 		result: "merge",
 		requireTarget: true,
-		venues: ["afd", "cfd", "mfd"],
-		actions: ["keepActions", "noActions"]
+		venues: ["afd", "mfd"],
+		actions: ["updatePages", "noActions"]
 	},
+	// Merge (CFD)
+	{
+		result: "merge",
+		requireTarget: true,
+		venues: ["cfd"],
+		actions: ["noActions"]
+	},
+	// Merge (TFD)
 	{
 		result: "merge",
 		requireTarget: true,
 		venues: ["tfd"],
-		actions: ["holdingCellActions", "noActions"]
+		actions: ["holdingCellMerge", "noActions"]
 	},
+
+	// No consensus
 	{
 		result: "no consensus",
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
-		actions: ["keepActions", "noActions"]
+		actions: ["updatePages", "noActions"]
 	},
+
+	// Custom
 	{
 		result: "custom",
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 		actions: ["noActions"]
 	}
 ];
+
 const actions = [
 	{
-		data: "keepActions",
-		label: "Update pages and talk pages"
+		label: "Remove nomination templates, tag talk pages",
+		data: {
+			name: "updatePages"
+		},
 	},
 	{
-		data: "deleteActions",
-		label: "Delete pages and talk pages"
+		label: "Delete pages",
+		data: {
+			name: "deletePages",
+			options: [
+				{
+					label: "Delete talk pages",
+					type: "toggleSwitch",
+					venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+					sysopOnly: true
+				},
+				{
+					label: "Tag talk pages for deletion",
+					type: "toggleSwitch",
+					venue: ["tfd"],
+					nonSysopOnly: true
+				},
+				{
+					label: "Delete redirects",
+					type: "toggleSwitch",
+					venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+				},
+				{
+					label: "Unlink backlinks",
+					type: "toggleSwitch",
+					for: "deletePages",
+					venue: ["afd", "ffd"],
+				}
+			]
+		}
 	},
 	{
-		data: "holdingCellActions",
-		label: "List pages at holding cell"
+		label: "List pages at holding cell",
+		data: {
+			name: "holdingCell",
+			options: [
+				{
+					label: "Holding cell section",
+					type: "dropdown",
+					venue: ["tfd"],
+					items: [
+						{label: "Review", data:"review"},
+						{label: "Convert", data:"convert"},
+						{label: "Substitute", data:"substitute"},
+						{label: "Orphan", data:"orphan"},
+						{label: "Ready for deletion", data:"ready"}
+					]
+				},
+				{
+					label: "Tag talk pages for deletion",
+					type: "toggleSwitch",
+					for: "deletePages",
+					venue: ["tfd"],
+					nonSysopOnly: true
+				}
+			]
+		}
 	},
 	{
-		data: "redirectActions",
-		label: "Redirect pages and talk pages"
+		label: "List pages at holding cell",
+		data: {
+			name: "holdingCellMerge",
+			options: [
+				{
+					label: "Holding cell section",
+					type: "dropdown",
+					venue: ["tfd"],
+					items: [
+						{label: "Merge (Arts)", data:"merge-arts"},
+						{label: "Merge (Geography, politics and governance)", data:"merge-geopolgov"},
+						{label: "Merge (Religion)", data:"merge-religion"},
+						{label: "Merge (Sports)", data:"merge-sports"},
+						{label: "Merge (Transport)", data:"merge-transport"},
+						{label: "Merge (Other)", data:"merge-other"},
+						{label: "Merge (Meta)", data:"merge-meta"}
+					]
+				}
+			]
+		},
 	},
 	{
-		data: "noActions",
-		label: "No automated actions"
-	}
-];
-const options = [
-	{
-		label: "Rcats",
-		type: "rcatMulitSelect",
-		for: ["redirect", "retarget"],
-		venue: ["afd", "cfd", "mfd", "rfd", "tfd"]
+		label: "Redirect pages, tag talk pages",
+		data: {
+			name: "redirectAndUpdate",
+			options: [
+				{
+					label: "Rcats",
+					type: "rcatMulitSelect",
+					venue: ["afd", "cfd", "mfd", "rfd", "tfd"]
+				}
+			]
+		},
 	},
 	{
-		label: "Delete talk pages",
-		type: "toggleSwitch",
-		for: ["delete"],
-		venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
-		sysopOnly: true
+		label: "Remove nomination templates, tag talk pages",
+		data: {name: "disambiguateAndUpdate"}
 	},
 	{
-		label: "Tag talk pages for deletion",
-		type: "toggleSwitch",
-		for: ["delete"],
-		venue: ["tfd"],
-		nonSysopOnly: true
+		label: "Add merge templates, tag talk pages",
+		data: {name: "mergeAndUpdate"}
 	},
 	{
-		label: "Delete redirects",
-		type: "toggleSwitch",
-		for: ["delete"],
-		venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
-	},
-	{
-		label: "Unlink backlinks",
-		type: "toggleSwitch",
-		for: ["delete"],
-		venue: ["afd", "ffd"],
-	},
-	{
-		label: "Use holding cell",
-		type: "toggleSwitch",
-		for: ["delete"],
-		venue: ["tfd"],
-		sysopOnly: true
-	},
-	{
-		label: "Holding cell section",
-		type: "dropdown",
-		for: ["merge"],
-		venue: ["tfd"],
-		items: [
-			{label: "Merge (Arts)", data:"merge-arts"},
-			{label: "Merge (Geography, politics and governance)", data:"merge-geopolgov"},
-			{label: "Merge (Religion)", data:"merge-religion"},
-			{label: "Merge (Sports)", data:"merge-sports"},
-			{label: "Merge (Transport)", data:"merge-transport"},
-			{label: "Merge (Other)", data:"merge-other"},
-			{label: "Merge (Meta)", data:"merge-meta"}
-		]
-	},
-	{
-		label: "Holding cell section",
-		type: "dropdown",
-		for: ["delete"],
-		venue: ["tfd"],
-		items: [
-			{label: "Review", data:"review"},
-			{label: "Convert", data:"convert"},
-			{label: "Substitute", data:"substitute"},
-			{label: "Orphan", data:"orphan"},
-			{label: "Ready for deletion", data:"ready"}
-		]
+		label: "No automated actions",
+		data: {name: "noActions"},
 	}
 ];
 
-export {resultsData, actions, options};
+export {resultsData, actions};
 // </nowiki>
