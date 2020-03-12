@@ -74,7 +74,9 @@ MainWindow.prototype.initialize = function () {
 
 	/* --- PREFS --- */
 	this.preferences = appConfig.defaultPrefs;
-	
+
+	/* --- MODE HANDLING --- */
+	this.modes = {};
 
 	/* --- CONTENT AREA --- */
 
@@ -197,6 +199,25 @@ MainWindow.prototype.getBodyHeight = function () {
 	return Math.max(200, layoutHeight, contentHeight);
 };
 
+/**
+ * Set actions mode while keeping track of previous and current modes
+ * @param {String} mode mode to be set, or "previous" to use the previous mode 
+ */
+MainWindow.prototype.setMode = function(mode) {
+	// Get the previous, current, and next modes
+	const previousMode = this.modes.previous;
+	const currentMode = this.modes.current;
+	const nextMode = mode === "previous" ? previousMode : mode;
+	// Current mode will be previous, next mode will be current
+	this.modes = {
+		previous: currentMode,
+		current: nextMode
+	};
+	// Set mode
+	this.actions.setMode(nextMode);
+
+};
+
 // Use getSetupProcess() to set up the window with data passed to it at the time 
 // of opening
 /**
@@ -220,9 +241,9 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 				data.discussion.pages &&
 				data.discussion.pages.length > 1
 			) {
-				this.actions.setMode("multimodeAvailable");
+				this.setMode("multimodeAvailable");
 			} else {
-				this.actions.setMode("normal");
+				this.setMode("normal");
 			}
 
 			// Set up result form
@@ -258,7 +279,7 @@ MainWindow.prototype.getReadyProcess = function ( data ) {
 // Use the getActionProcess() method to do things when actions are clicked
 MainWindow.prototype.getActionProcess = function ( action ) {
 	if ( action === "showPrefs" ) {
-		this.actions.setMode("prefs");
+		this.setMode("prefs");
 		this.contentArea.setItem( this.prefsLayout );
 		this.updateSize();
 
@@ -269,7 +290,7 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 				// Success
 				() => {
 					this.setPreferences(updatedPrefs);
-					this.actions.setMode("edit");
+					this.setMode("previous");
 					this.contentArea.setItem( this.resultLayout );
 					this.updateSize();
 				},
@@ -286,8 +307,8 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 		);
 
 	} else if ( action === "closePrefs" ) {
-		this.actions.setMode("edit");
-		this.contentArea.setItem( this.editLayout );
+		this.setMode("previous");
+		this.contentArea.setItem( this.resultLayout );
 		this.prefsForm.setPrefValues(this.preferences);
 		this.updateSize();
 
@@ -301,11 +322,11 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 		);
 
 	} else if ( action === "multimode") {
-		this.actions.setMode("multimodeActive");
+		this.setMode("multimodeActive");
 		this.resultForm.toggleMultimode(true);
 
 	} else if ( action === "singlemode") {
-		this.actions.setMode("multimodeAvailable");
+		this.setMode("multimodeAvailable");
 		this.resultForm.toggleMultimode(false);
 
 	} else if (!action && this.resultForm.changed) {
