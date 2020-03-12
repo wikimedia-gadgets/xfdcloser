@@ -241,7 +241,222 @@ const actions = [
 					name: "rcats",
 					label: "Rcats",
 					type: "rcatMulitSelect",
-					venue: ["afd", "cfd", "mfd", "rfd", "tfd"]
+					venue: ["afd", "cfd", "mfd", "rfd", "tfd"],
+					items: [
+						{
+							group: "Common",
+							names: [
+								"R to related topic",
+								"R from subtopic",
+								"R to list entry",
+								"R to section"
+							]
+						},
+						{
+							group: "Related information",
+							names: [
+								"R from album",
+								"R to article without mention",
+								"R from book",
+								"R to decade",
+								"R from domain name",
+								"R from top-level domain",
+								"R from film",
+								"R from gender",
+								"R from list topic",
+								"R from member",
+								"R to related topic",
+								"R from related word",
+								"R from phrase",
+								"R from school",
+								"R from song",
+								"R from subtopic",
+								"R to subtopic",
+								"R from Unicode"
+							]
+						},
+						{
+							group: "Fiction",
+							names: [
+								"R from fictional character",
+								"R from fictional element",
+								"R from fictional location",
+								"R to TV episode list entry"
+							]
+						},
+						{
+							group: "Abbreviation",
+							names: [
+								"R to acronym",
+								"R from acronym",
+								"R to initialism",
+								"R from initialism"
+							]
+						},
+						{
+							group: "Capitalisation",
+							names: [
+								"R from CamelCase",
+								"R from other capitalisation",
+								"R from miscapitalisation"
+							]
+						},
+						{
+							group: "Grammar & punctuation",
+							names: [
+								"R from modification",
+								"R from plural",
+								"R to plural"
+							]
+						}, 
+						{
+							group: "Parts of speech",
+							names: [
+								"R from adjective",
+								"R from adverb",
+								"R from common noun",
+								"R from gerund",
+								"R from proper noun",
+								"R from verb",
+							]
+						},
+						{
+							group: "Spelling",
+							names: [
+								"R from alternative spelling",
+								"R from ASCII-only",
+								"R to ASCII-only",
+								"R from diacritic",
+								"R to diacritic",
+								"R from misspelling",
+								"R from stylization"
+							]
+						},
+						{
+							group: "Alternative names (general)",
+							names: [
+								"R from alternative language",
+								"R from alternative name",
+								"R from former name",
+								"R from historic name",
+								"R from incorrect name",
+								"R from long name",
+								"R from portmanteau",
+								"R from short name",
+								"R from sort name",
+								"R from less specific name}",
+								"R from more specific name",
+								"R from synonym",
+								"R from antonym",
+							]
+						},
+						{
+							group: "Alternative names (people)",
+							names: [
+								"R from birth name",
+								"R from given name",
+								"R to joint biography",
+								"R from married name",
+								"R from name with title",
+								"R from personal name",
+								"R from pseudonym",
+								"R from surname",
+							]
+						},
+						{
+							group: "Alternative names (technical)",
+							names: [
+								"R from Java package name",
+								"R from molecular formula",
+								"R from technical name",
+								"R to technical name",
+								"R from trade name",
+							]
+						},
+						{
+							group: "Alternative names (organisms)",
+							names: [
+								"R from scientific name",
+								"R from alternative scientific name",
+								"R to scientific name",
+							]
+						},
+						{
+							group: "Alternative names (geography)",
+							names: [
+								"R from name and country",
+								"R from more specific geographic name",
+								"R from postal code"
+							]
+						},
+						{
+							group: "Navigation",
+							names: [
+								"R to anchor",
+								"R avoided double redirect",
+								"R from file metadata link",
+								"R to list entry",
+								"R mentioned in hatnote",
+								"R to section",
+								"R from shortcut",
+								"R from template shortcut",
+							]
+						},
+						{
+							group: "Disambiguation",
+							names: [
+								"R from ambiguous term",
+								"R to anthroponymy page",
+								"R to disambiguation page",
+								"R from incomplete disambiguation",
+								"R from incorrect disambiguation",
+								"R from other disambiguation",
+								"R from unnecessary disambiguation",
+							]
+						},
+						{
+							group: "Merge, duplicate & move",
+							names: [
+								"R from duplicated article",
+								"R with history",
+								"R from merge",
+								"R from move",
+								"R with old history",
+							]
+						},
+						{
+							group: "To namespaces",
+							names: [
+								"R to category namespace",
+								"R to draft namespace",
+								"R to help namespace",
+								"R to main namespace",
+								"R to portal namespace",
+								"R to project namespace",
+								"R to talk page",
+								"R to template namespace",
+								"R to user namespace",
+							]
+						},
+						{
+							group: "ISO codes",
+							names: [
+								"R from ISO 4",
+								"R from ISO 639 code",
+								"R from ISO 3166 code",
+								"R from ISO 4217 code",
+								"R from ISO 15924 code",
+							]
+						},
+						{
+							group: "Miscellaneous",
+							names: [
+								"R printworthy",
+								"R unprintworthy",
+								"Wikidata redirect"
+							]
+						}
+					]
 				}
 			]
 		},

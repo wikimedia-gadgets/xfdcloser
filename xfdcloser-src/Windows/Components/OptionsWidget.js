@@ -1,5 +1,6 @@
 // <nowiki>
 import {actions} from "../../data";
+import LookupMenuTagMultiselectWidget from "./LookupMenuTagMultiselectWidget";
 
 /**
  * 
@@ -71,11 +72,20 @@ function OptionsWidget(config) {
 					widget.getValue = () => widget.getMenu().findSelectedItem().getData();
 					break;
 				case "rcatMulitSelect":
-				//widget = new rcatMulitSelect();
-					widget = new OO.ui.DropdownInputWidget({//TODO: Replace with rcat multiselect
-						data: {name: option.name}
-					});					
-					widget.getValue = () => widget.getMenu().findSelectedItem().getData();
+					widget = new LookupMenuTagMultiselectWidget( {
+						data: {name: option.name},
+						allowArbitrary: true,
+						$overlay: config.$overlay,
+						popup: false,
+						menu: {
+							items: option.items.flatMap(itemgroup => [
+								new OO.ui.MenuSectionOptionWidget({label: itemgroup.group}),
+								...itemgroup.names.map(
+									name => new OO.ui.MenuOptionWidget( {data: "{{"+name+"}}", label: "{{"+name+"}}"} )
+								)
+							])
+						}
+					} );
 					break;
 				default:
 					throw new Error("Unrecognised option type: " + option.type);
