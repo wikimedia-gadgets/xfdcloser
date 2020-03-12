@@ -278,7 +278,13 @@ Discussion.prototype.openDialog = function(isRelisting) {
 		venue: config.venue,
 		user: config.user,
 		type: isRelisting ? "relist" : "close"
+	}).closed.then(winData => {
+		if (!winData || !winData.success) {
+			this.showLinks();
+		}
+		console.log("success", winData);
 	});
+
 	return true;
 };
 // Mark as finished

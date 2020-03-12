@@ -76,7 +76,7 @@ MultiResultItemWidget.prototype.getSelectedResultData = function() {
 	if (data && (data.result === "custom")) {
 		data.customResult = this.customResult.getValue().trim();
 	}
-	return selectedResult && selectedResult.getData();
+	return data;
 };
 
 export default MultiResultItemWidget;

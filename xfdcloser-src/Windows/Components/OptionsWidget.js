@@ -56,19 +56,26 @@ function OptionsWidget(config) {
 				let widget;
 				switch(option.type) {
 				case "toggleSwitch":
-					widget = new OO.ui.ToggleSwitchWidget({});
+					widget = new OO.ui.ToggleSwitchWidget({
+						data: {name: option.name}
+					});
 					break;
 				case "dropdown":
 					widget = new OO.ui.DropdownWidget({
+						data: {name: option.name},
 						$overlay: config.$overlay,
 						menu: {
 							items: option.items.map(item =>  new OO.ui.MenuOptionWidget(item))
 						}
 					});
+					widget.getValue = () => widget.getMenu().findSelectedItem().getData();
 					break;
 				case "rcatMulitSelect":
 				//widget = new rcatMulitSelect();
-					widget = new OO.ui.DropdownInputWidget({});//TODO: Replace with rcat multiselect
+					widget = new OO.ui.DropdownInputWidget({//TODO: Replace with rcat multiselect
+						data: {name: option.name}
+					});					
+					widget.getValue = () => widget.getMenu().findSelectedItem().getData();
 					break;
 				default:
 					throw new Error("Unrecognised option type: " + option.type);
@@ -99,6 +106,19 @@ OptionsWidget.prototype.onActionChoose = function(actionItem) {
 		optionLayout.getData().for === actionItem.getData().name
 	)
 	);
+};
+
+OptionsWidget.prototype.getValues = function() {
+	let values = {
+		action: this.actionsDropdown.getMenu().findSelectedItem().getData().name
+	};
+	this.optionLayouts.forEach(optionLayout => {
+		if (optionLayout.isVisible()) {
+			const widget = optionLayout.getField();
+			values[widget.getData().name] = widget.getValue();
+		}
+	});
+	return values;
 };
 
 export default OptionsWidget;

@@ -295,6 +295,7 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 		return new OO.ui.Process().next(
 			() => this.close({
 				success: true,
+				formData: this.resultForm.getResultFormData(),
 				tasks: [/* TODO */]
 			})
 		);

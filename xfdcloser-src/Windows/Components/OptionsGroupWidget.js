@@ -61,5 +61,15 @@ OptionsGroupWidget.prototype.showOptions = function(results, isMultimode) {
 	this.emit("resize");
 };
 
+/**
+ * @returns {Object[]} Array of {result, options} objects
+ */
+OptionsGroupWidget.prototype.getValues = function() {
+	return this.items.map(item => ({
+		result: item.getData().resultData.result,
+		options: item.getValues()
+	}) );
+};
+
 export default OptionsGroupWidget;
 // </nowiki>

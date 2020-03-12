@@ -158,23 +158,20 @@ const actions = [
 			name: "deletePages",
 			options: [
 				{
+					name: "deleteTalk",
 					label: "Delete talk pages",
 					type: "toggleSwitch",
 					venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 					sysopOnly: true
 				},
 				{
-					label: "Tag talk pages for deletion",
-					type: "toggleSwitch",
-					venue: ["tfd"],
-					nonSysopOnly: true
-				},
-				{
+					name: "deleteRedir",
 					label: "Delete redirects",
 					type: "toggleSwitch",
 					venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 				},
 				{
+					name: "unlink",
 					label: "Unlink backlinks",
 					type: "toggleSwitch",
 					for: "deletePages",
@@ -189,6 +186,7 @@ const actions = [
 			name: "holdingCell",
 			options: [
 				{
+					name: "holdcellSection",
 					label: "Holding cell section",
 					type: "dropdown",
 					venue: ["tfd"],
@@ -201,6 +199,7 @@ const actions = [
 					]
 				},
 				{
+					name: "tagTalk",
 					label: "Tag talk pages for deletion",
 					type: "toggleSwitch",
 					for: "deletePages",
@@ -216,6 +215,7 @@ const actions = [
 			name: "holdingCellMerge",
 			options: [
 				{
+					name: "holdcellSection",
 					label: "Holding cell section",
 					type: "dropdown",
 					venue: ["tfd"],
@@ -238,6 +238,7 @@ const actions = [
 			name: "redirectAndUpdate",
 			options: [
 				{
+					name: "rcats",
 					label: "Rcats",
 					type: "rcatMulitSelect",
 					venue: ["afd", "cfd", "mfd", "rfd", "tfd"]

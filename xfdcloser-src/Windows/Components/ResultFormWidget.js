@@ -25,6 +25,7 @@ function ResultFormWidget( config ) {
 	ResultFormWidget.super.call( this, config );
 	this.isMultimode = false;
 	this.isRelisting = config.type === "relist";
+	this.pages = config.pages;
 
 	// Top stuff
 	this.notesFieldset = new OO.ui.FieldsetLayout(/* no label */);
@@ -216,6 +217,41 @@ ResultFormWidget.prototype.updatePreview = function() {
 	this.preview.setWikitext(
 		`The result of the discussion was ${resultWikitext}${targetWikitext}${rationaleWikitext}`
 	);
+};
+
+ResultFormWidget.prototype.getResultFormData = function() {
+	if (this.isRelisting) {
+		return {
+			relistComment: this.resultWidget.getResultText()
+		};
+	}
+	const resultWikitext = this.isMultimode
+		? this.multiResultWidget.getResultText()
+		: this.resultWidget.getResultText();
+	const rationaleWikitext = this.relisting
+		? this.rationale.getValue()
+		: this.rationale.getValue("punctuated") || ".";
+	const target = !this.relisting && !this.isMultimode && this.resultWidget.getTargetWikitext({raw: true});
+	const targetTitle = target && mw.Title.newFromText(target);
+	const targetWikiext = target && this.resultWidget.getTargetWikitext();
+	const pageResults = this.isMultimode
+		? this.multiResultWidget.getResultsByPage().map(pageResult => (
+			{page: pageResult.page, resultType:pageResult.data.result}
+		))
+		: Array.isArray(this.pages) && this.pages.map(page => ({
+			page: page,
+			resultType: this.resultWidget.getSelectedResultData().result,
+		}));
+	const resultOptions = this.options.getValues();
+
+	return {
+		resultWikitext, // {String}
+		rationaleWikitext, // {String}
+		targetTitle, // {mw.Title|undefined}
+		targetWikiext, //{String|undefined}
+		pageResults, // {Object[]|false} Array of {mw.Title}page, {String}resultType pairs,
+		resultOptions // {Object[]} Array of {String}result, {Object}options pairs, where options has {String}optionName, {*}optionValue pairs
+	};
 };
 
 export default ResultFormWidget;
