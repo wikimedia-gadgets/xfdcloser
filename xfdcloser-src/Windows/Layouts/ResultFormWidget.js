@@ -76,7 +76,7 @@ function ResultFormWidget( config ) {
 		});
 		this.resultWidget.connect(this, {
 			"resultSelect": "onResultSelect",
-			"change": "updatePreview"
+			"change": "updatePreviewAndValidate"
 		});
 		this.resultWidgetField = new OO.ui.FieldLayout( this.resultWidget, {
 			/* no label, */
@@ -95,7 +95,7 @@ function ResultFormWidget( config ) {
 			this.multiResultWidget.connect(this, {
 				"resultSelect": "onResultSelect",
 				"resize": "onResize",
-				"change": "updatePreview"
+				"change": "updatePreviewAndValidate"
 			});
 			this.multiResultWidgetField = new OO.ui.FieldLayout( this.multiResultWidget, {
 				/* no label, */
@@ -114,7 +114,7 @@ function ResultFormWidget( config ) {
 	});
 	this.rationale.connect(this, {
 		"copyResultsClick": "onCopyResultsClick",
-		"change": "updatePreview"
+		"change": "updatePreviewAndValidate"
 	});
 	this.rationaleFieldset.addItems(
 		new OO.ui.FieldLayout( this.rationale, {
@@ -200,10 +200,14 @@ ResultFormWidget.prototype.toggleMultimode = function(show) {
 		// Trigger options update by calling this widget's onResultSelect with currently selected result's data
 		this.onResultSelect(this.resultWidget.getSelectedResultData() || []);
 	}
-	this.updatePreview();
+	this.updatePreviewAndValidate();
 };
 
-ResultFormWidget.prototype.updatePreview = function() {
+ResultFormWidget.prototype.updatePreviewAndValidate = function() {
+	this.getValidity().then(
+		() => this.emit("validated", true),
+		() => this.emit("validated", false)
+	);
 	if (this.isRelisting) {
 		this.preview.setWikitext(`{{Relist|1=${this.rationale.getValue()}}}`);
 		return;
@@ -252,6 +256,19 @@ ResultFormWidget.prototype.getResultFormData = function() {
 		pageResults, // {Object[]|false} Array of {mw.Title}page, {String}resultType pairs,
 		// resultOptions // {Object[]} Array of {String}result, {Object}options pairs, where options has {String}optionName, {*}optionValue pairs
 	};
+};
+
+/**
+ * @returns {Promise} A promise that resolves if valid, rejects if not.
+ */
+ResultFormWidget.prototype.getValidity = function() {
+	if (this.isRelisting) {
+		return $.Deferred().resolve();
+	} else if (this.isMultimode) {
+		return this.multiResultWidget.getValidity();
+	} else {
+		return this.resultWidget.getValidity();
+	}
 };
 
 export default ResultFormWidget;

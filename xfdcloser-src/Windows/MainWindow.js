@@ -321,7 +321,8 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 
 			this.resultForm.connect(this, {
 				"resize": "updateSize",
-				"showOptions": "onShowOptions"
+				"showOptions": "onShowOptions",
+				"validated": "onResultValidation"
 			});
 		}, this );
 };
@@ -436,6 +437,13 @@ MainWindow.prototype.setPreferences = function(prefs) {
 	// Apply preferences to existing items in the window:
 	this.resultForm.setPreferences(this.preferences);
 	this.prefsForm.setPrefValues(this.preferences);
+};
+
+MainWindow.prototype.onResultValidation = function(isValid) {
+	this.getActions().setAbilities({
+		next: isValid,
+		save: isValid
+	});
 };
 
 MainWindow.prototype.onShowOptions = function(resultData, isMultimode) {

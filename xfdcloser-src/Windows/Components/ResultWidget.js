@@ -164,6 +164,23 @@ ResultWidget.prototype.getSelectedResultData = function() {
 	return  selectedResult && selectedResult.getData();
 };
 
+/**
+ * @returns {Promise} A promise that resolves if valid, rejects if not.
+ */
+ResultWidget.prototype.getValidity = function() {
+	const selectedResult = this.resultButtonSelect.findSelectedItem();
+	if (!selectedResult) {
+		return $.Deferred().reject();
+	}
+	if (this.targetTitle.isVisible()) {
+		return this.targetTitle.getValidity();
+	}
+	if (this.customResult.isVisible()) {
+		return this.customResult.getValidity();
+	}
+	return $.Deferred().resolve();
+};
+
 export default ResultWidget;
 export {resultsData};
 

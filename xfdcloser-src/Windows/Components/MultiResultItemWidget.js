@@ -1,3 +1,4 @@
+import DelayedChangeMixin from "../Mixins/DelayedChangeWidget";
 // <nowiki>
 
 /**
@@ -7,8 +8,12 @@
  * @param {jQuery} config.$overlay element for overlays
  */
 function MultiResultItemWidget(config) {
-	// Call the parent constructor
+	// Configuration initialization
+	config = config || {};
+	// Call the parent and mixin constructors
 	MultiResultItemWidget.super.call( this, config );
+	DelayedChangeMixin.call( this, config );
+
 	this.page = config.page;
 
 	this.resultDropdown = new OO.ui.DropdownWidget( {
@@ -57,14 +62,17 @@ function MultiResultItemWidget(config) {
 	this.$element.css({"margin-bottom":"6px"}).append(this.fieldset.$element);
 
 	this.resultDropdown.getMenu().connect(this, {"choose": "onResultChoose"});
+	this.targetTitle.connect(this, {"change": "emitDelayedChange"});
+	this.customResult.connect(this, {"change": "emitDelayedChange"});
 }
 OO.inheritClass( MultiResultItemWidget, OO.ui.Widget );
+OO.mixinClass( MultiResultItemWidget, DelayedChangeMixin );
 
 MultiResultItemWidget.prototype.onResultChoose = function(result) {
 	const data = result.getData();
 	this.targetField.toggle(!!data.requireTarget);
 	this.customField.toggle(data.result === "custom");
-	this.emit("change");
+	this.emitChange();
 };
 
 MultiResultItemWidget.prototype.getSelectedResultData = function() {
@@ -77,6 +85,23 @@ MultiResultItemWidget.prototype.getSelectedResultData = function() {
 		data.customResult = this.customResult.getValue().trim();
 	}
 	return data;
+};
+
+/**
+ * @returns {Promise} A promise that resolves if valid, rejects if not.
+ */
+MultiResultItemWidget.prototype.getValidity = function() {
+	const selectedResult = this.resultDropdown.getMenu().findSelectedItem();
+	if (!selectedResult) {
+		return $.Deferred().reject();
+	}
+	if (this.targetField.isVisible()) {
+		return this.targetTitle.getValidity();
+	}
+	if (this.customField.isVisible()) {
+		return this.customResult.getValidity();
+	}
+	return $.Deferred().resolve();
 };
 
 export default MultiResultItemWidget;
