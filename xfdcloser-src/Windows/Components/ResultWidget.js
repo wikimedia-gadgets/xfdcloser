@@ -55,7 +55,11 @@ function ResultWidget(config) {
 		]
 	} );
 	this.optionsMultiselect.toggle(false);
-	this.optionsMultiselect.$element.find("label").css({"display":"inline-block", "margin-left":"1em"});
+	this.optionsMultiselect.$element.find("label").css({
+		"display":"inline-block",
+		"margin-left":"1em",
+		"padding":"4px 0"
+	});
 	
 	this.targetTitle = new OO.ui.TextInputWidget( {
 		label: "to:",
