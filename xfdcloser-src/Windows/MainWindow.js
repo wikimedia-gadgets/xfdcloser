@@ -304,6 +304,7 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 			});
 			// Add to layout and update
 			this.resultLayout.$element.append( this.resultForm.$element );
+			this.resultForm.updatePreviewAndValidate();
 
 			if (data.type === "close") {
 				this.optionsForm = new OptionsFormWidget({
@@ -312,6 +313,7 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 					$overlay: this.$overlay
 				});
 				this.optionsLayout.$element.append( this.optionsForm.$element );
+				this.optionsForm.connect(this, {"validated": "onOptionsValidation"});
 			}
 
 			// Set up preferences
@@ -391,6 +393,7 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 
 	} else if ( action === "next" ) {
 		this.setMode("options");
+		this.optionsForm.validate();
 		this.contentArea.setItem( this.optionsLayout );
 		this.updateSize();
 	
@@ -442,6 +445,12 @@ MainWindow.prototype.setPreferences = function(prefs) {
 MainWindow.prototype.onResultValidation = function(isValid) {
 	this.getActions().setAbilities({
 		next: isValid,
+		save: isValid
+	});
+};
+
+MainWindow.prototype.onOptionsValidation = function(isValid) {
+	this.getActions().setAbilities({
 		save: isValid
 	});
 };

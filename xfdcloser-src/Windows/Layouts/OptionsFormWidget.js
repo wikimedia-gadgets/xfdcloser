@@ -27,6 +27,9 @@ function OptionsFormWidget( config ) {
 			align:"top"
 		} )
 	);
+	this.options.connect(this, {"change": "validate"});
+
+	this.validate();
 }
 OO.inheritClass( OptionsFormWidget, OO.ui.Widget );
 
@@ -40,6 +43,20 @@ OptionsFormWidget.prototype.showOptions = function(resultData, isMultimode) {
 
 OptionsFormWidget.prototype.getOptionsData = function() {
 	return this.options.getValues();
+};
+
+/**
+ * @returns {Promise} A promise that resolves if valid, rejects if not.
+ */
+OptionsFormWidget.prototype.getValidity = function() {
+	return this.options.getValidity();
+};
+
+OptionsFormWidget.prototype.validate = function() {
+	this.getValidity().then(
+		() => this.emit("validated", true),
+		() => this.emit("validated", false)
+	);	
 };
 
 export default OptionsFormWidget;

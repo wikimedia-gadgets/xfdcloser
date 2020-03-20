@@ -60,6 +60,7 @@ function OptionsWidget(config) {
 					widget = new OO.ui.ToggleSwitchWidget({
 						data: {name: option.name}
 					});
+					widget.getValidity = () => $.Deferred().resolve();
 					break;
 				case "dropdown":
 					widget = new OO.ui.DropdownWidget({
@@ -70,6 +71,13 @@ function OptionsWidget(config) {
 						}
 					});
 					widget.getValue = () => widget.getMenu().findSelectedItem().getData();
+					widget.getValidity = () => widget.getMenu().findSelectedItem()
+						? $.Deferred().resolve()
+						: $.Deferred().reject();
+					widget.getMenu().connect(this, {
+						"choose": "onOptionChange",
+						"select": "onOptionChange"
+					});
 					break;
 				case "rcatMulitSelect":
 					widget = new LookupMenuTagMultiselectWidget( {
@@ -86,6 +94,7 @@ function OptionsWidget(config) {
 							])
 						}
 					} );
+					widget.getValidity = () => $.Deferred().resolve();
 					break;
 				default:
 					throw new Error("Unrecognised option type: " + option.type);
@@ -116,6 +125,11 @@ OptionsWidget.prototype.onActionChoose = function(actionItem) {
 		optionLayout.getData().for === actionItem.getData().name
 	)
 	);
+	this.emit("change");
+};
+
+OptionsWidget.prototype.onOptionChange = function() {
+	this.emit("change");
 };
 
 OptionsWidget.prototype.getValues = function() {
@@ -129,6 +143,26 @@ OptionsWidget.prototype.getValues = function() {
 		}
 	});
 	return values;
+};
+
+/**
+ * @returns {Promise} A promise that resolves if valid, rejects if not.
+ */
+OptionsWidget.prototype.getValidity = function() {
+	if (!this.actionsDropdown.getMenu().findSelectedItem()) {
+		return $.Deferred().reject();
+	}
+	const visibleOptions = this.optionLayouts.filter(
+		optionLayout => optionLayout.isVisible()
+	);
+	if (!visibleOptions.length) {
+		return $.Deferred().resolve();
+	}
+	return $.when.apply(this,
+		visibleOptions.map(
+			optionLayout => optionLayout.getField().getValidity()
+		)
+	);
 };
 
 export default OptionsWidget;
