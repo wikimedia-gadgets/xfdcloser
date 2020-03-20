@@ -277,6 +277,10 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 		.next( () => {
 			this.makeDraggable();
 
+			// Save some things needed later for tasks
+			this.discussion = data.discussion;
+			this.type = data.type;
+
 			// Set mode
 			if (data.type === "relist") {
 				this.setMode("relist");
@@ -375,8 +379,11 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 	} else if ( action === "save" ) {
 		this.setMode("tasks");
 		this.taskForm = new TaskFormWidget({
+			discussion: this.discussion,
+			type: this.type,
 			formData: this.resultForm.getResultFormData(),
-			options: this.optionsForm && this.optionsForm.getOptionsData()
+			options: this.optionsForm && this.optionsForm.getOptionsData(),
+			$overlay: this.$overlay
 		});
 		this.taskForm.connect(this, {"finished": "onTasksFinished"});
 		this.tasksLayout.$element.append( this.taskForm.$element );

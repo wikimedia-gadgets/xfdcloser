@@ -239,12 +239,11 @@ ResultFormWidget.prototype.getResultFormData = function() {
 	const targetTitle = target && mw.Title.newFromText(target);
 	const targetWikiext = target && this.resultWidget.getTargetWikitext();
 	const pageResults = this.isMultimode
-		? this.multiResultWidget.getResultsByPage().map(pageResult => (
-			{page: pageResult.page, resultType:pageResult.data.result}
-		))
+		? this.multiResultWidget.getResultsByPage()
 		: Array.isArray(this.pages) && this.pages.map(page => ({
 			page: page,
 			resultType: this.resultWidget.getSelectedResultData().result,
+			data: { target } // This is duplication, but matches the form used by multiResultWidget.getResultsByPage()
 		}));
 	// const resultOptions = this.options.getValues();
 
@@ -253,7 +252,7 @@ ResultFormWidget.prototype.getResultFormData = function() {
 		rationaleWikitext, // {String}
 		targetTitle, // {mw.Title|undefined}
 		targetWikiext, //{String|undefined}
-		pageResults, // {Object[]|false} Array of {mw.Title}page, {String}resultType pairs,
+		pageResults, // {Object[]|false} Array of {mw.Title}page, {String}resultType, [{Object}data] pairs/triplets.
 		// resultOptions // {Object[]} Array of {String}result, {Object}options pairs, where options has {String}optionName, {*}optionValue pairs
 	};
 };

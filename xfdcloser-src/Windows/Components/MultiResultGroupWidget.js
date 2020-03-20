@@ -70,7 +70,8 @@ MultiResultGroupWidget.prototype.onResultChange = function() {
 MultiResultGroupWidget.prototype.getResultsByPage = function() {
 	return this.items.map(item => ({
 		page: item.page,
-		data: item.getSelectedResultData()
+		data: item.getSelectedResultData(),
+		resultType: item.getSelectedResultData().result
 	}) );
 };
 
