@@ -1,5 +1,4 @@
 import OptionsWidget from "./OptionsWidget";
-import config from "../../config";
 // <nowiki>
 
 /**
@@ -19,9 +18,13 @@ function OptionsGroupWidget(config) {
 		$group: this.$element
 	}, config ) );
 
+	this.$overlay = config.$overlay;
 	this.venue = config.venue;
 	this.isSysop = config.isSysop;
 	this.isMultimode = false;
+
+	this.aggregate( {change: "optionsChange"} );
+	this.connect( this, {"optionsChange": "onOptionsChange"} );
 }
 OO.inheritClass( OptionsGroupWidget, OO.ui.Widget );
 OO.mixinClass( OptionsGroupWidget, OO.ui.mixin.GroupElement );
@@ -53,7 +56,7 @@ OptionsGroupWidget.prototype.showOptions = function(results, isMultimode) {
 				resultData: resultData,
 				venue: this.venue,
 				isSysop: this.isSysop,
-				$overlay: config.$overlay
+				$overlay: this.$overlay
 			}));
 		}
 	});
@@ -71,5 +74,17 @@ OptionsGroupWidget.prototype.getValues = function() {
 	}) );
 };
 
+/**
+ * @returns {Promise} A promise that resolves if valid, rejects if not.
+ */
+OptionsGroupWidget.prototype.getValidity = function() {
+	return $.when.apply(this,
+		this.items.map( item => item.getValidity() )
+	);
+};
+
+OptionsGroupWidget.prototype.onOptionsChange = function() {
+	this.emit("change");
+};
 export default OptionsGroupWidget;
 // </nowiki>

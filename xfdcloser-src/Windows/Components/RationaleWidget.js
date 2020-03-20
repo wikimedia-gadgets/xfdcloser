@@ -21,7 +21,6 @@ function RationaleWidget( config ) {
 		framed: false
 	} );
 	this.copyButton.toggle(this.isMultimode);
-	this.copyButton.$element.css({"float":"right"});
 	this.$element.append(this.copyButton.$element);
 
 	

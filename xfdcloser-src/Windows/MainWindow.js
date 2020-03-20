@@ -1,6 +1,8 @@
 import appConfig from "../config";
-import ResultFormWidget from "./Components/ResultFormWidget";
-import PrefsFormWidget from "./Components/PrefsFormWidget";
+import ResultFormWidget from "./Layouts/ResultFormWidget";
+import PrefsFormWidget from "./Layouts/PrefsFormWidget";
+import OptionsFormWidget from "./Layouts/OptionsFormWidget";
+import TaskFormWidget from "./Layouts/TaskFormWidget";
 import { setPrefs as ApiSetPrefs, defaultPrefs } from "../prefs";
 // <nowiki>
 
@@ -19,28 +21,70 @@ MainWindow.static.title = $("<span>").css({"font-weight":"normal"}).append(
 );
 MainWindow.static.size = "large";
 MainWindow.static.actions = [
-	// Primary (top right):
+	// Primary actions (top right):
 	{
-		label: "X", // not using an icon since color becomes inverted, i.e. white on light-grey
-		title: "Cancel",
-		flags: "primary",
-		modes: ["normal", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
+		action: "savePrefs",
+		label: "Update",
+		flags: ["primary", "progressive"],
+		modes: "prefs" 
 	},
-	// Safe (top left)
 	{
-		action: "showPrefs",
-		flags: "safe",
-		icon: "settings",
-		title: "Preferences",
-		modes: ["normal", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
+		action: "next",
+		label: "Next",
+		title: "Next",
+		flags: ["primary", "progressive"],
+		modes: ["normal", "multimodeAvailable", "multimodeActive"]
 	},
-	// Others (bottom)
 	{
 		action: "save",
-		accessKey: "s",
-		label: new OO.ui.HtmlSnippet("<span style='padding:0 1em;'>Save</span>"),
+		label: "Save",
+		title: "Close discussion and implement selected actions",
 		flags: ["primary", "progressive"],
-		modes: ["normal", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
+		modes: ["relist", "options"]
+	},
+	{
+		action: "finish",
+		label: "Close",
+		title: "Close",
+		flags: ["primary", "progressive"],
+		modes: "tasks",
+		disabled: true
+	},
+	// Safe actions (top left)
+	{
+		action: "closePrefs",
+		label: "Cancel",
+		flags: "safe",
+		modes: "prefs"
+	},
+	{
+		label: "Cancel",
+		title: "Cancel",
+		flags: "safe",
+		modes: ["normal", "relist", "multimodeAvailable", "multimodeActive"]
+	},
+	{
+		action: "back",
+		label: "Back",
+		title: "Back",
+		flags: "safe",
+		modes: "options"
+	},
+	{
+		action: "abort",
+		label: "Abort",
+		title: "Abort",
+		flags: ["safe", "destructive"],
+		modes: "tasks"
+	},
+	// Other actions (bottom left)
+	{
+		action: "showPrefs",
+		label: "Preferences",
+		title: "Preferences",
+		icon: "settings",
+		flags: "safe",
+		modes: ["normal", "relist", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
 	},
 	{
 		action: "multimode",
@@ -51,19 +95,6 @@ MainWindow.static.actions = [
 		action: "singlemode",
 		label: "Single result...",
 		modes: ["multimodeActive"]
-	},
-	// "prefs" mode only
-	{
-		action: "savePrefs",
-		label: "Update",
-		flags: ["primary", "progressive"],
-		modes: "prefs" 
-	},
-	{
-		action: "closePrefs",
-		label: "Cancel",
-		flags: "safe",
-		modes: "prefs"
 	}
 ];
 
@@ -82,9 +113,19 @@ MainWindow.prototype.initialize = function () {
 
 	// Pages added dynamically upon opening, so just need a layout
 	this.resultLayout = new OO.ui.PanelLayout( {
-		padded: false,
+		padded: true,
 		expanded: false
 	} );
+
+	this.optionsLayout = new OO.ui.PanelLayout({
+		padded: true,
+		expanded: false
+	});
+
+	this.tasksLayout = new OO.ui.PanelLayout({
+		padded: true,
+		expanded: false
+	});
 
 	// Preferences, filled in with current prefs upon loading.
 	this.prefsForm = new PrefsFormWidget();
@@ -97,7 +138,9 @@ MainWindow.prototype.initialize = function () {
 	this.contentArea = new OO.ui.StackLayout( {
 		items: [
 			this.resultLayout,
-			this.prefsLayout
+			this.prefsLayout,
+			this.optionsLayout,
+			this.tasksLayout
 		],
 		padded: false,
 		expanded: false
@@ -201,13 +244,13 @@ MainWindow.prototype.getBodyHeight = function () {
 
 /**
  * Set actions mode while keeping track of previous and current modes
- * @param {String} mode mode to be set, or "previous" to use the previous mode 
+ * @param {String} mode mode to be set, or "_previous" to use the previous mode 
  */
 MainWindow.prototype.setMode = function(mode) {
 	// Get the previous, current, and next modes
 	const previousMode = this.modes.previous;
 	const currentMode = this.modes.current;
-	const nextMode = mode === "previous" ? previousMode : mode;
+	const nextMode = mode === "_previous" ? previousMode : mode;
 	// Current mode will be previous, next mode will be current
 	this.modes = {
 		previous: currentMode,
@@ -235,7 +278,9 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 			this.makeDraggable();
 
 			// Set mode
-			if (
+			if (data.type === "relist") {
+				this.setMode("relist");
+			} else if (
 				data.type === "close" &&
 				!data.discussion.isBasicMode() &&
 				data.discussion.pages &&
@@ -259,13 +304,28 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 			});
 			// Add to layout and update
 			this.resultLayout.$element.append( this.resultForm.$element );
+			this.resultForm.updatePreviewAndValidate();
+
+			if (data.type === "close") {
+				this.optionsForm = new OptionsFormWidget({
+					isSysop: data.user.isSysop,
+					venue: data.venue.type,
+					$overlay: this.$overlay
+				});
+				this.optionsLayout.$element.append( this.optionsForm.$element );
+				this.optionsForm.connect(this, {"validated": "onOptionsValidation"});
+			}
 
 			// Set up preferences
 			this.setPreferences(data.preferences || {});
 			// Force a size update to ensure eveything fits okay
 			this.updateSize();
 
-			this.resultForm.connect(this, {"resize": "updateSize"});
+			this.resultForm.connect(this, {
+				"resize": "updateSize",
+				"showOptions": "onShowOptions",
+				"validated": "onResultValidation"
+			});
 		}, this );
 };
 
@@ -290,7 +350,7 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 				// Success
 				() => {
 					this.setPreferences(updatedPrefs);
-					this.setMode("previous");
+					this.setMode("_previous");
 					this.contentArea.setItem( this.resultLayout );
 					this.updateSize();
 				},
@@ -307,27 +367,45 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 		);
 
 	} else if ( action === "closePrefs" ) {
-		this.setMode("previous");
+		this.setMode("_previous");
 		this.contentArea.setItem( this.resultLayout );
 		this.prefsForm.setPrefValues(this.preferences);
 		this.updateSize();
 
 	} else if ( action === "save" ) {
-		return new OO.ui.Process().next(
-			() => this.close({
-				success: true,
-				formData: this.resultForm.getResultFormData(),
-				tasks: [/* TODO */]
-			})
-		);
+		this.setMode("tasks");
+		this.taskForm = new TaskFormWidget({
+			formData: this.resultForm.getResultFormData(),
+			options: this.optionsForm && this.optionsForm.getOptionsData()
+		});
+		this.taskForm.connect(this, {"finished": "onTasksFinished"});
+		this.tasksLayout.$element.append( this.taskForm.$element );
+		this.contentArea.setItem( this.tasksLayout );
+		this.updateSize();
 
-	} else if ( action === "multimode") {
+	} else if ( action === "multimode" ) {
 		this.setMode("multimodeActive");
 		this.resultForm.toggleMultimode(true);
 
-	} else if ( action === "singlemode") {
+	} else if ( action === "singlemode" ) {
 		this.setMode("multimodeAvailable");
 		this.resultForm.toggleMultimode(false);
+
+	} else if ( action === "next" ) {
+		this.setMode("options");
+		this.optionsForm.validate();
+		this.contentArea.setItem( this.optionsLayout );
+		this.updateSize();
+	
+	} else if ( action === "back" ) {
+		this.setMode("_previous");
+		this.contentArea.setItem( this.resultLayout );
+		this.updateSize();
+
+	} else if ( action === "finish" ) {
+		return new OO.ui.Process().next(
+			() => this.close( {success: true} )
+		);
 
 	} else if (!action && this.resultForm.changed) {
 		// Confirm closing of dialog if there have been changes 
@@ -347,6 +425,9 @@ MainWindow.prototype.getTeardownProcess = function ( data ) {
 		.first( () => {
 			this.resultLayout.$element.empty();
 			this.resultForm = null;
+			this.optionsLayout.$element.empty();
+			this.optionsForm = null;
+			this.contentArea.setItem( this.resultLayout );
 
 			this.$element.find(".oo-ui-window-frame").css("transform","");
 			this.$element.find(".oo-ui-processDialog-location").off(".xfdcMainWin");
@@ -359,6 +440,30 @@ MainWindow.prototype.setPreferences = function(prefs) {
 	// Apply preferences to existing items in the window:
 	this.resultForm.setPreferences(this.preferences);
 	this.prefsForm.setPrefValues(this.preferences);
+};
+
+MainWindow.prototype.onResultValidation = function(isValid) {
+	this.getActions().setAbilities({
+		next: isValid,
+		save: isValid
+	});
+};
+
+MainWindow.prototype.onOptionsValidation = function(isValid) {
+	this.getActions().setAbilities({
+		save: isValid
+	});
+};
+
+MainWindow.prototype.onShowOptions = function(resultData, isMultimode) {
+	this.optionsForm.showOptions(resultData, isMultimode);
+};
+
+MainWindow.prototype.onTasksFinished = function() {
+	this.getActions().setAbilities({
+		finish: true,
+		abort: false
+	});
 };
 
 export default MainWindow;

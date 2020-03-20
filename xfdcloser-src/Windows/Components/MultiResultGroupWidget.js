@@ -78,5 +78,15 @@ MultiResultGroupWidget.prototype.getResultText = function() {
 	return this.resultSummary.getValue().trim();
 };
 
+/**
+ * @returns {Promise} A promise that resolves if valid, rejects if not.
+ */
+MultiResultGroupWidget.prototype.getValidity = function() {
+	return $.when.apply(null, [
+		...this.items.map(item => item.getValidity()),
+		this.resultSummary.getValidity()
+	]);
+};
+
 export default MultiResultGroupWidget;
 // </nowiki>
