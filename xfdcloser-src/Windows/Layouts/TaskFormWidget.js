@@ -1,6 +1,7 @@
 import {hasCorrectNamespace, multiButtonConfirm, setExistence} from "../../util";
 import appConfig from "../../config";
 import API from "../../api";
+import Task from "../Components/Task";
 // <nowiki>
 /**
  * @param {Object} config
@@ -183,15 +184,42 @@ TaskFormWidget.prototype.resolveRedirects = function() {
 };
 
 TaskFormWidget.prototype.initialiseTasks = function() {
-	// TODO: Use actual Task widgets (and determine which tasks to add)
-	this.tasksFieldset.addItems([
-		new OO.ui.FieldLayout( new OO.ui.ProgressBarWidget(), {
+	// TODO: Use actual, specific Task widgets (and determine which tasks to add)
+	const tasks = [
+		new Task({
 			label: "Task One"
-		} ),
-		new OO.ui.FieldLayout( new OO.ui.ProgressBarWidget({progress:11}), {
+		}),
+		new Task({
 			label: "Task Two"
-		} )
-	] );
+		}),
+		new Task({
+			label: $("<span>").append(["Task ", extraJs.makeLink("Three")])
+		}),
+		new Task({
+			label: "Task Four"
+		}),
+	];
+	tasks.forEach( task => task.connect(this, {"resize": "onResize"}) );
+	this.tasksFieldset.addItems( tasks );
+	this.onResize();
+
+	// Simulate tasks states
+	tasks[0].start();
+	tasks[0].setTotalSteps(1);
+
+	tasks[1].setTotalSteps(10);
+	tasks[1].trackStep();
+	tasks[1].trackStep({failed: true});
+	tasks[1].addError("Could not edit something");
+
+	tasks[2].addWarning("Pagenamehere skipped: Could not find nomination template");
+
+	tasks[3].addError("Some sort of error happened");
+	tasks[3].addError("A Second Error!");
+	tasks[3].addWarning("Something to warn you about");
+	tasks[3].addWarning("Another warning");
+	tasks[3].addWarning("Yet another warning");
+	
 };
 
 export default TaskFormWidget;

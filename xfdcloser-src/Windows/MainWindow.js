@@ -385,7 +385,10 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 			options: this.optionsForm && this.optionsForm.getOptionsData(),
 			$overlay: this.$overlay
 		});
-		this.taskForm.connect(this, {"finished": "onTasksFinished"});
+		this.taskForm.connect(this, {
+			"finished": "onTasksFinished",
+			"resize": "updateSize"
+		});
 		this.tasksLayout.$element.append( this.taskForm.$element );
 		this.contentArea.setItem( this.tasksLayout );
 		this.updateSize();

@@ -126,7 +126,7 @@ function extendMwApi(api) {
 		return doGetQuery(titles);
 	};
 	return api;
-};
+}
 
 var API = extendMwApi(
 	new mw.Api( {
