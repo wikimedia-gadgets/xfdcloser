@@ -7,6 +7,14 @@
  * @param {mw.Title[]} config.pages Pages for this task
  * @param {Object} config.options Options for this task: {String}optionName, {*}optionValue pairs
  * @param {String|jQuery} config.label label for the task
+ * @param {Discussion} config.discussion Discussion object
+ * @param {object} config.appConfig App configuration, including {Venue}venue
+ * @param {Object} config.formData
+ *  @param {String} config.formData.resultWikitext
+ *  @param {String} config.formData.rationaleWikitext
+ *  @param {mw.Title|undefined} config.formData.targetTitle
+ *  @param {String|undefined} config.formData.targetWikiext
+ *  @param {Object[]|false} config.formData.pageResults Array of {mw.Title}page, {String}resultType [{object}data] pairs/triplets
  * @param {mw.Api} [config.api] mw.Api object, if not using XFDcloser's default API object
  */
 function Task(config) {
@@ -30,6 +38,10 @@ function Task(config) {
 	this.api = config.api;
 	this.pages = config.pages;
 	this.options = config.options;
+	this.discussion = config.discussion;
+	this.appConfig = config.appConfig;
+	this.venue = config.appConfig.venue;
+	this.formData = config.formData;
 
 	// Warnings and errors
 	this.warningsList = [];
@@ -52,13 +64,18 @@ function toSmallSnippet(content) {
 
 /**
  * @param {String} errorMessage
- * @param {Object} options
- * @param {Boolean} options.abort Abort all remaining actions and tasks
+ * @param {Object} [config]
+ * @param {Boolean} [config.abort] Abort all remaining actions and tasks
+ * @param {String} [config.code] Api error code
+ * @param {jqxhr} [config.jqxhr] Api error jqxhr object
  */
-Task.prototype.addError = function(errorMessage, options) {
+Task.prototype.addError = function(errorMessage, config) {
+	if (config && config.code) {
+		errorMessage = extraJs.makeErrorMsg(config.code, config.jqxhr).html() + " – " + errorMessage;
+	}
 	this.errorsList.push( toSmallSnippet(errorMessage) );
 	this.field.setErrors(this.errorsList);
-	if (options && options.abort) {
+	if (config && config.abort) {
 		this.api.abort();
 		this.emit("abort");
 	}
@@ -112,9 +129,16 @@ Task.prototype.trackStep = function(state) {
 };
 
 Task.prototype.updateProgress = function() {
-	const progress = this.steps.total === 1
-		? false /* indeterminate */
-		: (this.steps.completed + this.steps.failed)/this.steps.total*100;
+	const progress = (this.steps.completed + this.steps.failed)/this.steps.total*100;
+	if (progress === 100) {
+		this.progressbar.setProgress(100);
+		return;
+	}
+	if (this.steps.total === 1) {
+		this.progressbar.setProgress(false /* indeterminate */);
+		this.setNotice("Processing...");
+		return;
+	}
 	this.progressbar.setProgress(progress);
 	this.setNotice(`Processing... (${this.steps.completed + this.steps.failed} / ${this.steps.total})`);
 };
@@ -122,8 +146,15 @@ Task.prototype.updateProgress = function() {
 
 Task.prototype.start = function() {
 	this.setNotice("Processing...");
-	this.doTask().then( notice => {
-		this.setNotice(notice || "Done!");
+	return this.doTask().then( notice => {
+		const currentLabel = this.field.getLabel();
+		this.setLabel( $("<span>").append([
+			currentLabel,
+			": ",
+			notice || "Done!"
+		]) );
+		this.progressbar.toggle(false);
+		this.field.setNotices([]);
 		this.emit("completed");
 	});
 };

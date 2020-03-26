@@ -2,6 +2,7 @@ import {hasCorrectNamespace, multiButtonConfirm, setExistence} from "../../util"
 import appConfig from "../../config";
 import API from "../../api";
 import Task from "../Components/Task";
+import closeDiscussion from "../Tasks/closeDiscussion";
 // <nowiki>
 /**
  * @param {Object} config
@@ -185,17 +186,29 @@ TaskFormWidget.prototype.resolveRedirects = function() {
 
 TaskFormWidget.prototype.initialiseTasks = function() {
 	// TODO: Use actual, specific Task widgets (and determine which tasks to add)
+	const baseConfig = {
+		appConfig: appConfig,
+		discussion: this.discussion,
+		formData: this.formData,
+		api: API
+	};
 	const tasks = [
+		this.type === "close"
+			? new closeDiscussion(baseConfig)
+			: new Task({
+				...baseConfig,
+				label: "Task One"
+			}),
 		new Task({
-			label: "Task One"
-		}),
-		new Task({
+			...baseConfig,
 			label: "Task Two"
 		}),
 		new Task({
+			...baseConfig,
 			label: $("<span>").append(["Task ", extraJs.makeLink("Three")])
 		}),
 		new Task({
+			...baseConfig,
 			label: "Task Four"
 		}),
 	];
@@ -203,22 +216,21 @@ TaskFormWidget.prototype.initialiseTasks = function() {
 	this.tasksFieldset.addItems( tasks );
 	this.onResize();
 
-	// Simulate tasks states
-	tasks[0].start();
-	tasks[0].setTotalSteps(1);
+	tasks[0].start().then(() => {
+		// Simulate tasks states
+		tasks[1].setTotalSteps(10);
+		tasks[1].trackStep();
+		tasks[1].trackStep({failed: true});
+		tasks[1].addError("Could not edit something");
 
-	tasks[1].setTotalSteps(10);
-	tasks[1].trackStep();
-	tasks[1].trackStep({failed: true});
-	tasks[1].addError("Could not edit something");
+		tasks[2].addWarning("Pagenamehere skipped: Could not find nomination template");
 
-	tasks[2].addWarning("Pagenamehere skipped: Could not find nomination template");
-
-	tasks[3].addError("Some sort of error happened");
-	tasks[3].addError("A Second Error!");
-	tasks[3].addWarning("Something to warn you about");
-	tasks[3].addWarning("Another warning");
-	tasks[3].addWarning("Yet another warning");
+		tasks[3].addError("Some sort of error happened");
+		tasks[3].addError("A Second Error!");
+		tasks[3].addWarning("Something to warn you about");
+		tasks[3].addWarning("Another warning");
+		tasks[3].addWarning("Yet another warning");
+	});
 	
 };
 
