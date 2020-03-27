@@ -4,6 +4,7 @@ import RationaleWidget from "../Components/RationaleWidget";
 import OptionsGroupWidget from "../Components/OptionsGroupWidget";
 import MultiResultGroupWidget from "../Components/MultiResultGroupWidget";
 import PreviewWidget from "../Components/PreviewWidget";
+import ResizingWidget from "../Mixins/ResizingMixin";
 // <nowiki>
 
 /**
@@ -23,6 +24,8 @@ function ResultFormWidget( config ) {
 	config = config || {};
 	// Call parent constructor
 	ResultFormWidget.super.call( this, config );
+	ResizingWidget.call( this, config );
+
 	this.isMultimode = false;
 	this.isRelisting = config.type === "relist";
 	this.pages = config.pages;
@@ -94,7 +97,7 @@ function ResultFormWidget( config ) {
 			});
 			this.multiResultWidget.connect(this, {
 				"resultSelect": "onResultSelect",
-				"resize": "onResize",
+				"resize": "emitResize",
 				"change": "updatePreviewAndValidate"
 			});
 			this.multiResultWidgetField = new OO.ui.FieldLayout( this.multiResultWidget, {
@@ -126,7 +129,7 @@ function ResultFormWidget( config ) {
 	this.previewFieldset = new OO.ui.FieldsetLayout({label: "Preview"});
 	this.$element.append(this.previewFieldset.$element);
 	this.preview = new PreviewWidget();
-	this.preview.connect(this, {"resize": "onResize"});
+	this.preview.connect(this, {"resize": "emitResize"});
 	this.previewFieldset.addItems(
 		new OO.ui.FieldLayout( this.preview, {
 			align: "top"
@@ -142,7 +145,7 @@ function ResultFormWidget( config ) {
 			isSysop: config.user.isSysop,
 			$overlay: config.$overlay
 		});
-		this.options.connect(this, {"resize": "onResize"});
+		this.options.connect(this, {"resize": "emitResize"});
 		this.optionsFieldset.addItems(
 			new OO.ui.FieldLayout( this.options, {
 				align:"top"
@@ -151,6 +154,7 @@ function ResultFormWidget( config ) {
 	}	
 }
 OO.inheritClass( ResultFormWidget, OO.ui.Widget );
+OO.mixinClass( ResultFormWidget, ResizingWidget );
 
 ResultFormWidget.prototype.clearAll = () => console.log("ResultFormWidget", "clearAll"); //TODO: Replace stub with working function
 ResultFormWidget.prototype.setPreferences = () => console.log("ResultFormWidget", "setPreferences"); //TODO: Replace stub with working function
@@ -178,11 +182,6 @@ ResultFormWidget.prototype.onCopyResultsClick = function() {
 
 ResultFormWidget.prototype.onResultSelect = function(resultData) {
 	this.emit("showOptions", resultData, this.isMultimode);
-	// this.onResize();
-};
-
-ResultFormWidget.prototype.onResize = function() {
-	this.emit("resize");
 };
 
 /**

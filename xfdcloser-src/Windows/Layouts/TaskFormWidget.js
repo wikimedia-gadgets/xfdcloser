@@ -3,6 +3,7 @@ import appConfig from "../../config";
 import API from "../../api";
 import Task from "../Components/Task";
 import closeDiscussion from "../Tasks/closeDiscussion";
+import ResizingMixin from "../Mixins/ResizingMixin";
 // <nowiki>
 /**
  * @param {Object} config
@@ -22,6 +23,7 @@ function TaskFormWidget( config ) {
 	config = config || {};
 	// Call parent constructor
 	TaskFormWidget.super.call( this, config );
+	ResizingMixin.call(this, config);
 
 	this.discussion = config.discussion;
 	this.type = config.type;
@@ -45,10 +47,8 @@ function TaskFormWidget( config ) {
 	// );
 }
 OO.inheritClass( TaskFormWidget, OO.ui.Widget );
+OO.mixinClass( TaskFormWidget, ResizingMixin );
 
-TaskFormWidget.prototype.onResize = function() {
-	this.emit("resize");
-};
 
 TaskFormWidget.prototype.setFinished = function() {
 	this.emit("finished");
@@ -212,9 +212,9 @@ TaskFormWidget.prototype.initialiseTasks = function() {
 			label: "Task Four"
 		}),
 	];
-	tasks.forEach( task => task.connect(this, {"resize": "onResize"}) );
+	tasks.forEach( task => task.connect(this, {"resize": "emitResize"}) );
 	this.tasksFieldset.addItems( tasks );
-	this.onResize();
+	this.emitResize();
 
 	tasks[0].start().then(() => {
 		// Simulate tasks states

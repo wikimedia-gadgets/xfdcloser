@@ -1,4 +1,5 @@
 import OptionsGroupWidget from "../Components/OptionsGroupWidget";
+import ResizingMixin from "../Mixins/ResizingMixin";
 
 // <nowiki>
 /**
@@ -12,6 +13,7 @@ function OptionsFormWidget( config ) {
 	config = config || {};
 	// Call parent constructor
 	OptionsFormWidget.super.call( this, config );
+	ResizingMixin.call( this, config );
 
 	// Options
 	this.optionsFieldset = new OO.ui.FieldsetLayout(/* no label */);
@@ -21,7 +23,7 @@ function OptionsFormWidget( config ) {
 		isSysop: config.isSysop,
 		$overlay: config.$overlay
 	});
-	this.options.connect(this, {"resize": "onResize"});
+	this.options.connect(this, {"resize": "emitResize"});
 	this.optionsFieldset.addItems(
 		new OO.ui.FieldLayout( this.options, {
 			align:"top"
@@ -32,10 +34,7 @@ function OptionsFormWidget( config ) {
 	this.validate();
 }
 OO.inheritClass( OptionsFormWidget, OO.ui.Widget );
-
-OptionsFormWidget.prototype.onResize = function() {
-	this.emit("resize");
-};
+OO.mixinClass( OptionsFormWidget, ResizingMixin );
 
 OptionsFormWidget.prototype.showOptions = function(resultData, isMultimode) {
 	this.options.showOptions(resultData, isMultimode);

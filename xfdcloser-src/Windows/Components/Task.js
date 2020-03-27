@@ -1,4 +1,7 @@
 // <nowiki>
+
+import ResizingMixin from "../Mixins/ResizingMixin";
+
 /**
  * @abstract
  * @class Task
@@ -23,6 +26,7 @@ function Task(config) {
 
 	// Call parent constructor
 	Task.super.call( this, config );
+	ResizingMixin.call( this, config );
 
 	// Sub-widgets
 	this.progressbar = new OO.ui.ProgressBarWidget({progress:0});
@@ -55,6 +59,7 @@ function Task(config) {
 	};
 }
 OO.inheritClass( Task, OO.ui.Widget );
+OO.mixinClass( Task, ResizingMixin );
 
 function toSmallSnippet(content) {
 	return new OO.ui.HtmlSnippet(
@@ -79,7 +84,7 @@ Task.prototype.addError = function(errorMessage, config) {
 		this.api.abort();
 		this.emit("abort");
 	}
-	this.emit("resize");
+	this.emitResize();
 };
 
 /**
@@ -88,7 +93,7 @@ Task.prototype.addError = function(errorMessage, config) {
 Task.prototype.addWarning = function(warningMessage) {
 	this.warningsList.push( toSmallSnippet(warningMessage) );
 	this.field.setWarnings(this.warningsList);
-	this.emit("resize");
+	this.emitResize();
 };
 
 /**
@@ -96,7 +101,7 @@ Task.prototype.addWarning = function(warningMessage) {
  */
 Task.prototype.setLabel = function(label) {
 	this.field.setLabel(label);
-	this.emit("resize");
+	this.emitResize();
 };
 
 /**
@@ -104,7 +109,7 @@ Task.prototype.setLabel = function(label) {
  */
 Task.prototype.setNotice = function(notice) {
 	this.field.setNotices([ toSmallSnippet(notice) ]);
-	this.emit("resize");
+	this.emitResize();
 };
 
 /**

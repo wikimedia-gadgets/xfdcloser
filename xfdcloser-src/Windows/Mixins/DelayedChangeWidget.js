@@ -1,4 +1,4 @@
-// </nowiki>
+// <nowiki>
 
 /**
  * A mixin to enable emitting `change` events after a delay, with subsequent events cancelling unsent delayed `change` events
