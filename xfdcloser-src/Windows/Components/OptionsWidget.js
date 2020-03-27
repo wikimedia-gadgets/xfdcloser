@@ -99,6 +99,9 @@ function OptionsWidget(config) {
 				default:
 					throw new Error("Unrecognised option type: " + option.type);
 				}
+				if (option.initialValue) {
+					widget.setValue(option.initialValue);
+				}
 				const layout = new OO.ui.FieldLayout(widget, {
 					label: option.label,
 					data: {for: action.data.name}
