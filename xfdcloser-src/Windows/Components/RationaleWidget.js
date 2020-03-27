@@ -68,15 +68,20 @@ RationaleWidget.prototype.prependRationale = function(text) {
  * or (punctuated format) the trimmed rationale preprened with either a period and a space, or a space, based on the "Result is a new sentence" option
  */
 RationaleWidget.prototype.getValue = function(format) {
-	const text = this.textbox.getValue();
-	if (!text.trim()) {
+	const text = this.textbox.getValue().trim();
+	if (!text) {
 		return "";
 	}
+
+	const firstChar = text.slice(0,1);
+	const needsLinebreak = firstChar === "*" || firstChar === ":" || firstChar === ";";
+
 	if (format === "punctuated") {
 		const isNewSentence = this.newSentenceOption && this.newSentenceOption.isSelected();
-		return (isNewSentence ? ". " : " ") + text.trim();
+		return `${isNewSentence ? "." : ""}${needsLinebreak ? "\n" : " "}${text}`;
 	}
-	return text.trim();
+
+	return needsLinebreak ? "\n" + text : text;
 };
 
 export default RationaleWidget;

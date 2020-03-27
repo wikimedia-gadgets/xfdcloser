@@ -175,7 +175,11 @@ ResultFormWidget.prototype.onCopyResultsClick = function() {
 				? (data.customResult || " ")
 				: extraJs.toSentenceCase(data.result);
 			const suffix = data.requireTarget ? ` to [[${result.data.target}]]`	: "";
-			return `*'''${resultText}''' [[${result.page}]]${suffix}\n`;
+			const pageNamespaceId = result.page.getNamespaceId();
+			const pageLink = (pageNamespaceId === 6 /* File: */ || pageNamespaceId === 14 /* Category: */ )
+				? `[[:${result.page}]]`
+				: `[[${result.page}]]`;
+			return `*'''${resultText}''' ${pageLink}${suffix}\n`;
 		}).join("");
 	this.rationale.prependRationale(results);
 };
