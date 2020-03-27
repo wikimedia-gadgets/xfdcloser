@@ -1,4 +1,4 @@
-import DelayedChangeMixin from "../Mixins/DelayedChangeWidget";
+import DelayedChangeMixin from "../Mixins/DelayedChangeMixin";
 // <nowiki>
 
 /**

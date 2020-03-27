@@ -5,18 +5,18 @@
  * @param {Object} config 
  * @param {Number} delay Default delay in milliseconds
  */
-function DelayedChangeWidget(config) {
+function DelayedChangeMixin(config) {
 	config = config || {};
 	this.defaultDelay = config.delay || 800;
 	this.changeTimerID = 0;
 }
-OO.initClass( DelayedChangeWidget );
+OO.initClass( DelayedChangeMixin );
 
 /**
  * Emit a `change` event after a delay. Any delayed `change` events not yet emitted will be cancelled.
  * @param {Number} [delay] delay in milliseconds before emitting a `change` event
  */
-DelayedChangeWidget.prototype.emitDelayedChange = function(delay) {
+DelayedChangeMixin.prototype.emitDelayedChange = function(delay) {
 	// If there's a timeout from a previous change, clear it
 	if (this.changeTimerID) {
 		clearTimeout(this.changeTimerID);
@@ -31,7 +31,7 @@ DelayedChangeWidget.prototype.emitDelayedChange = function(delay) {
 /**
  * Emit a `change` event immediately. Any delayed `change` events not yet emitted will be cancelled.
  */
-DelayedChangeWidget.prototype.emitChange = function() {
+DelayedChangeMixin.prototype.emitChange = function() {
 	if (this.changeTimerID) {
 		clearTimeout(this.changeTimerID);
 	}
@@ -39,5 +39,5 @@ DelayedChangeWidget.prototype.emitChange = function() {
 	this.emit("change");
 };
 
-export default DelayedChangeWidget;
+export default DelayedChangeMixin;
 // </nowiki>
