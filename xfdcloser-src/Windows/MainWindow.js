@@ -4,12 +4,15 @@ import PrefsFormWidget from "./Layouts/PrefsFormWidget";
 import OptionsFormWidget from "./Layouts/OptionsFormWidget";
 import TaskFormWidget from "./Layouts/TaskFormWidget";
 import { setPrefs as ApiSetPrefs, defaultPrefs } from "../prefs";
+import DraggableMixin from "./Mixins/DraggableMixin";
 // <nowiki>
 
 function MainWindow( config ) {
 	MainWindow.super.call( this, config );
+	DraggableMixin.call( this, config );
 }
 OO.inheritClass( MainWindow, OO.ui.ProcessDialog );
+OO.mixinClass( MainWindow, DraggableMixin );
 
 MainWindow.static.name = "main";
 MainWindow.static.title = $("<span>").css({"font-weight":"normal"}).append(
@@ -169,69 +172,6 @@ MainWindow.prototype.initialize = function () {
 			event.preventDefault();
 		}.bind(this));
 	
-};
-
-MainWindow.prototype.makeDraggable = function() {
-	let $frameEl = this.$element.find(".oo-ui-window-frame");
-	let $handleEl = this.$element.find(".oo-ui-processDialog-location").css({"cursor":"move"});
-	// Position for css translate transformations, relative to initial position
-	// (which is centered on viewport when scrolled to top)
-	let position = { x: 0, y: 0 };
-	const constrain = function(val, minVal, maxVal) {
-		if (val < minVal) return minVal;
-		if (val > maxVal) return maxVal;
-		return val;
-	};
-	const constrainX = (val) => {
-		// Don't got too far horizontally (leave at least 100px visible)
-		let limit = window.innerWidth/2 + $frameEl.outerWidth()/2 - 100;
-		return constrain(val, -1*limit, limit);
-	};
-	const constrainY = (val) => {
-		// Can't take title bar off the viewport, since it's the drag handle
-		let minLimit = -1*(window.innerHeight - $frameEl.outerHeight())/2;
-		// Don't go too far down the page: (whole page height) - (initial position)
-		let maxLimit = (document.documentElement||document).scrollHeight - window.innerHeight/2;
-		return constrain(val, minLimit, maxLimit);
-	};
-
-	let pointerdown = false;
-	let dragFrom = {};
-
-	let onDragStart = event => {
-		pointerdown = true;
-		dragFrom.x = event.clientX;
-		dragFrom.y = event.clientY;
-	};
-	let onDragMove = event => {
-		if (!pointerdown || dragFrom.x == null || dragFrom.y === null) {
-			return;
-		}
-		const dx = event.clientX - dragFrom.x;
-		const dy = event.clientY - dragFrom.y;
-		dragFrom.x = event.clientX;
-		dragFrom.y = event.clientY;
-		position.x = constrainX(position.x + dx);
-		position.y = constrainY(position.y + dy);
-		$frameEl.css("transform", `translate(${position.x}px, ${position.y}px)`);
-	};
-	let onDragEnd = () => {
-		pointerdown = false;
-		delete dragFrom.x;
-		delete dragFrom.y;
-		// Make sure final positions are whole numbers
-		position.x = Math.round(position.x);
-		position.y = Math.round(position.y);
-		$frameEl.css("transform", `translate(${position.x}px, ${position.y}px)`);
-	};
-
-	// Use pointer events if available; otherwise use mouse events
-	const pointer = ("PointerEvent" in window) ? "pointer" : "mouse";
-	$handleEl.on(pointer+"enter.xfdcMainWin", () => $frameEl.css("will-change", "transform") ); // Tell browser to optimise transform
-	$handleEl.on(pointer+"leave.xfdcMainWin", () => { if (!pointerdown) $frameEl.css("will-change", ""); } ); // Remove optimisation if not dragging
-	$handleEl.on(pointer+"down.xfdcMainWin", onDragStart);
-	$("body").on(pointer+"move.xfdcMainWin", onDragMove);
-	$("body").on(pointer+"up.xfdcMainWin", onDragEnd);
 };
 
 // Override the getBodyHeight() method to specify a custom height
@@ -439,9 +379,7 @@ MainWindow.prototype.getTeardownProcess = function ( data ) {
 			this.optionsForm = null;
 			this.contentArea.setItem( this.resultLayout );
 
-			this.$element.find(".oo-ui-window-frame").css("transform","");
-			this.$element.find(".oo-ui-processDialog-location").off(".xfdcMainWin");
-			$("body").off(".xfdcMainWin");
+			this.removeDraggability();
 		} );
 };
 
