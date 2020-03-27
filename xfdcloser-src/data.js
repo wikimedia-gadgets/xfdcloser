@@ -46,23 +46,23 @@ const resultsData = [
 		actions: ["holdingCell", "noActions"]
 	},
 
-	// Redirect (sysop, not CFD/RFD)
+	// Redirect (sysop, AFD/MFD)
 	{
 		result: "redirect",
 		requireTarget: true,
 		allowSoft: true,
 		allowDeleteFirst: true,
 		sysopOnly: true,
-		venues: ["afd", "mfd", "tfd"],
+		venues: ["afd", "mfd"],
 		actions: ["redirectAndUpdate", "noActions"]
 	},
-	// Redirect (non-sysop, not CFD/RFD)
+	// Redirect (non-sysop, AFD/MFD)
 	{
 		result: "redirect",
 		requireTarget: true,
 		allowSoft: true,
 		nonSysopOnly: true,
-		venues: ["afd", "mfd", "tfd"],
+		venues: ["afd", "mfd"],
 		actions: ["redirectAndUpdate", "noActions"]
 	},
 	// Redirect (CFD)
@@ -71,6 +71,23 @@ const resultsData = [
 		requireTarget: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
+	},
+	// Redirect (non-sysop, TFD)
+	{
+		result: "redirect",
+		requireTarget: true,
+		allowDeleteFirst: true,
+		sysopOnly: true,
+		venues: ["tfd"],
+		actions: ["redirectAndUpdate", "noActions"]
+	},
+	// Redirect (non-sysop, TFD)
+	{
+		result: "redirect",
+		requireTarget: true,
+		nonSysopOnly: true,
+		venues: ["tfd"],
+		actions: ["redirectAndUpdate", "noActions"]
 	},
 
 	// Rename (CFD)
@@ -97,6 +114,14 @@ const resultsData = [
 		requireTarget: true,
 		allowSoft: true,
 		nonSysopOnly: true,
+		venues: ["rfd"],
+		actions: ["redirectAndUpdate", "noActions"]
+	},
+
+	// Soft redirect (RFD)
+	{
+		result: "soft redirect",
+		requireTarget: true,
 		venues: ["rfd"],
 		actions: ["redirectAndUpdate", "noActions"]
 	},
@@ -137,11 +162,19 @@ const resultsData = [
 		actions: ["updatePages", "noActions"]
 	},
 
-	// Custom
+	// Custom (sysop)
 	{
 		result: "custom",
+		sysopOnly: true,
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
-		actions: ["noActions"]
+		actions: ["updatePages", "deletePages", "noActions"]
+	},
+	// Custom (non-sysop)
+	{
+		result: "custom",
+		nonSysopOnly: true,
+		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+		actions: ["updatePages", "noActions"]
 	}
 ];
 
@@ -168,7 +201,7 @@ const actions = [
 					name: "deleteRedir",
 					label: "Delete redirects",
 					type: "toggleSwitch",
-					venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+					venue: ["afd", "cfd", "ffd", "mfd", "tfd"],
 				},
 				{
 					name: "unlink",

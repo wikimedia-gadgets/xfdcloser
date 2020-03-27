@@ -41,17 +41,12 @@ function ResultWidget(config) {
 		data: {prefix: "delete and "},
 		label: "Delete first"
 	} );
-	this.redirectAfterOption = new OO.ui.CheckboxMultioptionWidget( {
-		data: {suffix: " and redirect"},
-		label: "then redirect"
-	} );
 
 	this.optionsMultiselect = new OO.ui.CheckboxMultiselectWidget( {
 		items: [
 			this.speedyOption,
 			this.softOption,
-			this.deleteFirstOption,
-			this.redirectAfterOption
+			this.deleteFirstOption
 		]
 	} );
 	this.optionsMultiselect.toggle(false);
@@ -100,7 +95,6 @@ ResultWidget.prototype.onResultSelect = function(result) {
 	this.speedyOption.toggle(!!data.allowSpeedy);
 	this.softOption.toggle(!!data.allowSoft);
 	this.deleteFirstOption.toggle(!!data.allowDeleteFirst);
-	this.redirectAfterOption.toggle(data.result === "delete");
 	this.optionsMultiselect.toggle(
 		!!data.allowSpeedy || !!data.allowSoft || !!data.allowDeleteFirst || data.result === "delete"
 	);
