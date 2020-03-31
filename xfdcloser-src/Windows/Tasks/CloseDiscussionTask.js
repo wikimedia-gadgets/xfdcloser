@@ -1,14 +1,14 @@
 import Task from "../Components/Task";
 // <nowiki>
 
-function closeDiscussion(config) {
+function CloseDiscussionTask(config) {
 	config = {label: "Closing discussion", ...config};
 	// Call parent constructor
-	closeDiscussion.super.call( this, config );
+	CloseDiscussionTask.super.call( this, config );
 }
-OO.inheritClass( closeDiscussion, Task );
+OO.inheritClass( CloseDiscussionTask, Task );
 
-closeDiscussion.prototype.doTask = function() {
+CloseDiscussionTask.prototype.doTask = function() {
 	this.setTotalSteps(1);
 	const appConfig = this.appConfig;
 
@@ -110,5 +110,5 @@ closeDiscussion.prototype.doTask = function() {
 
 };
 
-export default closeDiscussion;
+export default CloseDiscussionTask;
 // </nowiki>
