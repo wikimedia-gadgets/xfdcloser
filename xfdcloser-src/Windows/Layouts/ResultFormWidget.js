@@ -17,6 +17,7 @@ import ResizingWidget from "../Mixins/ResizingMixin";
  * @param {String} config.type "close" or "relist" 
  * @param {Object} config.user Object with {String}sig, {string}name, {boolean}isSysop
  * @param {String} config.venue code for venue, e.g. "afd"
+ * @param {String} config.nomPageLink Nomination page link target, with #section anchor if appropriate
  * @param {jQuery} $overlay element for overlays
  */
 function ResultFormWidget( config ) {
@@ -29,6 +30,7 @@ function ResultFormWidget( config ) {
 	this.isMultimode = false;
 	this.isRelisting = config.type === "relist";
 	this.pages = config.pages;
+	this.nomPageLink = config.nomPageLink;
 
 	// Top stuff
 	this.notesFieldset = new OO.ui.FieldsetLayout(/* no label */);
@@ -216,6 +218,13 @@ ResultFormWidget.prototype.updatePreviewAndValidate = function() {
 		return;
 	}
 	const resultText = this.isMultimode ? this.multiResultWidget.getResultText() : this.resultWidget.getResultText();
+	if (resultText === "soft delete" && this.pages.length) {
+		this.rationale.setSoftDelete(
+			this.pages[0].getPrefixedText(),
+			this.nomPageLink,
+			this.pages.length > 1
+		);
+	}
 	const resultWikitext = resultText ? `'''${resultText}'''` : "";
 	const target = !this.isMultimode && this.resultWidget.getTargetWikitext();
 	const targetWikitext =  target ? ` to  ${target}` : "";

@@ -241,6 +241,7 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 				sectionHeader: data.discussion.sectionHeader,
 				isBasicMode: data.discussion.isBasicMode(),
 				pages: data.discussion.pages || [],
+				nomPageLink: data.discussion.getNomPageLink(),
 				venue: data.venue.type,
 				user: data.user,
 				type: data.type,

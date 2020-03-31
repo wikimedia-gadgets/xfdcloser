@@ -84,5 +84,15 @@ RationaleWidget.prototype.getValue = function(format) {
 	return needsLinebreak ? "\n" + text : text;
 };
 
+RationaleWidget.prototype.setSoftDelete = function(page, nomPageLink, isMulti) {
+	if (this.textbox.getValue().includes("Soft deletion rationale")) {
+		return;
+	}
+	const end = isMulti ? "|multi=yes}}" : "}}";
+	this.prependRationale(
+		`{{subst:Wikipedia:XFDcloser/Soft deletion rationale|1=${page}|2=${nomPageLink + end} `
+	);
+};
+
 export default RationaleWidget;
 // </nowiki>
