@@ -43,7 +43,7 @@ MainWindow.static.actions = [
 		label: "Save",
 		title: "Close discussion and implement selected actions",
 		flags: ["primary", "progressive"],
-		modes: ["relist", "options"]
+		modes: ["relist", "basic", "options"]
 	},
 	{
 		action: "finish",
@@ -64,7 +64,7 @@ MainWindow.static.actions = [
 		label: "Cancel",
 		title: "Cancel",
 		flags: "safe",
-		modes: ["normal", "relist", "multimodeAvailable", "multimodeActive"]
+		modes: ["normal", "relist", "basic", "multimodeAvailable", "multimodeActive"]
 	},
 	{
 		action: "back",
@@ -87,7 +87,7 @@ MainWindow.static.actions = [
 		title: "Preferences",
 		icon: "settings",
 		flags: "safe",
-		modes: ["normal", "relist", "multimodeAvailable", "multimodeActive"] // available when current mode isn't "prefs"
+		modes: ["normal", "relist", "basic", "multimodeAvailable", "multimodeActive"]
 	},
 	{
 		action: "multimode",
@@ -224,6 +224,8 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 			// Set mode
 			if (data.type === "relist") {
 				this.setMode("relist");
+			} else if (data.type === "close" && data.discussion.isBasicMode()) {
+				this.setMode("basic");
 			} else if (
 				data.type === "close" &&
 				!data.discussion.isBasicMode() &&
