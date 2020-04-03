@@ -378,6 +378,8 @@ MainWindow.prototype.getTeardownProcess = function ( data ) {
 			this.resultForm = null;
 			this.optionsLayout.$element.empty();
 			this.optionsForm = null;
+			this.tasksLayout.$element.empty();
+			this.taskForm = null;
 			this.contentArea.setItem( this.resultLayout );
 
 			this.removeDraggability();
