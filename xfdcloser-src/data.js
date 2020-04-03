@@ -169,6 +169,13 @@ const resultsData = [
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 		actions: ["updatePages", "deletePages", "noActions"]
 	},
+	// Custom (sysop, CFD)
+	{
+		result: "custom",
+		sysopOnly: true,
+		venues: ["cfd"],
+		actions: ["updatePages", "noActions"]
+	},
 	// Custom (non-sysop)
 	{
 		result: "custom",
