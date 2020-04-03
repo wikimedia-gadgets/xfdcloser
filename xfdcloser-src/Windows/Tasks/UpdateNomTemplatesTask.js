@@ -3,7 +3,7 @@ import Task from "../Components/Task";
 
 function UpdateNomTemplatesTask(config) {
 	config = {
-		label: `Updating link in nomination ${config.pages.length > 1 ? "templates" : "template"}`,
+		label: `Updating link in nomination ${config.discussion.pages.length > 1 ? "templates" : "template"}`,
 		...config
 	};
 	// Call parent constructor

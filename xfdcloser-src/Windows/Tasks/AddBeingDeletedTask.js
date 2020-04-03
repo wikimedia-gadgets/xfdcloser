@@ -3,7 +3,7 @@ import Task from "../Components/Task";
 
 function AddBeingDeletedTask(config) {
 	config = {
-		label: `Updating ${config.pages.length > 1 ? "templates" : "template"}`,
+		label: `Updating ${config.pageResults.length > 1 ? "templates" : "template"}`,
 		...config
 	};
 	// Call parent constructor

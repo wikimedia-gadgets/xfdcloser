@@ -3,7 +3,7 @@ import Task from "../Components/Task";
 
 function AddOldXfdTask(config) {
 	config = {
-		label: `Updating talk ${config.pages.length > 1 ? "pages" : "page"}`,
+		label: `Updating talk ${config.pageResults.length > 1 ? "pages" : "page"}`,
 		...config
 	};
 	// Call parent constructor

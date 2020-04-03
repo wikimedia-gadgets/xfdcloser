@@ -3,7 +3,7 @@ import Task from "../Components/Task";
 
 function DeletePagesTask(config) {
 	config = {
-		label: `Deleting ${config.pages.length > 1 ? "pages" : "page"}`,
+		label: `Deleting ${config.pageResults.length > 1 ? "pages" : "page"}`,
 		...config
 	};
 	// Call parent constructor

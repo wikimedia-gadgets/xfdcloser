@@ -1,9 +1,26 @@
 import {hasCorrectNamespace, multiButtonConfirm, setExistence} from "../../util";
 import appConfig from "../../config";
 import API from "../../api";
-import Task from "../Components/Task";
-import closeDiscussion from "../Tasks/closeDiscussion";
 import ResizingMixin from "../Mixins/ResizingMixin";
+import CloseDiscussionTask from "../Tasks/CloseDiscussionTask";
+import AddOldXfdTask from "../Tasks/AddOldXfdTask";
+import RemoveNomTemplatesTask from "../Tasks/RemoveNomTemplatesTask";
+import RedirectTask from "../Tasks/RedirectTask";
+import AddMergeTemplatesTask from "../Tasks/AddMergeTemplatesTask";
+import DisambiguateTask from "../Tasks/DisambiguateTask";
+import DeletePagesTask from "../Tasks/DeletePagesTask";
+import DeleteTalkpagesTask from "../Tasks/DeleteTalkpagesTask";
+import DeleteRedirectsTask from "../Tasks/DeleteRedirectsTask";
+import UnlinkBacklinksTask from "../Tasks/UnlinkBacklinksTask";
+import AddBeingDeletedTask from "../Tasks/AddBeingDeletedTask";
+import AddToHoldingCellTask from "../Tasks/AddToHoldingCellTask";
+import TagTalkWithSpeedyTask from "../Tasks/TagTalkWithSpeedyTask";
+import GetRelistInfoTask from "../Tasks/GetRelistInfoTask";
+import UpdateDiscussionTask from "../Tasks/UpdateDiscussionTask";
+import UpdateOldLogPageTask from "../Tasks/UpdateOldLogPageTask";
+import UpdateNewLogPageTask from "../Tasks/UpdateNewLogPageTask";
+import UpdateNomTemplatesTask from "../Tasks/UpdateNomTemplatesTask";
+
 // <nowiki>
 /**
  * @param {Object} config
@@ -73,15 +90,15 @@ TaskFormWidget.prototype.doSanityChecks = function() {
 		warnings.push(`Mass actions will be peformed (${this.formData.pageResults.length} nominated pages detected).`);
 	}
 	
-	const expectedNamespace = appConfig.mw.namespaces[(appConfig.venue.ns_number[0]).toString()];
+	const expectedNamespace = appConfig.venue.ns_number && appConfig.mw.namespaces[(appConfig.venue.ns_number[0]).toString()];
 	// Check target page namespace:
 	var targetTitles = isMultimode
 		? [this.formData.targetTitle]
 		: this.formData.pageResults
 			.filter(pr => pr.data && pr.data.target)
-			.map(pr => mw.title.newFromText(pr.data.target));
+			.map(pr => mw.Title.newFromText(pr.data.target));
 	targetTitles.forEach(target => {
-		if (target && !hasCorrectNamespace(target)) {
+		if (target && expectedNamespace && !hasCorrectNamespace(target)) {
 			warnings.push(`Target page [[${target.getPrefixedText()}]] is not in the ${expectedNamespace} namespace.`);
 		}
 	});
@@ -185,53 +202,191 @@ TaskFormWidget.prototype.resolveRedirects = function() {
 };
 
 TaskFormWidget.prototype.initialiseTasks = function() {
-	// TODO: Use actual, specific Task widgets (and determine which tasks to add)
 	const baseConfig = {
 		appConfig: appConfig,
 		discussion: this.discussion,
 		formData: this.formData,
 		api: API
 	};
-	const tasks = [
-		this.type === "close"
-			? new closeDiscussion(baseConfig)
-			: new Task({
-				...baseConfig,
-				label: "Task One"
-			}),
-		new Task({
-			...baseConfig,
-			label: "Task Two"
-		}),
-		new Task({
-			...baseConfig,
-			label: $("<span>").append(["Task ", extraJs.makeLink("Three")])
-		}),
-		new Task({
-			...baseConfig,
-			label: "Task Four"
-		}),
-	];
+	const pageResultsWithOptions = this.formData.pageResults.map(pageResult => {
+		const optionsForResult = this.options.find(options => options.result === pageResult.resultType);
+		pageResult.options = optionsForResult.options;
+		return pageResult;
+	});
+	let tasks = [];
+
+	if (this.type === "close") {
+		tasks = this.prepareCloseTasks(baseConfig, pageResultsWithOptions);
+	} else if (this.type === "relist") {
+		tasks = this.prepareRelistTasks(baseConfig);
+	}
 	tasks.forEach( task => task.connect(this, {"resize": "emitResize"}) );
 	this.tasksFieldset.addItems( tasks );
 	this.emitResize();
 
 	tasks[0].start().then(() => {
-		// Simulate tasks states
-		tasks[1].setTotalSteps(10);
-		tasks[1].trackStep();
-		tasks[1].trackStep({failed: true});
-		tasks[1].addError("Could not edit something");
-
-		tasks[2].addWarning("Pagenamehere skipped: Could not find nomination template");
-
-		tasks[3].addError("Some sort of error happened");
-		tasks[3].addError("A Second Error!");
-		tasks[3].addWarning("Something to warn you about");
-		tasks[3].addWarning("Another warning");
-		tasks[3].addWarning("Yet another warning");
+		return $.when.apply(null,
+			tasks.slice(1).map(task => task.start())
+		);
 	});
 	
+};
+
+/**
+ * @param {Object} baseConfig 
+ * @param {Object} baseConfig.appConfig App configuration object
+ * @param {Discussion} baseConfig.discussion Discussion object,
+ * @param {Object} baseConfig.formData: formData (as per TaskFormWidget constructor)
+ * @param {mw.Api} baseConfig.api extended mw.Api object
+ * @param {Object[]} pageResultsWithOptions
+ * @returns {Task[]} Tasks
+ */
+TaskFormWidget.prototype.prepareCloseTasks = function(baseConfig, pageResultsWithOptions) {
+	const tasks = [];
+
+	// Close discussion
+	tasks.push( new CloseDiscussionTask(baseConfig) );
+
+	// Add Old xfd templates
+	const addOldXfdPageResults = pageResultsWithOptions
+		.filter(pageResult => {
+			const action = pageResult.options.action;
+			return (action === "updatePages" ||
+				action === "redirectAndUpdate" ||
+				action === "disambiguateAndUpdate" ||
+				action === "mergeAndUpdate"
+			);
+		});
+	if (addOldXfdPageResults.length) {
+		tasks.push(
+			new AddOldXfdTask({ ...baseConfig, pageResults: addOldXfdPageResults })
+		);
+	}
+
+	// Remove nomination templates
+	const removeNomPageResults = pageResultsWithOptions
+		.filter(pageResult => pageResult.options.action === "updatePages");
+	if (removeNomPageResults.length) {
+		tasks.push(
+			new RemoveNomTemplatesTask({ ...baseConfig, pageResults: removeNomPageResults })
+		);
+	}
+
+	// Redirect pages
+	const redirectActionPageResults = pageResultsWithOptions
+		.filter(pageResult => pageResult.options.action === "redirectAndUpdate");
+	if (redirectActionPageResults.length) {
+		tasks.push(
+			new RedirectTask({ ...baseConfig, pageResults: removeNomPageResults })
+		);
+	}
+
+	// Merge (not holding cell)
+	const mergeActionPageResults = pageResultsWithOptions
+		.filter(pageResult => pageResult.options.action === "mergeAndUpdate");
+	if (mergeActionPageResults.length) {
+		tasks.push(
+			new AddMergeTemplatesTask({ ...baseConfig, pageResults: mergeActionPageResults })
+		);
+	}
+
+	// Disambiguate
+	const disambigPageResults =  pageResultsWithOptions
+		.filter(pageResult => pageResult.options.action === "disambiguateAndUpdate");
+	if (disambigPageResults.length) {
+		tasks.push(
+			new DisambiguateTask({ ...baseConfig, pageResults: disambigPageResults })
+		);
+	}
+
+	// Delete
+	const deletePageResults = pageResultsWithOptions
+		.filter(pageResult => pageResult.options.action === "deletePages");
+	if (deletePageResults.length) {
+		tasks.push(
+			new DeletePagesTask({ ...baseConfig, pageResults: deletePageResults })
+		);
+		const deleteTalkPageResults = deletePageResults.filter(pageResult => pageResult.options.deleteTalk);
+		if (deleteTalkPageResults.length) {
+			tasks.push(
+				new DeleteTalkpagesTask({ ...baseConfig, pageResults: deleteTalkPageResults })
+			);
+		}
+		const deleteRedirPageResults = deletePageResults.filter(pageResult => pageResult.options.deleteRedir);
+		if (deleteRedirPageResults.length) {
+			tasks.push(
+				new DeleteRedirectsTask({ ...baseConfig, pageResults: deleteRedirPageResults })
+			);
+		}
+		const unlinkPageResults = deletePageResults.filter(pageResult => pageResult.options.unlink);
+		if (unlinkPageResults.length) {
+			tasks.push(
+				new UnlinkBacklinksTask({ ...baseConfig, pageResults: unlinkPageResults })
+			);
+		}
+	}
+
+	// Holding cell
+	const holdingCellPageResults = pageResultsWithOptions
+		.filter(pageResult => pageResult.options.action === "holdingCell" || pageResult.options.action === "holdingCellMerge");
+	if (holdingCellPageResults.length) {
+		tasks.push(
+			new AddBeingDeletedTask({ ...baseConfig, pageResults: holdingCellPageResults }),
+			new AddToHoldingCellTask({ ...baseConfig, pageResults: holdingCellPageResults })
+		);
+		const tagTalkPageResuts = holdingCellPageResults.filter(pageResult => pageResult.option.tagTalk);
+		if (tagTalkPageResuts.length) {
+			tasks.push(
+				new TagTalkWithSpeedyTask({ ...baseConfig, pageResults: tagTalkPageResuts })
+			);
+		}
+	}
+
+	return tasks;
+};
+
+/**
+ * @param {Object} baseConfig 
+ * @param {Object} baseConfig.appConfig App configuration object
+ * @param {Discussion} baseConfig.discussion Discussion object,
+ * @param {Object} baseConfig.formData: formData (as per TaskFormWidget constructor)
+ * @param {mw.Api} baseConfig.api extended mw.Api object
+ * @returns {Task[]} Tasks
+ */
+TaskFormWidget.prototype.prepareRelistTasks = function(baseConfig) {
+	const tasks = [ new GetRelistInfoTask(baseConfig) ];
+	
+	switch ( appConfig.venue ) {
+	case "afd":
+		tasks.push(
+			new UpdateDiscussionTask(baseConfig),
+			new UpdateOldLogPageTask(baseConfig),
+			new UpdateNewLogPageTask(baseConfig)
+		);
+		break;
+	case "mfd":
+		tasks.push( new UpdateDiscussionTask(baseConfig) );
+		break;
+	case "rfd":
+		tasks.push(
+			new UpdateOldLogPageTask(baseConfig),
+			new UpdateNewLogPageTask(baseConfig)
+		);
+		if (!baseConfig.discussion.isBasicMode() && baseConfig.discussion.pages.length > 1) {
+			tasks.push( new UpdateNomTemplatesTask(baseConfig) );
+		}
+		break;
+	default: // ffd, tfd
+		tasks.push(
+			new UpdateOldLogPageTask(baseConfig),
+			new UpdateNewLogPageTask(baseConfig)
+		);
+		if (!baseConfig.discussion.isBasicMode()) {
+			tasks.push( new UpdateNomTemplatesTask(baseConfig) );
+		}
+		break;	
+	}
+	return tasks;
 };
 
 export default TaskFormWidget;

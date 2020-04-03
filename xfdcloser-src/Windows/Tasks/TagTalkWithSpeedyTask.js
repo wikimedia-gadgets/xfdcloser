@@ -3,7 +3,7 @@ import Task from "../Components/Task";
 
 function TagTalkWithSpeedyTask(config) {
 	config = {
-		label: `Tagging talk ${config.pages.length > 1 ? "pages" : "page"}`,
+		label: `Tagging talk ${config.pageResults.length > 1 ? "pages" : "page"}`,
 		...config
 	};
 	// Call parent constructor

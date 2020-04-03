@@ -12,6 +12,10 @@ CloseDiscussionTask.prototype.doTask = function() {
 	this.setTotalSteps(1);
 	const appConfig = this.appConfig;
 
+	// For testing without actually editing
+	const testing = true;
+	if (testing) return $.Deferred().resolve("Simulated");
+
 	// Get nomination page content and remove {Closing} etc templates if present
 	return this.api.get( {
 		action: "query",

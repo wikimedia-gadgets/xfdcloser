@@ -1,13 +1,11 @@
-// <nowiki>
-
 import ResizingMixin from "../Mixins/ResizingMixin";
+// <nowiki>
 
 /**
  * @abstract
  * @class Task
  * @param {Object} config
- * @param {mw.APi} config.api extended mw.Api object
- * @param {mw.Title[]} config.pages Pages for this task
+ * @param {mw.Api} config.api extended mw.Api object
  * @param {Object} config.options Options for this task: {String}optionName, {*}optionValue pairs
  * @param {String|jQuery} config.label label for the task
  * @param {Discussion} config.discussion Discussion object
@@ -18,7 +16,6 @@ import ResizingMixin from "../Mixins/ResizingMixin";
  *  @param {mw.Title|undefined} config.formData.targetTitle
  *  @param {String|undefined} config.formData.targetWikiext
  *  @param {Object[]|false} config.formData.pageResults Array of {mw.Title}page, {String}resultType [{object}data] pairs/triplets
- * @param {mw.Api} [config.api] mw.Api object, if not using XFDcloser's default API object
  */
 function Task(config) {
 	// Configuration initialization
@@ -40,7 +37,8 @@ function Task(config) {
 	
 	// Store api and data
 	this.api = config.api;
-	this.pages = config.pages;
+	this.pageResults = config.formData.pageResults;
+	this.pages = config.formData.pageResults.map(pageResult => pageResult.page);
 	this.options = config.options;
 	this.discussion = config.discussion;
 	this.appConfig = config.appConfig;

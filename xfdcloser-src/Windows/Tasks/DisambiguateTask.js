@@ -3,7 +3,7 @@ import Task from "../Components/Task";
 
 function DisambiguateTask(config) {
 	config = {
-		label: `Updating ${config.pages.length > 1 ? "pages" : "page"}`,
+		label: `Updating ${config.pageResults.length > 1 ? "pages" : "page"}`,
 		...config
 	};
 	// Call parent constructor
