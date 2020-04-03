@@ -55,13 +55,14 @@ function TaskFormWidget( config ) {
 	this.doSanityChecks()
 		.then(() => this.resolveRedirects())
 		.then(() => this.initialiseTasks())
+		.then(() => {
+			// Simulate tasks being completed after 1.5 seconds
+			window.setTimeout(
+				() => this.setFinished(),
+				1500
+			);
+		})
 		.catch(reason => this.emit("cancelled", reason)); // TODO: Abort everything. Either close window, or return to previous page.
-
-	// Simulate tasks being completed: 
-	// window.setTimeout(
-	// 	() => this.setFinished(),
-	// 	1100
-	// );
 }
 OO.inheritClass( TaskFormWidget, OO.ui.Widget );
 OO.mixinClass( TaskFormWidget, ResizingMixin );
@@ -224,7 +225,7 @@ TaskFormWidget.prototype.initialiseTasks = function() {
 	this.tasksFieldset.addItems( tasks );
 	this.emitResize();
 
-	tasks[0].start().then(() => {
+	return tasks[0].start().then(() => {
 		return $.when.apply(null,
 			tasks.slice(1).map(task => task.start())
 		);

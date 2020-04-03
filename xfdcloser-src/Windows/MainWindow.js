@@ -318,6 +318,7 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 		this.updateSize();
 
 	} else if ( action === "save" ) {
+		this.pushPending();
 		this.setMode("tasks");
 		this.taskForm = new TaskFormWidget({
 			discussion: this.discussion,
@@ -357,6 +358,15 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 		return new OO.ui.Process().next(
 			() => this.close( {success: true} )
 		);
+
+	} else if (
+		!action &&
+		this.modes.current === "tasks" &&
+		this.getActions().get({"actions":"finish"}).length &&
+		this.getActions().get({"actions":"finish"})[0].isDisabled()
+	) {
+		// Ignore escape key presses
+		return new OO.ui.Process();
 
 	} else if (!action && this.resultForm.changed) {
 		// Confirm closing of dialog if there have been changes 
@@ -411,6 +421,7 @@ MainWindow.prototype.onShowOptions = function(resultData, isMultimode) {
 };
 
 MainWindow.prototype.onTasksFinished = function() {
+	this.popPending();
 	this.getActions().setAbilities({
 		finish: true,
 		abort: false
