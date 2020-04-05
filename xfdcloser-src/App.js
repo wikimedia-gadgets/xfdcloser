@@ -1,7 +1,7 @@
 import config from "./config";
 import ShowHideTag from "./ShowHideTag";
 import Discussion from "./Discussion";
-
+import windowManager from "./windowManager";
 // <nowiki>
 
 (function App() {
@@ -24,6 +24,13 @@ import Discussion from "./Discussion";
 
 	// Initialise show/hide closed discussions tag, unless there is only one discussion on the page
 	const showHide = $("#mw-content-text " + config.xfd.html.head).length > 1 && ShowHideTag.initialiseNewTag();
+
+	// Preferences portlet link
+	mw.util.addPortletLink("p-cactions", "#", "XFDC prefs", "p-xfdc-prefs", "XFDcloser preferences");
+	$("#p-xfdc-prefs").click(e => {
+		e.preventDefault();
+		windowManager.openWindow("prefs");
+	});
 
 	// Set up discussion object for each discussion
 	$(config.xfd.html.head + " > span.mw-headline")

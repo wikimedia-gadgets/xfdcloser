@@ -268,11 +268,11 @@ Discussion.prototype.setStatus = function($status) {
  * @returns {Boolean} True if dialog was opened, false if another dialog is already open
  */
 Discussion.prototype.openDialog = function(isRelisting) {
-	let currentWindow = windowManager.getCurrentWindow();
-	if (currentWindow && ( currentWindow.isOpened() || currentWindow.isOpening() ) ) {
-		// Another dialog window is already open
-		return false;
-	}
+	// let currentWindow = windowManager.getCurrentWindow();
+	// if (currentWindow && ( currentWindow.isOpened() || currentWindow.isOpening() ) ) {
+	// 	// Another dialog window is already open
+	// 	return false;
+	// }
 	windowManager.openWindow("main", {
 		discussion: this,
 		venue: config.venue,

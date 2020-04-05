@@ -9,6 +9,8 @@ function PrefsFormWidget( config ) {
 
 	this.$element.addClass("rater-prefsFormWidget");
 
+	this.changed = false;
+
 	this.layout =  new OO.ui.FieldsetLayout( {
 		label: "Preferences",
 		$element: this.$element
@@ -47,6 +49,11 @@ function PrefsFormWidget( config ) {
 				align: "right"
 			} )
 		]);
+		this.preferences[prefName].input.connect(this, {
+			"change": "onPrefChange",
+			"choose": "onPrefChange",
+			"select": "onPrefChange"
+		});
 	}
 }
 OO.inheritClass( PrefsFormWidget, OO.ui.Widget );
@@ -100,6 +107,10 @@ PrefsFormWidget.prototype.getPrefs = function() {
 		prefs[prefName] = value;
 	}
 	return prefs;
+};
+
+PrefsFormWidget.prototype.onPrefChange = function() {
+	this.changed = true;
 };
 
 export default PrefsFormWidget;
