@@ -12,10 +12,6 @@ CloseDiscussionTask.prototype.doTask = function() {
 	this.setTotalSteps(1);
 	const appConfig = this.appConfig;
 
-	// For testing without actually editing
-	const testing = true;
-	if (testing) return $.Deferred().resolve("Simulated");
-
 	// Get nomination page content and remove {Closing} etc templates if present
 	return this.api.get( {
 		action: "query",
@@ -104,7 +100,7 @@ CloseDiscussionTask.prototype.doTask = function() {
 					);
 				} else {
 					this.addError(
-						`Could not edit page ${extraJs.makeLink(this.discussion.nomPage).html()}; could not close discussion`,
+						`Could not edit page ${extraJs.makeLink(this.discussion.nomPage).get(0).outerHTML}; could not close discussion`,
 						{code, jqxhr, abort: true}
 					);
 				}

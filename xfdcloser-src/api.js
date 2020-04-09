@@ -13,12 +13,12 @@ function extendMwApi(api) {
 			var basetimestamp = page.revisions && page.revisions[0].timestamp;
 			var simplifiedPage = {
 				pageid: page.pageid,
-				missing: page.missing === "",
-				redirect: page.redirect === "",
+				missing: page.missing,
+				redirect: page.redirect,
 				categories: page.categories,
 				ns: page.ns,
 				title: page.title,
-				content: page.revisions && page.revisions[0].slots.main["*"]
+				content: page.revisions && page.revisions[0].slots.main.content
 			};
 			return $.when( transform(simplifiedPage) )
 				.then(function(editParams) {
@@ -27,7 +27,7 @@ function extendMwApi(api) {
 						title: page.title,
 						// Protect against errors and conflicts
 						assert: "user",
-						basetimestamp: basetimestamp,
+						basetimestamp: editParams.redirect ? null : basetimestamp, // basetimestamp of a redirect should not be used if editing the redirect's target
 						starttimestamp: starttime
 					}, editParams );
 					var doEdit = function(isRetry) {
@@ -67,6 +67,7 @@ function extendMwApi(api) {
 					{
 						"action": "query",
 						"format": "json",
+						"formatversion": "2",
 						"curtimestamp": 1,
 						"titles": titles,
 						"prop": "revisions|info",
@@ -112,9 +113,8 @@ function extendMwApi(api) {
 							return !arg.success;
 						});
 						if (errors.length > 0) {
-							return $.Deferred().reject("write", errors);
+							return $.Deferred().reject("write", errors.length, errors);
 						}
-						return true;
 					});
 			}, function(code, error) {
 				if (!isRetry) {

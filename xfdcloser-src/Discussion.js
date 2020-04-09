@@ -273,18 +273,21 @@ Discussion.prototype.openDialog = function(isRelisting) {
 	// 	// Another dialog window is already open
 	// 	return false;
 	// }
-	windowManager.openWindow("main", {
+	const winInstance = windowManager.openWindow("main", {
 		discussion: this,
 		venue: config.venue,
 		user: config.user,
 		type: isRelisting ? "relist" : "close"
-	}).closed.then(winData => {
+	});
+	if (!winInstance) {
+		return false;
+	}
+	winInstance.closed.then(winData => {
 		if (!winData || !winData.success) {
 			this.showLinks();
 		}
 		console.log("success", winData);
 	});
-
 	return true;
 };
 // Mark as finished

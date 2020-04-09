@@ -17,7 +17,7 @@ manager.openWindow = function(win, data) {
 		// Another dialog window is already open
 		return;
 	}
-	OO.ui.WindowManager.prototype.openWindow.call(this, win, data);
+	return OO.ui.WindowManager.prototype.openWindow.call(this, win, data);
 };
 $( document.body ).append( manager.$element );
 
