@@ -49,6 +49,12 @@ const _makeNewWikitext = function(wikitext, pageTitle) {
 
 	const templates = extraJs.parseTemplates(wikitext, true);
 	templates.forEach(template => {
+		const isXfdTemplate = /(a|t|d|f|i|m|r)fd/i.test(template.name);
+		if ( !isXfdTemplate ) return;
+
+		const date = template.getParam("date") && template.getParam("date").value || "";
+		const result = template.getParam("result") && template.getParam("result").value || "keep";
+
 		// Old AFDs
 		if (/(?:old|afd) ?(?:old|afd) ?(?:multi|full)?/i.test(template.name)){
 			oldAfdTemplate = template;
@@ -64,8 +70,6 @@ const _makeNewWikitext = function(wikitext, pageTitle) {
 		// Old TFDs
 		else if (/(?:old|tfd|Previous) ?(?:tfd|tfd|end)(?:full)?/i.test(template.name)) {
 			count++;
-			const date = template.getParam("date") && template.getParam("date").value || "";
-			const result = template.getParam("result") && template.getParam("result").value || "keep";
 			const logSubpage = template.getParam("link") && template.getParam("link").value || `{{subst:Date|${date}|ymd}}`;
 			const fragment = (template.getParam(1) && template.getParam(1).value) ||
 				(template.getParam("disc") && template.getParam("disc").value) ||
@@ -73,29 +77,25 @@ const _makeNewWikitext = function(wikitext, pageTitle) {
 			const page = `{{subst:#ifexist:Wikipedia:Templates for deletion/Log/${logSubpage}`+
 				`|Wikipedia:Templates for deletion/Log/${logSubpage}#${fragment}`+
 				`|Wikipedia:Templates for discussion/Log/${logSubpage}#${fragment}}}`;
-			oldafdmulti += ` |date${count}=${date} |result${count}='''${extraJs.toSentenceCase(result)}''' |page${count}=${page}`;
+			oldafdmulti += ` |date${count}=${date} |result${count}='''${extraJs.toSentenceCase(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
 			wikitext = wikitext.replace(template.wikitext, "");
 		}
 		// Old FFDs
 		else if (/old ?(?:f|i)fd(?:full)?/i.test(template.name)) {
 			count++;
-			const date = template.getParam("date") && template.getParam("date").value || "";
 			const formattedDate = `{{subst:#iferror:{{subst:#time:|${date}}}|${date}|{{subst:#time:Y F j|${date}}}}}`;
-			const result = template.getParam("result") && template.getParam("result").value || "keep";
 			const fragment = "File:" + template.getParam("page") && template.getParam("page").value || PAGENAME;
 			const page = `{{subst:#ifexist:Wikipedia:Images and media for deletion/${formattedDate}`+
 				`|Wikipedia:Images and media for deletion/${formattedDate}#${fragment}`+
 				`|{{subst:#ifexist:Wikipedia:Files for deletion/${formattedDate}`+
 				`|Wikipedia:Files for deletion/${formattedDate}#${fragment}`+
-				`|Wikipedia:Files for discussion/${formattedDate}#${fragment}`;
-			oldafdmulti += ` |date${count}=${date} |result${count}='''${extraJs.toSentenceCase(result)}''' |page${count}=${page}`;
+				`|Wikipedia:Files for discussion/${formattedDate}#${fragment}}}}}`;
+			oldafdmulti += ` |date${count}=${date} |result${count}='''${extraJs.toSentenceCase(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
 			wikitext = wikitext.replace(template.wikitext, "");
 		}
 		// Old MFDs
 		else if (/(?:old ?mfd|mfdend|mfdold)(?:full)?/i.test(template.name)) {
 			count++;
-			const date = template.getParam("date") && template.getParam("date").value || "";
-			const result = template.getParam("result") && template.getParam("result").value || "keep";
 			const subpage = (template.getParam("votepage") && template.getParam("votepage").value) ||
 				(template.getParam("title") && template.getParam("title").value) ||
 				(template.getParam("page") && template.getParam("page").value) ||
@@ -107,8 +107,6 @@ const _makeNewWikitext = function(wikitext, pageTitle) {
 		// Old RFDs
 		else if (/old?(?: |-)?rfd(?:full)?/i.test(template.name)) {
 			count++;
-			const date = template.getParam("date") && template.getParam("date").value || "";
-			const result = template.getParam("result") && template.getParam("result").value || "keep";
 			const rawlink = template.getParam("rawlink") && template.getParam("rawlink").value;
 			const subpage = (template.getParam("page") && template.getParam("page").value) ||
 				date + "#" + SUBJECTPAGENAME;
@@ -140,7 +138,7 @@ const _makeNewWikitext = function(wikitext, pageTitle) {
 
 	if ( oldAfdTemplate ) {
 		// Override the existing oldafdmulti
-		return wikitext.replace(oldAfdTemplate.wikitext, oldafdmulti+"\n");
+		return wikitext.replace(oldAfdTemplate.wikitext, oldafdmulti);
 	} else {
 		// Prepend to content ([[WP:Talk page layout]] is too complicated to automate)
 		return oldafdmulti + "\n" + wikitext;
