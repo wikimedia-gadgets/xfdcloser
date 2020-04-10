@@ -43,7 +43,12 @@ $.when(
 	}
 	
 	/* Load the sandbox script */
-	importScript("User:Evad37/XFDcloser/sandbox/core.js");
+	// importScript("User:Evad37/XFDcloser/sandbox/core.js");
+	var scriptUrl = "http://localhost:8125/dist/core.js";
+	mw.loader.getScript(scriptUrl).catch(function(e) {
+		e.message += " " + scriptUrl;
+		console.error(e);
+	});
 
 });
 /* </nowiki> */
