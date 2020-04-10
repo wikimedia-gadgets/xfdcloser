@@ -133,12 +133,12 @@ const resultsData = [
 		actions: ["disambiguateAndUpdate", "noActions"]
 	},
 
-	// Merge (AFD/CFD/MFD)
+	// Merge (AFD/MFD)
 	{
 		result: "merge",
 		requireTarget: true,
 		venues: ["afd", "mfd"],
-		actions: ["updatePages", "noActions"]
+		actions: ["mergeAndUpdate", "noActions"]
 	},
 	// Merge (CFD)
 	{

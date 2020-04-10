@@ -77,7 +77,7 @@ MultiResultItemWidget.prototype.onResultChoose = function(result) {
 
 MultiResultItemWidget.prototype.getSelectedResultData = function() {
 	const selectedResult = this.resultDropdown.getMenu().findSelectedItem();
-	const data = selectedResult && selectedResult.getData();
+	const data = selectedResult && selectedResult.getData() && { ...selectedResult.getData() };
 	if (data && data.requireTarget) {
 		data.target = this.targetTitle.getValue().trim();
 	}
