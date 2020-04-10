@@ -1,0 +1,2 @@
+	mw.loader.load("ext.gadget.XFDcloser-core");
+})();

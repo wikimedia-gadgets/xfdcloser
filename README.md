@@ -5,16 +5,19 @@ This is the source code for version 4 of the Wikipedia gadget [XFDcloser](https:
 Will be available at [https://en.wikipedia.org/wiki/Wikipedia:XFDcloser](https://en.wikipedia.org/wiki/Wikipedia:XFDcloser). Currently, that page is for version 3.
 
 ## Repository structure
-- `index.js` is the on-wiki entry point, written in ES5. This is published to [MediaWiki:Gadget-XFDcloser.js](https://en.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser.js) (when deploying). 
-   - `index-sandbox.js` is similar, but is designed for testing changes to the sandbox version of XFDCloser in userspace. See "On-wiki testing" section below.
-- `xfdcloser-src\` contains the main source code for the app, split into modules, which may be written in ES6. Code here can assume that the ResourceLoader modules specified in the above files have been loaded and that the DOM is ready.
+- `dist\` contains the files that have been built from source files: "core" files that contain the bulk of the code, and "loader" files that load the corresponding core file only if some basic checks pass.
+   - `dist\core.js` contains bundled and transpiled code, with a source map. Loaded when doing on-wiki testing (see "On-wiki testing" section below).
+   - `dist\core.min.js` is the minified version of core.js. It is published to [User:Evad37/XFDcloser/beta/core.js](https://en.wikipedia.org/wiki/User:Evad37/rater/beta/app.js) for beta testing.
+   - `dist\core-gadget.js` is the final version, including comments about it being a global gadget file. It is published to [MediaWiki:Gadget-XFDcloser-core.js](https://en.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser-core.js) (the *live version* of the script), once the other versions have been adequately tested.
+   - `dist\loader-beta.js` is a loader for the beta testing version. It is published to [User:Evad37/XFDcloser/beta.js](https://en.wikipedia.org/wiki/User:Evad37/rater/beta.js) for beta testing.
+   - `dist\loader-dev.js` is a loader for the testing the development version. Loaded when doing on-wiki testing (see "On-wiki testing" section below).
+   - `dist\loader-gadget.js` is a loader for the gadget version. It is published to [MediaWiki:Gadget-XFDcloser-core.js](https://en.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser-core.js) (the *live version* of the script), once the other versions have been adequately tested.
+- `xfdcloser-src\` contains the main source code for the app, split into modules, which may be written in ES6. Code here can assume that the ResourceLoader modules (as specified in the loaders, or in [MediaWiki:Gadgets-definition](https://en.wikipedia.org/wiki/MediaWiki:Gadgets-definition) as applicable) have been loaded and that the DOM is ready.
    - `App.js` is the entry point
    - Related code should be placed in the same module.
    - Small pieces of code, not particularly related to anything, can be placed in `xfdcloser-src\util.js`
-- The source code is bundled, transpiled, and minified using `npm run build`. This writes two files to the `dist\` directory:
-   - `dist\core.js` contains bundled and transpiled code, with a source map. It is published to [User:Evad37/XFDcloser/sandbox/core.js](https://en.wikipedia.org/wiki/User:Evad37/XFDcloser/sandbox/core.js), for testing/debugging purposes.
-   - `dist\core.min.js` is the minified version.  It is published to [MediaWiki:Gadget-XFDcloser-core.js](https://en.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser-core.js) (the *live version* of the script), once the sandbox version has been adequately tested. Or [User:Evad37/XFDcloser/beta/core.js](https://en.wikipedia.org/wiki/User:Evad37/rater/beta/app.js) for beta testing.
 - `server.js` is a simple node server to allow testing via the [localhost import trick](https://en.wikipedia.org/wiki/Wikipedia:User_scripts/Guide#Loading_it_from_a_localhost_web_server).
+- The source code is bundled, transpiled, minified, and concatenated using `npm run build`. This writes the files to the `dist\` directory. To only build the development versions (`dist\core.js` and `dist\loader-dev.js`), use `npm run build:dev` instead.
 
 ### Tooling
 - **eslint** for ES6 linting
@@ -41,7 +44,7 @@ Will be available at [https://en.wikipedia.org/wiki/Wikipedia:XFDcloser](https:/
       return config;
    };
    // </nowiki>
-   var xfdcDevUrl = "http://localhost:8125/index-sandbox.js";
+   var xfdcDevUrl = "http://localhost:8125/dist/loader-dev.js";
    mw.loader.getScript(xfdcDevUrl).catch(function(e) {
       e.message += " " + xfdcDevUrl;
       console.error(e);
