@@ -48,7 +48,7 @@ DisambiguateTask.prototype.doTask = function() {
 		
 		return {
 			text: updatedWikitext,
-			summary: `${this.venue.type.toUpperCase()} closed as ${this.formData.resultWikitext} ${this.appConfig.script.advert}`
+			summary: `${this.venue.type.toUpperCase()} closed as ${this.result} ${this.appConfig.script.advert}`
 		};
 	};
 

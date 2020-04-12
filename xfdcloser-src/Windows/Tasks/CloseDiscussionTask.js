@@ -1,10 +1,20 @@
 import Task from "../Components/Task";
 // <nowiki>
 
-function CloseDiscussionTask(config) {
+/**
+ * 
+ * @param {Object} config
+ * @param {Object} options
+ *  @param {String} [options.target] target (wikitext)
+ *  @param {String} [options.rationale] additional rationale (wikitext)
+ */
+function CloseDiscussionTask(config, options) {
 	config = {label: "Closing discussion", ...config};
 	// Call parent constructor
 	CloseDiscussionTask.super.call( this, config );
+	// Additional data that may be present
+	this.target = options.target;
+	this.rationale = options.rationale;
 }
 OO.inheritClass( CloseDiscussionTask, Task );
 
@@ -69,9 +79,9 @@ CloseDiscussionTask.prototype.doTask = function() {
 
 			// Add wikitext above/below discussion
 			const xfd_close_top = this.venue.wikitext.closeTop
-				.replace(/__RESULT__/, this.formData.resultWikitext || "&thinsp;")
-				.replace(/__TO_TARGET__/, this.formData.targetWikiext ? " to " + this.formData.targetWikiext : "")
-				.replace(/__RATIONALE__/, (this.formData.rationaleWikitext || "."))
+				.replace(/__RESULT__/, this.result || "&thinsp;")
+				.replace(/__TO_TARGET__/, this.target ? " to " + this.target : "")
+				.replace(/__RATIONALE__/, this.rationale || ".")
 				.replace(/__SIG__/, this.appConfig.user.sig);
 			const section_contents = contents.slice(contents.indexOf("\n") + 1).replace(
 				/({{closing}}|{{AfDh}}|{{AfDb}}|\{\{REMOVE THIS TEMPLATE WHEN CLOSING THIS AfD\|.?\}\}|<noinclude>\[\[Category:Relisted AfD debates\|.*?\]\](\[\[Category:AfD debates relisted 3 or more times|.*?\]\])?<\/noinclude>)/gi,
@@ -86,7 +96,7 @@ CloseDiscussionTask.prototype.doTask = function() {
 				title: this.discussion.nomPage,
 				section: this.discussion.sectionNumber,
 				text: updated_section,
-				summary: `/* ${this.discussion.sectionHeader} */ Closed as ${this.formData.resultWikitext}${this.appConfig.script.advert}`,
+				summary: `/* ${this.discussion.sectionHeader} */ Closed as ${this.result}${this.appConfig.script.advert}`,
 				basetimestamp: lastEditTime
 			} );
 		} )

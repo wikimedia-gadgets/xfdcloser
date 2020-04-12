@@ -25,11 +25,11 @@ AddMergeTemplatesTask.prototype.doTask = function() {
 	const curdate = `${today.getUTCDate()} ${this.appConfig.monthNames[today.getUTCMonth()]} ${today.getUTCFullYear()}`;
 
 	const targets = extraJs.uniqueArray(
-		this.formData.pageResults
+		this.pageResults
 			.filter(pageResult => pageResult.resultType === "merge")
 			.map(pageResult => pageResult.data.target)
 	).map(target => {
-		const mergeFromPages = this.formData.pageResults
+		const mergeFromPages = this.pageResults
 			.filter(pageResult => pageResult.data && pageResult.data.target === target );
 		const mergeToTemplate = this.venue.wikitext.mergeTo
 			.replace(/__TARGET__/, target)
@@ -65,7 +65,7 @@ AddMergeTemplatesTask.prototype.doTask = function() {
 		}
 		return {
 			prependtext: target.mergeFromTemplates,
-			summary: `[[:${this.discussion.getNomPageLink()}]] closed as ${this.formData.resultWikitext} ${this.appConfig.script.advert}`
+			summary: `[[:${this.discussion.getNomPageLink()}]] closed as ${this.result} ${this.appConfig.script.advert}`
 		};
 	};
 
@@ -130,7 +130,7 @@ AddMergeTemplatesTask.prototype.doTask = function() {
 	} );
 
 	const transformNom = (page) => {
-		const pageResult = this.formData.pageResults.find(pageResult => page.title === pageResult.page.getPrefixedText());
+		const pageResult = this.pageResults.find(pageResult => page.title === pageResult.page.getPrefixedText());
 		if (!pageResult){
 			return $.Deferred().reject("Unexpected title");
 		}

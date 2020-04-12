@@ -10,12 +10,9 @@ import ResizingMixin from "../Mixins/ResizingMixin";
  * @param {String|jQuery} config.label label for the task
  * @param {Discussion} config.discussion Discussion object
  * @param {object} config.appConfig App configuration, including {Venue}venue
- * @param {Object} config.formData
- *  @param {String} config.formData.resultWikitext
- *  @param {String} config.formData.rationaleWikitext
- *  @param {mw.Title|undefined} config.formData.targetTitle
- *  @param {String|undefined} config.formData.targetWikiext
- *  @param {Object[]|false} config.formData.pageResults Array of {mw.Title}page, {String}resultType [{object}data] pairs/triplets
+ * @param {Object} config.result result wikitext
+ * @param {Object[]|false} config.pageResults Array of objects with: {mw.Title}page, {String}resultType, {Object}options [, {object}data]
+ *  where options has {String}optionName: {*}optionValue pairs, and [data] may include {String}target, {String}customResult
  */
 function Task(config) {
 	// Configuration initialization
@@ -37,13 +34,13 @@ function Task(config) {
 	
 	// Store api and data
 	this.api = config.api;
-	this.pageResults = config.formData.pageResults;
-	this.pages = config.formData.pageResults.map(pageResult => pageResult.page);
+	this.pageResults = config.pageResults;
+	this.pages = config.pageResults && config.pageResults.map(pageResult => pageResult.page);
 	this.options = config.options;
 	this.discussion = config.discussion;
 	this.appConfig = config.appConfig;
 	this.venue = config.appConfig.venue;
-	this.formData = config.formData;
+	this.result = config.result;
 
 	// Warnings and errors
 	this.warningsList = [];

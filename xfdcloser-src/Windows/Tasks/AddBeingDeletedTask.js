@@ -15,7 +15,7 @@ AddBeingDeletedTask.prototype.doTask = function() {
 	this.setTotalSteps(this.pages.length);
 
 	// Merge targets and pages to be merged (if any)
-	const mergePageResults = this.formData.pageResults
+	const mergePageResults = this.pageResults
 		.filter(pageResult => pageResult.resultType === "merge");
 	const mergeTargets = extraJs.uniqueArray(
 		mergePageResults.map(pageResult => pageResult.data.target)
@@ -34,7 +34,7 @@ AddBeingDeletedTask.prototype.doTask = function() {
 			return $.Deferred().reject("doesNotExist");
 		}
 
-		const pageResult = this.formData.pageResults
+		const pageResult = this.pageResults
 			.find(pageResult => pageResult.page.getPrefixedText() === pageObj.getPrefixedText());
 		const holdcellsection = pageResult.options.holdcellSection;
 		
@@ -48,7 +48,7 @@ AddBeingDeletedTask.prototype.doTask = function() {
 				// Is a merge target, so just remove nom template
 				return {
 					text: this.venue.removeNomTemplate(oldWikitext),
-					summary: `[[${this.discussion.getNomPageLink()}]] closed as ${this.formData.resultWikitext} ${this.appConfig.script.advert}`
+					summary: `[[${this.discussion.getNomPageLink()}]] closed as ${this.result} ${this.appConfig.script.advert}`
 				};
 			} else if ( holdcellsection === "ready" ) {
 				// Is ready for deletion, so tag for speedy deletion

@@ -206,8 +206,8 @@ TaskFormWidget.prototype.initialiseTasks = function() {
 	const baseConfig = {
 		appConfig: appConfig,
 		discussion: this.discussion,
-		formData: this.formData,
-		api: API
+		api: API,
+		result: this.formData.resultWikitext
 	};
 	const pageResultsWithOptions = this.formData.pageResults.map(pageResult => {
 		const optionsForResult = this.options.find(options => options.result === pageResult.resultType);
@@ -246,7 +246,10 @@ TaskFormWidget.prototype.prepareCloseTasks = function(baseConfig, pageResultsWit
 	const tasks = [];
 
 	// Close discussion
-	tasks.push( new CloseDiscussionTask(baseConfig) );
+	tasks.push( new CloseDiscussionTask(baseConfig, {
+		target: this.formData.targetWikiext,
+		rationale: this.formData.rationaleWikitext
+	}) );
 
 	// Add Old xfd templates
 	const addOldXfdPageResults = pageResultsWithOptions

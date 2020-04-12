@@ -1,6 +1,10 @@
 import Task from "../Components/Task";
 // <nowiki>
 
+/**
+ * 
+ * @param {Object} config
+ */
 function AddOldXfdTask(config) {
 	config = {
 		label: `Updating talk ${config.pageResults.length > 1 ? "pages" : "page"}`,
@@ -20,7 +24,7 @@ const _makeOldxfdWikitext = function(altpage) {
 	var result = this.venue.wikitext.oldXfd
 		.replace(/__DATE__/, this.discussion.nomDate)
 		.replace(/__SECTION__/, this.discussion.sectionHeader)
-		.replace(/__RESULT__/, this.formData.resultWikitext)
+		.replace(/__RESULT__/, this.result)
 		.replace(/__FIRSTDATE__/, this.discussion.firstDate)
 		.replace(/__SUBPAGE__/, this.discussion.getNomSubpage());
 	if ( altpage ) {
@@ -127,8 +131,8 @@ const _makeNewWikitext = function(wikitext, pageTitle) {
 	count++;
 	const currentCount = count === 1 ? "" : count.toString();
 	const currentResult = count === 1
-		? this.formData.resultWikitext
-		: extraJs.toSentenceCase(this.formData.resultWikitext);
+		? this.result
+		: extraJs.toSentenceCase(this.result);
 
 	const page = this.venue.type === "afd"
 		? this.discussion.getNomSubpage()
@@ -165,7 +169,7 @@ const _transform = function(page) {
 	}
 	const baseEditParams = {
 		section: "0",
-		summary: `Old ${this.venue.type.toUpperCase()} – ${this.discussion.nomDate}: ${this.formData.resultWikitext} ${this.appConfig.script.advert}`,
+		summary: `Old ${this.venue.type.toUpperCase()} – ${this.discussion.nomDate}: ${this.result} ${this.appConfig.script.advert}`,
 	};
 	
 	// Required edit params vary based on talk page redirect status and venue
