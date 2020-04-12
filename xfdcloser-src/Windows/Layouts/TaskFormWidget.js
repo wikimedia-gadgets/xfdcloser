@@ -335,7 +335,7 @@ TaskFormWidget.prototype.prepareCloseTasks = function(baseConfig, pageResultsWit
 			new AddBeingDeletedTask({ ...baseConfig, pageResults: holdingCellPageResults }),
 			new AddToHoldingCellTask({ ...baseConfig, pageResults: holdingCellPageResults })
 		);
-		const tagTalkPageResuts = holdingCellPageResults.filter(pageResult => pageResult.option.tagTalk);
+		const tagTalkPageResuts = holdingCellPageResults.filter(pageResult => pageResult.options.tagTalk);
 		if (tagTalkPageResuts.length) {
 			tasks.push(
 				new TagTalkWithSpeedyTask({ ...baseConfig, pageResults: tagTalkPageResuts })
