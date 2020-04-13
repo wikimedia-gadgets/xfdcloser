@@ -120,6 +120,50 @@ function extendMwApi(api) {
 		};
 		return doGetQuery(titles);
 	};
+
+	/**
+	 * @param {String|String[]} titles pages to be deleted
+	 * @param {Object} options options to send with the Api request
+	 *  @param {String} options.reason deletion reason for logs
+	 * @param {Function} onEachSuccess callback for each successful deletion
+	 * @param {Function} onEachFail callback for each failed deletion
+	 */
+	api.deleteWithRetry = function(titles, options, onEachSuccess, onEachFail) {
+		options = options || {};
+		const deleteTitle = (title, isRetry) => api.postWithEditToken({ action: "delete", title, ...options })
+			.then(
+				(response) => {
+					if (onEachSuccess) {
+						onEachSuccess(response);
+					}
+					return {success: true};
+				},
+				(code, error) => {
+					if (!isRetry) {
+						return deleteTitle(title, true);
+					}
+					if (onEachFail) {
+						onEachFail(code, error, title);
+					}
+					return {success: false, code, error, title};
+				}
+			);
+		
+		const deletionPromises = Array.isArray(titles)
+			? titles.map(title => deleteTitle(title))
+			: [deleteTitle(titles)];
+		
+		return $.when.apply(null, deletionPromises)
+			.then(function() {
+				var args = Array.prototype.slice.call(arguments);
+				var errors = args.filter(function(arg) {
+					return !arg.success;
+				});
+				if (errors.length > 0) {
+					return $.Deferred().reject("delete", errors.length, errors);
+				}
+			});
+	};
 	return api;
 }
 

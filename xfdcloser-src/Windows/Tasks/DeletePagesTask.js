@@ -18,45 +18,33 @@ DeletePagesTask.prototype.doTask = function() {
 	}
 	this.setTotalSteps(this.pages.length);
 
-	const apiDeletePage = (page, isRetry) => {
-		const pageText = page.getPrefixedText();
-		const pageLink = extraJs.makeLink(pageText).get(0).outerHTML;
+	const pagesToDelete = this.pages.filter(page => {
 		if (!page.exists()) {
+			const pageLink = extraJs.makeLink(page.getPrefixedText()).get(0).outerHTML;
 			this.addWarning(
 				`${pageLink} skipped: does not exist (may have already been deleted by others)`
 			);
 			this.trackStep({failed: true});
-			return;
+			return false;
 		}
-
-		return this.api.postWithToken( "csrf", {
-			action: "delete",
-			title: pageText,
-			reason: `[[${this.discussion.getNomPageLink()}]] ${this.appConfig.script.advert}`
-		} )
-			.then( () => this.trackStep() )
-			.catch( (code, error) => {
-				if (!isRetry) {
-					return apiDeletePage(page, true);
-				}
-				this.addError(
-					`Could not delete page ${pageLink}`,
-					{code, error}
-				);
-				this.trackStep({failed: true});
-			} );
-	};
-
-	return $.when.apply(null,
-		this.pages.map(page => apiDeletePage(page))
-	).then(() => {
-		// All errors already handled above, just need to determine task status
-		if (this.steps.completed === 0) {
-			return "Failed";
-		} else if (this.steps.completed < this.steps.total) {
-			return "Done with errors";
-		}
+		return true;
 	});
+	const reason = `[[${this.discussion.getNomPageLink()}]] ${this.appConfig.script.advert}`;
+
+	return this.api.deleteWithRetry(
+		pagesToDelete.map(page => page.getPrefixedText()),
+		{reason},
+		() => { this.trackStep(); },
+		(code, error, title) => {
+			this.addError(
+				`Could not delete page ${extraJs.makeLink(title).get(0).outerHTML}`,
+				{code, error}
+			);
+			this.trackStep({failed: true});
+		}
+	).catch( // Errors already handled above, just need to determine task status
+		() => (this.steps.completed === 0) ? "Failed" : "Done with errors"
+	);
 };
 
 export default DeletePagesTask;
