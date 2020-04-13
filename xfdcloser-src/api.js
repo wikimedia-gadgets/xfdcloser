@@ -84,12 +84,7 @@ function extendMwApi(api) {
 					return processPage(page, id, starttime);
 				});
 				
-				// If only for one title, return that promise (which may either be resolved or rejected)
-				if (!$.isArray(titles)) {
-					return pages[0];
-				}
-
-				// Otherwise, convert the array of promises into a single promise, resolved if all were
+				// Convert the array of promises into a single promise, resolved if all were
 				// resolved, or rejected with an array of errors of all that failed.
 				return $.when.apply(
 					null,

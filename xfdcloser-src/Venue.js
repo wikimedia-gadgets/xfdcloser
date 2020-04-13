@@ -166,18 +166,18 @@ Venue.Tfd = () => {
 			relistPattern:	/Wikipedia:Templates(_|\s){1}for(_|\s){1}discussion\/Log\/\d{4}(_|\s){1}\w*(_|\s){1}\d{1,2}#(?=[^}]*}{2})/gi
 		},
 		holdingCellSectionNumber: {
-			"review":			2,
-			"convert":			11,
-			"substitute":		12,
-			"orphan":			13,
-			"ready":			14,	// (ready for deletion)
-			"merge-arts":		4,
-			"merge-geopolgov":	5,	// (geography, politics and governance)
-			"merge-religion":	6,
-			"merge-sports":		7,
-			"merge-transport":	8,
-			"merge-other":		9,
-			"merge-meta":		10
+			"review":			3,
+			"merge-arts":		5,
+			"merge-geopolgov":	6,	// (geography, politics and governance)
+			"merge-religion":	7,
+			"merge-sports":		8,
+			"merge-transport":	9,
+			"merge-other":		10,
+			"merge-meta":		11,
+			"convert":			12,
+			"substitute":		13,
+			"orphan":			14,
+			"ready":			15	// (ready for deletion)
 		}
 	});
 	// Override prototype
