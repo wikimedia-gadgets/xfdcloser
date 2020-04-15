@@ -132,6 +132,38 @@ var multiButtonConfirm = function(config) {
 	return dialogClosed.promise();
 };
 
+/**
+ * Merge two objects recursively, including arrays. Returns a new object without modifying either input.
+ * Keys present in both the target and the source take on the value of the source, except if:
+ * - both are objects, in which case those objects are merged
+ * - both are arrays, in which case those arrays are merged  
+ * 
+ * @param {Object} target
+ * @param {Object} source
+ * @returns {Object} merged object
+ */
+const recursiveMerge = (target, source) => {
+	const result = {};
+	// Get all keys from both objects
+	const keys = Object.keys({...target, ...source});
+	// Check if the value each key is an array, or plain object, or neither
+	keys.forEach(key => {
+		if ( Array.isArray(target[key]) && Array.isArray(source[key]) ) {
+			// Both values are arrays, so merge them
+			result[key] = [...target[key], ...source[key]];
+		} else if ( $.isPlainObject(target[key]) && $.isPlainObject(source[key])) {
+			// Both values are plain objects, so recursively merge them
+			result[key] = recursiveMerge(target[key], source[key]);
+		} else if (source[key] === undefined) {
+			// Key only exists on target, so use that value
+			result[key] = target[key];
+		} else {
+			result[key] = source[key];
+		}
+	});
+	return result;
+};
+
 export { 
 	safeUnescape,
 	dmyDateString,
@@ -140,6 +172,7 @@ export {
 	setExistence,
 	arrayFromResponsePages,
 	pageFromResponse,
-	multiButtonConfirm
+	multiButtonConfirm,
+	recursiveMerge
 };
 // </nowiki>

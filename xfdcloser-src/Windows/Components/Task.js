@@ -13,6 +13,7 @@ import ResizingMixin from "../Mixins/ResizingMixin";
  * @param {Object} config.result result wikitext
  * @param {Object[]|false} config.pageResults Array of objects with: {mw.Title}page, {String}resultType, {Object}options [, {object}data]
  *  where options has {String}optionName: {*}optionValue pairs, and [data] may include {String}target, {String}customResult
+ * @param {Promise} [config.delayStart] delay the start of this task until this promise is resolved
  */
 function Task(config) {
 	// Configuration initialization
@@ -41,6 +42,7 @@ function Task(config) {
 	this.appConfig = config.appConfig;
 	this.venue = config.appConfig.venue;
 	this.result = config.result;
+	this.delayStart = config.delayStart;
 
 	// Warnings and errors
 	this.warningsList = [];
@@ -143,10 +145,11 @@ Task.prototype.updateProgress = function() {
 	this.setNotice(`Processing... (${this.steps.completed + this.steps.failed} / ${this.steps.total})`);
 };
 
-
 Task.prototype.start = function() {
-	this.setNotice("Processing...");
-	return this.doTask().then( notice => {
+	return $.when(this.delayStart).then( () => {
+		this.setNotice("Processing...");
+		return this.doTask();
+	}).then( notice => {
 		const currentLabel = this.field.getLabel();
 		this.setLabel( $("<span>").append([
 			currentLabel,

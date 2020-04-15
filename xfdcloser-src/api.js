@@ -1,4 +1,5 @@
 import config from "./config";
+import { recursiveMerge } from "./util";
 
 // <nowiki>
 
@@ -122,16 +123,23 @@ function extendMwApi(api) {
 	};
 
 	/**
-	 * @param {String|String[]} titles pages to be deleted
+	 * @param {String|String[]|Number|Number[]} pages pages to be deleted, either:
+	 * - page titles as strings
+	 * - page ids as numbers
 	 * @param {Object} options options to send with the Api request
 	 *  @param {String} options.reason deletion reason for logs
 	 * @param {Function} onEachSuccess callback for each successful deletion
 	 * @param {Function} onEachFail callback for each failed deletion
 	 */
-	api.deleteWithRetry = function(titles, options, onEachSuccess, onEachFail) {
-		options = options || {};
-		const deleteTitle = (title, isRetry) => api.postWithEditToken({ action: "delete", title, ...options })
-			.then(
+	api.deleteWithRetry = function(pages, options, onEachSuccess, onEachFail) {
+		const deletePage = (titleOrId, isRetry) => {
+			const baseQuery = {action: "delete"};
+			if (typeof titleOrId === "number") {
+				baseQuery.pageid = titleOrId;
+			} else {
+				baseQuery.title = titleOrId;
+			}
+			return api.postWithEditToken({...baseQuery, ...options}).then(
 				(response) => {
 					if (onEachSuccess) {
 						onEachSuccess(response);
@@ -140,18 +148,19 @@ function extendMwApi(api) {
 				},
 				(code, error) => {
 					if (!isRetry) {
-						return deleteTitle(title, true);
+						return deletePage(titleOrId, true);
 					}
 					if (onEachFail) {
-						onEachFail(code, error, title);
+						onEachFail(code, error, titleOrId);
 					}
-					return {success: false, code, error, title};
+					return {success: false, code, error, title:titleOrId};
 				}
 			);
+		};
 		
-		const deletionPromises = Array.isArray(titles)
-			? titles.map(title => deleteTitle(title))
-			: [deleteTitle(titles)];
+		const deletionPromises = Array.isArray(pages)
+			? pages.map(page => deletePage(page))
+			: [deletePage(pages)];
 		
 		return $.when.apply(null, deletionPromises)
 			.then(function() {
@@ -164,6 +173,32 @@ function extendMwApi(api) {
 				}
 			});
 	};
+
+	/**
+	 * @param {Object} params query parameters
+	 * @param {String} [method] method for sending query, default if not specified is "get"
+	 * @returns {Promise} recursively merged query responses 
+	 */
+	api.queryWithContinue = function(params, method) {
+		const baseQuery = {
+			action: "query",
+			format: "json",
+			formatversion: "2",
+			...params
+		};
+		const doQuery = (query, previousResult) => api[method||"get"](query).then(response => {
+			const result = previousResult
+				? recursiveMerge(previousResult, response.query)
+				: response.query;
+			if (response.continue) {
+				return doQuery({...baseQuery, ...response.continue}, result);
+			}
+			return result;
+		});
+
+		return doQuery(baseQuery);
+	};
+
 	return api;
 }
 

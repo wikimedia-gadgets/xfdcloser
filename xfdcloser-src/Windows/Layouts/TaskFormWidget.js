@@ -317,16 +317,21 @@ TaskFormWidget.prototype.prepareCloseTasks = function(baseConfig, pageResultsWit
 			);
 		}
 		const deleteRedirPageResults = deletePageResults.filter(pageResult => pageResult.options.deleteRedir);
+		const deleteRedirDelay = $.Deferred();
 		if (deleteRedirPageResults.length) {
 			tasks.push(
-				new DeleteRedirectsTask({ ...baseConfig, pageResults: deleteRedirPageResults })
+				new DeleteRedirectsTask({ ...baseConfig, pageResults: deleteRedirPageResults, delayStart: deleteRedirDelay})
 			);
 		}
 		const unlinkPageResults = deletePageResults.filter(pageResult => pageResult.options.unlink);
 		if (unlinkPageResults.length) {
+			const unlinkTask = new UnlinkBacklinksTask({ ...baseConfig, pageResults: unlinkPageResults });
+			unlinkTask.finishedReadingApi.then(() => deleteRedirDelay.resolve());
 			tasks.push(
 				new UnlinkBacklinksTask({ ...baseConfig, pageResults: unlinkPageResults })
 			);
+		} else {
+			deleteRedirDelay.resolve();
 		}
 	}
 
