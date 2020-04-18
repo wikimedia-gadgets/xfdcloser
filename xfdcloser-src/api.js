@@ -9,6 +9,15 @@ import { recursiveMerge } from "./util";
  * @returns {mw.Api} extended API object 
  */
 function extendMwApi(api) {
+	/**
+	 * @param {String|String[]} titles
+	 * @param {Object|null} [getParams] additional parameters for the api query
+	 * @param {Function} transform function that is passed a simplifiedPage object,
+	 *  and returns edit parameters as a key-value pair object (or a promise of one)
+	 * @param {Function} onEachSuccess callback for each successful deletion
+	 * @param {Function} onEachFail callback for each failed deletion
+	 * @returns {Promise} resolved if all edits were successful, rejected if there were failures
+	 */
 	api.editWithRetry = function(titles, getParams, transform, onEachSuccess, onEachFail) {
 		var processPage = function(page, id, starttime) {
 			var basetimestamp = page.revisions && page.revisions[0].timestamp;
