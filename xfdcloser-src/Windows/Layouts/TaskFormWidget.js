@@ -31,6 +31,7 @@ import UpdateNomTemplatesTask from "../Tasks/UpdateNomTemplatesTask";
  *  @param {String} config.formData.rationaleWikitext
  *  @param {mw.Title|undefined} config.formData.targetTitle
  *  @param {String|undefined} config.formData.targetWikiext
+ *  @param {Object|undefined} config.formData.resultOptions
  *  @param {Object[]|false} config.formData.pageResults Array of {mw.Title}page, {String}resultType [{object}data] pairs/triplets
  * @param {Object[]} config.options Array of {String}result, {Object}options pairs, where options has {String}optionName, {*}optionValue pairs
  * @param {jQuery} config.$overlay element for overlays
@@ -207,7 +208,8 @@ TaskFormWidget.prototype.initialiseTasks = function() {
 		appConfig: appConfig,
 		discussion: this.discussion,
 		api: API,
-		result: this.formData.resultWikitext
+		result: this.formData.resultWikitext,
+		resultOptions:  this.formData.resultOptions
 	};
 	const pageResultsWithOptions = this.formData.pageResults.map(pageResult => {
 		const optionsForResult = this.options.find(options => options.result === pageResult.resultType);
@@ -281,7 +283,7 @@ TaskFormWidget.prototype.prepareCloseTasks = function(baseConfig, pageResultsWit
 		.filter(pageResult => pageResult.options.action === "redirectAndUpdate");
 	if (redirectActionPageResults.length) {
 		tasks.push(
-			new RedirectTask({ ...baseConfig, pageResults: removeNomPageResults })
+			new RedirectTask({ ...baseConfig, pageResults: redirectActionPageResults })
 		);
 	}
 

@@ -250,6 +250,7 @@ ResultFormWidget.prototype.getResultFormData = function() {
 	const target = !this.relisting && !this.isMultimode && this.resultWidget.getTargetWikitext({raw: true});
 	const targetTitle = target && mw.Title.newFromText(target);
 	const targetWikiext = target && this.resultWidget.getTargetWikitext();
+	const resultOptions = !this.isMultimode && this.resultWidget.getResultOptions();
 	const pageResults = this.isMultimode
 		? this.multiResultWidget.getResultsByPage()
 		: Array.isArray(this.pages) && this.pages.map(page => ({
@@ -257,15 +258,14 @@ ResultFormWidget.prototype.getResultFormData = function() {
 			resultType: this.resultWidget.getSelectedResultData().result,
 			data: { target } // This is duplication, but matches the form used by multiResultWidget.getResultsByPage()
 		}));
-	// const resultOptions = this.options.getValues();
 
 	return {
 		resultWikitext, // {String}
 		rationaleWikitext, // {String}
-		targetTitle, // {mw.Title|undefined}
-		targetWikiext, //{String|undefined}
+		targetTitle, // [{mw.Title}]
+		targetWikiext, // [{String}]
+		resultOptions, // [{Object<String:boolean>}] Object with keys as option names, values as booleans (true for checked, false for unchecked)
 		pageResults, // {Object[]|false} Array of {mw.Title}page, {String}resultType, [{Object}data] pairs/triplets.
-		// resultOptions // {Object[]} Array of {String}result, {Object}options pairs, where options has {String}optionName, {*}optionValue pairs
 	};
 };
 

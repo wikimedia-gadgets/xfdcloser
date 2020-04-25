@@ -509,7 +509,7 @@ const actions = [
 					type: "rcatMulitSelect",
 					venue: ["afd"],
 					items: rcats,
-					initialValue: "{{R to related section}}"
+					initialValue: "{{R to related topic}}"
 				}
 			]
 		},

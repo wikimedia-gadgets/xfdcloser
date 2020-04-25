@@ -30,15 +30,15 @@ function ResultWidget(config) {
 	} );
 
 	this.speedyOption = new OO.ui.CheckboxMultioptionWidget( {
-		data: {prefix: "speedy "},
+		data: {name:"speedy", prefix: "speedy "},
 		label: "Speedy"
 	} );
 	this.softOption = new OO.ui.CheckboxMultioptionWidget( {
-		data: {prefix: "soft "},
+		data: {name:"soft", prefix: "soft "},
 		label: "Soft"
 	} );
 	this.deleteFirstOption = new OO.ui.CheckboxMultioptionWidget( {
-		data: {prefix: "delete and "},
+		data: {name:"deleteFirst", prefix: "delete and "},
 		label: "Delete first"
 	} );
 
@@ -112,6 +112,16 @@ ResultWidget.prototype.onOptionsChange = function(option) {
 			.forEach(o => o.setSelected(false));
 	}
 	this.emitChange();
+};
+
+ResultWidget.prototype.getResultOptions = function() {
+	const resultOptions = {};
+	this.optionsMultiselect.items
+		.filter(option => option.isVisible())
+		.forEach(option => {
+			resultOptions[option.getData().name] = option.isSelected();
+		});
+	return resultOptions;
 };
 
 ResultWidget.prototype.getResultText = function() {
