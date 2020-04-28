@@ -20,6 +20,7 @@ import UpdateDiscussionTask from "../Tasks/UpdateDiscussionTask";
 import UpdateOldLogPageTask from "../Tasks/UpdateOldLogPageTask";
 import UpdateNewLogPageTask from "../Tasks/UpdateNewLogPageTask";
 import UpdateNomTemplatesTask from "../Tasks/UpdateNomTemplatesTask";
+import RemoveCircularLinksTask from "../Tasks/RemoveCircularLinksTask";
 
 // <nowiki>
 /**
@@ -285,6 +286,12 @@ TaskFormWidget.prototype.prepareCloseTasks = function(baseConfig, pageResultsWit
 		tasks.push(
 			new RedirectTask({ ...baseConfig, pageResults: redirectActionPageResults })
 		);
+		const isSoftRedirection = /^soft/.test(baseConfig.result);
+		if (!isSoftRedirection) {
+			tasks.push(
+				new RemoveCircularLinksTask({ ...baseConfig, pageResults: redirectActionPageResults })
+			);
+		}
 	}
 
 	// Merge (not holding cell)
