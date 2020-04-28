@@ -45,10 +45,10 @@
 /* Fix left padding when labelPosition:before is used on a TextInputWidget.
  * Is otherwise set to 0px via inline style on the <input> element.
  */
-.oo-ui-textInputWidget.oo-ui-textInputWidget-labelPosition-before.padLeft2-5em .oo-ui-inputWidget-input {
-	padding-left: 2.5em !important;
+.oo-ui-textInputWidget.oo-ui-textInputWidget-labelPosition-before.padLeft2em .oo-ui-inputWidget-input {
+	padding-left: 2em !important;
 }
 
 .oo-ui-textInputWidget.oo-ui-textInputWidget-labelPosition-before.padLeft4em .oo-ui-inputWidget-input {
-	padding-left: 3em !important;
+	padding-left: 4em !important;
 }

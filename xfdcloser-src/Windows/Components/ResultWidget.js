@@ -59,6 +59,7 @@ function ResultWidget(config) {
 	this.targetTitle = new OO.ui.TextInputWidget( {
 		label: "to:",
 		labelPosition: "before",
+		classes: ["padLeft2em"],
 		validate: function(val) {
 			return mw.Title.newFromText(val) !== null;
 		}
@@ -68,6 +69,7 @@ function ResultWidget(config) {
 	this.customResult = new OO.ui.TextInputWidget( {
 		label: "Result:",
 		labelPosition: "before",
+		classes: ["padLeft4em"],
 		validate: "non-empty"
 	} );
 	this.customResult.toggle(false);
