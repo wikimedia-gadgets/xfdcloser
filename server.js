@@ -6,7 +6,7 @@ const port = 8125;
 
 const server = http.createServer((request, response) => {
 	const filePath = '.' + request.url
-	const contentType = "text/javascript";
+	const contentType = /\.css$/.test(filePath) ? "text/css" : "text/javascript";
 	fs.readFile(filePath, function(error, content) {
 		if (error) {
 			response.writeHead(error.code == 'ENOENT' ? 404 : 500);

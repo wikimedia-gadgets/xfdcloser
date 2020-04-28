@@ -5,27 +5,49 @@ This is the source code for version 4 of the Wikipedia gadget [XFDcloser](https:
 Will be available at [https://en.wikipedia.org/wiki/Wikipedia:XFDcloser](https://en.wikipedia.org/wiki/Wikipedia:XFDcloser). Currently, that page is for version 3.
 
 ## Repository structure
-- `dist\` contains the files that have been built from source files: "core" files that contain the bulk of the code, and "loader" files that load the corresponding core file only if some basic checks pass.
+- `dist\` contains the files that have been built from source files: "core" files that contain the bulk of the code, "loader" files that load the corresponding core file only if some basic checks pass, and CSS styles.
    - `dist\core.js` contains bundled and transpiled code, with a source map. Loaded when doing on-wiki testing (see "On-wiki testing" section below).
    - `dist\core.min.js` is the minified version of core.js. It is published to [User:Evad37/XFDcloser/beta/core.js](https://en.wikipedia.org/wiki/User:Evad37/rater/beta/app.js) for beta testing.
    - `dist\core-gadget.js` is the final version, including comments about it being a global gadget file. It is published to [MediaWiki:Gadget-XFDcloser-core.js](https://en.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser-core.js) (the *live version* of the script), once the other versions have been adequately tested.
    - `dist\loader-beta.js` is a loader for the beta testing version. It is published to [User:Evad37/XFDcloser/beta.js](https://en.wikipedia.org/wiki/User:Evad37/rater/beta.js) for beta testing.
    - `dist\loader-dev.js` is a loader for the testing the development version. Loaded when doing on-wiki testing (see "On-wiki testing" section below).
    - `dist\loader-gadget.js` is a loader for the gadget version. It is published to [MediaWiki:Gadget-XFDcloser-core.js](https://en.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser-core.js) (the *live version* of the script), once the other versions have been adequately tested.
+   - `dist\styles-gadget.css` is the stylesheet for the gadget version. It is published to [MediaWiki:Gadget-XFDcloser-core.css](https://en.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser-core.css) (the *live version* of the stylesheet).
 - `xfdcloser-src\` contains the main source code for the app, split into modules, which may be written in ES6. Code here can assume that the ResourceLoader modules (as specified in the loaders, or in [MediaWiki:Gadgets-definition](https://en.wikipedia.org/wiki/MediaWiki:Gadgets-definition) as applicable) have been loaded and that the DOM is ready.
    - `App.js` is the entry point
    - Related code should be placed in the same module.
    - Small pieces of code, not particularly related to anything, can be placed in `xfdcloser-src\util.js`
+- `loader-src\` contains the code to load the main code if the current page passes checks, written in ES5. This is split into the checks, as well as "top" and "bottom" loader code, for each of the beta, dev, and gadget versions. Due to the splitting, these files are not valid javascript (until concatenated in the build step), and so they are named as .js.txt files.
+- `styles-src\styles.css` is the stylesheet for the script. The rules here are concatenated with top and bottom comments to build the gadget version's stylesheet.
 - `server.js` is a simple node server to allow testing via the [localhost import trick](https://en.wikipedia.org/wiki/Wikipedia:User_scripts/Guide#Loading_it_from_a_localhost_web_server).
 - The source code is bundled, transpiled, minified, and concatenated using `npm run build`. This writes the files to the `dist\` directory. To only build the development versions (`dist\core.js` and `dist\loader-dev.js`), use `npm run build:dev` instead.
 
 ### Tooling
 - **eslint** for ES6 linting
 - **jshint** for ES5 linting ([ESLint doesn't support override for ecmaVersion](https://github.com/sindresorhus/eslint-config-xo/issues/16#issuecomment-190302577))
+- **stylelint** for CSS linting
 - **browserify** with **babelify** for bundling, transpiling, and source-mapping
 - **uglifyjs** for minifying
+- **concat-cli** for concatenation
 
 ## On-wiki testing
+### Testwiki
+1. Add code like the following to [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js):
+
+   ```js
+   // Dev version of XFDcloser
+   var xfdcDevUrl = "http://localhost:8125/dist/loader-dev.js";
+   mw.loader.getScript(xfdcDevUrl).catch(function(e) {
+	   e.message += " " + xfdcDevUrl;
+	   console.error(e);
+   });
+   ```
+
+2. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
+3. Run `node server` in a terminal (in the directory where your local repistory is located)
+4. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
+
+### English Wikipedia
 1. Add code like the following to [your common.js](https://en.wikipedia.org/wiki/Special:MyPage/common.js), replacing `YOURUSERNAME` with your user name:
 
    ```js

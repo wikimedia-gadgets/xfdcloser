@@ -8,9 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint:es5": "jshint \"dist/loader-dev.js\" \"dist/loader-beta.js\" \"dist/loader-gadget.js\"",
     "lint:es5:dev": "jshint \"dist/loader-dev.js\"",
-    "lint:es6": "eslint \"xfdcloser-src/**\"",
-    "lint:fix": "eslint \"xfdcloser-src/**\" --fix",
-    "lint": "npm run lint:fix && npm run lint:es5",
+    "lint:css": "stylelint \"styles-src/**/*.css\" --fix",
+    "lint:es6": "eslint \"xfdcloser-src/**/*.js\" --fix",
+    "lint": "npm run lint:es6 && npm run lint:es5 && npm run lint:css",
+    "lint:dev": "npm run lint:es6 && npm run lint:es5:dev && npm run lint:css",
     "build:index:dev": "concat-cli -f \"loader-src/loader-dev-top.js.txt\" \"loader-src/checks.js.txt\" \"loader-src/loader-dev-bottom.js.txt\" -o dist/loader-dev.js",
     "build:index:beta": "concat-cli -f \"loader-src/loader-beta-top.js.txt\" \"loader-src/checks.js.txt\" \"loader-src/loader-beta-bottom.js.txt\" -o dist/loader-beta.js",
     "build:index:gadget": "concat-cli -f \"core-comment-top.js\" \"loader-src/loader-gadget-top.js.txt\" \"loader-src/checks.js.txt\" \"loader-src/loader-gadget-bottom.js.txt\" \"core-comment-bottom.js\" -o dist/loader-gadget.js",
@@ -18,8 +19,9 @@
     "build:bundle": "browserify xfdcloser-src/App.js --debug -t babelify --outfile dist/core.js",
     "build:minify": "uglifyjs dist/core.js --compress -b ascii_only=true,beautify=false --output dist/core.min.js",
     "build:concat": "concat-cli -f \"core-comment-top.js\" dist/core.min.js \"core-comment-bottom.js\" -o dist/core-gadget.js",
-    "build": "npm run build:index && npm run lint && npm run build:bundle && npm run build:minify && npm run build:concat",
-    "build:dev": "npm run build:index:dev && npm run lint:es5:dev && npm run lint:fix && npm run build:bundle"
+    "build:css": "concat-cli -f \"core-comment-top.js\" \"styles-src/styles.css\" \"core-comment-bottom.js\" -o dist/styles-gadget.css",
+    "build": "npm run build:index && npm run lint && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
+    "build:dev": "npm run build:index:dev && npm run lint:dev && npm run build:bundle "
   },
   "author": {
     "name": "Evad37",
@@ -38,6 +40,8 @@
     "concat-cli": "^4.0.0",
     "eslint": "^6.5.1",
     "jshint": "^2.10.2",
+    "stylelint": "^13.3.3",
+    "stylelint-config-standard": "^20.0.0",
     "uglify-js": "^3.8.0"
   }
 }

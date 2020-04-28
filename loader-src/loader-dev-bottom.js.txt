@@ -1,3 +1,4 @@
+	importStylesheetURI("http://localhost:8125/styles-src/styles.css");
 	var scriptUrl = "http://localhost:8125/dist/core.js";
 	mw.loader.getScript(scriptUrl).catch(function(e) {
 		e.message += " " + scriptUrl;
