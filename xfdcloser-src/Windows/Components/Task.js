@@ -73,7 +73,7 @@ function toSmallSnippet(content) {
  */
 Task.prototype.addError = function(errorMessage, config) {
 	if (config && config.code) {
-		errorMessage = extraJs.makeErrorMsg(config.code, config.jqxhr).html() + " – " + errorMessage;
+		errorMessage = extraJs.makeErrorMsg(config.code, config.error) + " – " + errorMessage;
 	}
 	this.errorsList.push( toSmallSnippet(errorMessage) );
 	this.field.setErrors(this.errorsList);
