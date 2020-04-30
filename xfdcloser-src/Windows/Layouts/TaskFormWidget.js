@@ -377,7 +377,7 @@ TaskFormWidget.prototype.prepareRelistTasks = function(baseConfig) {
 	const relistInfoTask = new GetRelistInfoTask(baseConfig, this.formData.relistComment);
 	const relistInfoPromise = relistInfoTask.relistInfo;
 	
-	switch ( appConfig.venue ) {
+	switch ( appConfig.venue.type ) {
 	case "afd":
 		return [
 			relistInfoTask,
