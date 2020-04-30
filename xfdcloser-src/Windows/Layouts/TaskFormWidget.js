@@ -79,6 +79,7 @@ TaskFormWidget.prototype.setFinished = function() {
  */
 TaskFormWidget.prototype.doSanityChecks = function() {	
 	const isMultimode = this.formData.pageResults && this.formData.pageResults.length > 1;
+	const expectedNamespace = appConfig.venue.ns_number && appConfig.mw.namespaces[(appConfig.venue.ns_number[0]).toString()];
 	let warnings = [];
 
 	// Check if closing dicussion early (and it hasn't been relisted )
@@ -93,18 +94,19 @@ TaskFormWidget.prototype.doSanityChecks = function() {
 		warnings.push(`Mass actions will be peformed (${this.formData.pageResults.length} nominated pages detected).`);
 	}
 	
-	const expectedNamespace = appConfig.venue.ns_number && appConfig.mw.namespaces[(appConfig.venue.ns_number[0]).toString()];
-	// Check target page namespace:
-	var targetTitles = isMultimode
-		? [this.formData.targetTitle]
-		: this.formData.pageResults
-			.filter(pr => pr.data && pr.data.target)
-			.map(pr => mw.Title.newFromText(pr.data.target));
-	targetTitles.forEach(target => {
-		if (target && expectedNamespace && !hasCorrectNamespace(target)) {
-			warnings.push(`Target page [[${target.getPrefixedText()}]] is not in the ${expectedNamespace} namespace.`);
-		}
-	});
+	if (this.type === "close") {
+		// Check target page namespace:
+		const targetTitles = (!isMultimode)
+			? [this.formData.targetTitle]
+			: this.formData.pageResults
+				.filter(pr => pr.data && pr.data.target)
+				.map(pr => mw.Title.newFromText(pr.data.target));
+		targetTitles.forEach(target => {
+			if (target && expectedNamespace && !hasCorrectNamespace(target)) {
+				warnings.push(`Target page [[${target.getPrefixedText()}]] is not in the ${expectedNamespace} namespace.`);
+			}
+		});
+	}
 	
 	//Check namespaces of nominated pages
 	var wrongNamespacePages = this.formData.pageResults &&
@@ -212,7 +214,7 @@ TaskFormWidget.prototype.initialiseTasks = function() {
 		result: this.formData.resultWikitext,
 		resultOptions:  this.formData.resultOptions
 	};
-	const pageResultsWithOptions = this.formData.pageResults.map(pageResult => {
+	const pageResultsWithOptions = this.formData.pageResults && this.formData.pageResults.map(pageResult => {
 		const optionsForResult = this.options.find(options => options.result === pageResult.resultType);
 		pageResult.options = optionsForResult.options;
 		return pageResult;
@@ -372,39 +374,45 @@ TaskFormWidget.prototype.prepareCloseTasks = function(baseConfig, pageResultsWit
  * @returns {Task[]} Tasks
  */
 TaskFormWidget.prototype.prepareRelistTasks = function(baseConfig) {
-	const tasks = [ new GetRelistInfoTask(baseConfig) ];
+	const relistInfoTask = new GetRelistInfoTask(baseConfig, this.formData.relistComment);
+	const relistInfoPromise = relistInfoTask.relistInfo;
 	
 	switch ( appConfig.venue ) {
 	case "afd":
-		tasks.push(
-			new UpdateDiscussionTask(baseConfig),
-			new UpdateOldLogPageTask(baseConfig),
-			new UpdateNewLogPageTask(baseConfig)
-		);
-		break;
+		return [
+			relistInfoTask,
+			new UpdateDiscussionTask(baseConfig, relistInfoPromise),
+			new UpdateOldLogPageTask(baseConfig, relistInfoPromise),
+			new UpdateNewLogPageTask(baseConfig, relistInfoPromise)
+		];
 	case "mfd":
-		tasks.push( new UpdateDiscussionTask(baseConfig) );
-		break;
-	case "rfd":
-		tasks.push(
-			new UpdateOldLogPageTask(baseConfig),
-			new UpdateNewLogPageTask(baseConfig)
-		);
+		return [
+			relistInfoTask,
+			new UpdateDiscussionTask(baseConfig, relistInfoPromise)
+		];
+	case "rfd": {
+		const tasks = [
+			relistInfoTask,
+			new UpdateOldLogPageTask(baseConfig, relistInfoPromise),
+			new UpdateNewLogPageTask(baseConfig, relistInfoPromise)
+		];
 		if (!baseConfig.discussion.isBasicMode() && baseConfig.discussion.pages.length > 1) {
-			tasks.push( new UpdateNomTemplatesTask(baseConfig) );
+			tasks.push( new UpdateNomTemplatesTask(baseConfig, relistInfoPromise) );
 		}
-		break;
-	default: // ffd, tfd
-		tasks.push(
-			new UpdateOldLogPageTask(baseConfig),
-			new UpdateNewLogPageTask(baseConfig)
-		);
-		if (!baseConfig.discussion.isBasicMode()) {
-			tasks.push( new UpdateNomTemplatesTask(baseConfig) );
-		}
-		break;	
+		return tasks;
 	}
-	return tasks;
+	default: { // ffd, tfd
+		const tasks = [
+			relistInfoTask,
+			new UpdateOldLogPageTask(baseConfig, relistInfoPromise),
+			new UpdateNewLogPageTask(baseConfig, relistInfoPromise)
+		];
+		if (!baseConfig.discussion.isBasicMode()) {
+			tasks.push( new UpdateNomTemplatesTask(baseConfig, relistInfoPromise) );
+		}
+		return tasks;
+	}
+	}
 };
 
 export default TaskFormWidget;

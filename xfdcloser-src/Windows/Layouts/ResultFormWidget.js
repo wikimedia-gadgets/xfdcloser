@@ -214,7 +214,7 @@ ResultFormWidget.prototype.updatePreviewAndValidate = function() {
 		() => this.emit("validated", false)
 	);
 	if (this.isRelisting) {
-		this.preview.setWikitext(`{{Relist|1=${this.rationale.getValue()}}}`);
+		this.preview.setWikitext(`{{Relist|1=${this.rationale.getValue("escaped")}}}`);
 		return;
 	}
 	const resultText = this.isMultimode ? this.multiResultWidget.getResultText() : this.resultWidget.getResultText();
@@ -238,7 +238,7 @@ ResultFormWidget.prototype.updatePreviewAndValidate = function() {
 ResultFormWidget.prototype.getResultFormData = function() {
 	if (this.isRelisting) {
 		return {
-			relistComment: this.resultWidget.getResultText()
+			relistComment: this.rationale.getValue("escaped")
 		};
 	}
 	const resultWikitext = this.isMultimode

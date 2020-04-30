@@ -61,11 +61,12 @@ RationaleWidget.prototype.prependRationale = function(text) {
 };
 
 /**
- * @param {String} [format] Optional, either omit or set to "punctuated",
- * either an empty string will be returned if no rationale has been entered, or the trimmed rationale prepeneded with
- * either a space, or a period and a space, will be returned (based on if the new sentence option is selected)
- * @returns {String} Rationale - either an empty string if no rationale entered, or the trimmed rationale (format parameter ommited),
- * or (punctuated format) the trimmed rationale preprened with either a period and a space, or a space, based on the "Result is a new sentence" option
+ * @param {String} [format] Optional, either omit or set to "punctuated" or "escaped"
+ * @returns {String} Rationale, either an empty string if no rationale entered, or
+ *  - format is `punctuated`: the rationale, trimmed, and prepeneded by  either a period and a space, or a space, based on the "Result is a new sentence" option
+ *  - format is `escaped`: the rationale, trimmed, trimmed, with pipes not within templates or links escaped
+ *  - format is omitted: the rationale, trimmed
+ *  - In all cases, a linebreak is prepeneded if the rational starts with `*`, `:`, or `;`
  */
 RationaleWidget.prototype.getValue = function(format) {
 	const text = this.textbox.getValue().trim();
@@ -81,7 +82,7 @@ RationaleWidget.prototype.getValue = function(format) {
 		return `${isNewSentence ? "." : ""}${needsLinebreak ? "\n" : " "}${text}`;
 	}
 
-	return needsLinebreak ? "\n" + text : text;
+	return (needsLinebreak ? "\n" : "") + (format === "escaped" ? text.replace(/(\|)(?!(?:[^[]*]|[^{]*}))/g, "&#124;") : text);
 };
 
 RationaleWidget.prototype.setSoftDelete = function(page, nomPageLink, isMulti) {
