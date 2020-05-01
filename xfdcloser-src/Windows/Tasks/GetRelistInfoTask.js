@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function GetRelistInfoTask(config, relistComment) {
@@ -45,6 +46,8 @@ GetRelistInfoTask.prototype.doTask = function() {
 		: { ...queryBase, rvsection: this.discussion.sectionNumber };
 	
 	return this.api.get(query).then(response => {
+		if (this.aborted) return rejection("Aborted");
+
 		const content = response.query.pages[0].revisions[0].slots.main.content;
 		const nomPageTimestamps = {
 			start: response.curtimestamp,
@@ -53,7 +56,7 @@ GetRelistInfoTask.prototype.doTask = function() {
 		const heading =  content.slice(0, content.indexOf("\n"));
 		// Abort if discussion is already closed
 		if ( content.includes("xfd-closed") ) {
-			return $.Deferred().reject(
+			return rejection(
 				"abort", null,
 				"Discussion has already been closed"
 			);
@@ -281,7 +284,7 @@ GetRelistInfoTask.prototype.doTask = function() {
 			});
 		}
 		default: 
-			return $.Deferred().reject("abort", null, "Unknown XfD venue");
+			return rejection("abort", null, "Unknown XfD venue");
 		}
 	}).then(
 		() => { this.trackStep(); },
@@ -297,7 +300,7 @@ GetRelistInfoTask.prototype.doTask = function() {
 					{code, error, abort: true}
 				);
 			}
-			return $.Deferred().reject();
+			return rejection();
 		}
 	);
 };

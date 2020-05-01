@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function RedirectTask(config) {
@@ -21,8 +22,6 @@ function RedirectTask(config) {
 }
 OO.inheritClass( RedirectTask, Task );
 
-
-
 RedirectTask.prototype.doTask = function() {
 	const targets = extraJs.uniqueArray(
 		this.pageResults.map(pageResult => pageResult.data.target)
@@ -35,6 +34,8 @@ RedirectTask.prototype.doTask = function() {
 		pageResult.page.getPrefixedText(),
 		null,
 		() => {
+			if (this.aborted && !this.deleteFirst) return rejection("Aborted");
+
 			let text;
 			const rcatshell = pageResult.options.rcats && pageResult.options.rcats.length
 				? `\n\n{{Rcat shell|\n${pageResult.options.rcats.join("\n")}\n}}`

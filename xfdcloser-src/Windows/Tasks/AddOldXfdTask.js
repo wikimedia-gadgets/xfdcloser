@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 /**
@@ -155,17 +156,18 @@ const _makeNewWikitext = function(wikitext, pageTitle) {
  * @returns {Object} API edit parameters
  */
 const _transform = function(page) {
+	if (this.aborted) return rejection("Aborted");
 	const makeOldxfdWikitext = _makeOldxfdWikitext.bind(this);
 	const makeNewWikitext = _makeNewWikitext.bind(this);
 
 	// Check there's a corresponding nominated page
 	const pageObj = this.discussion.getPageByTalkTitle(page.title);
 	if ( !pageObj ) {
-		return $.Deferred().reject("Unexpected title");
+		return rejection("Unexpected title");
 	}
 	// Check corresponding page exists
 	if ( !pageObj.exists() ) {
-		return $.Deferred().reject("Subject page does not exist");
+		return rejection("Subject page does not exist");
 	}
 	const baseEditParams = {
 		section: "0",

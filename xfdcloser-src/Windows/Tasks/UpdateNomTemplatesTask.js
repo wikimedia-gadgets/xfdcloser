@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function UpdateNomTemplatesTask(config, relistInfoPromise) {
@@ -15,14 +16,16 @@ OO.inheritClass( UpdateNomTemplatesTask, Task );
 
 UpdateNomTemplatesTask.prototype.doTask = function() {
 	const transform = (page, today) => {
+		if (this.aborted) return rejection("Aborted");
+
 		// Check there's a corresponding nominated page
 		const pageObj = this.discussion.getPageByTitle(page.title, {"moduledocs": true});
 		if ( !pageObj ) {
-			return $.Deferred().reject("unexpectedTitle");
+			return rejection("unexpectedTitle");
 		}
 		// Check corresponding page exists
 		if ( page.missing ) {
-			return $.Deferred().reject("doesNotExist");
+			return rejection("doesNotExist");
 		}
 		let updatedWikitext;
 		try {
@@ -47,6 +50,8 @@ UpdateNomTemplatesTask.prototype.doTask = function() {
 	};
 
 	return this.relistInfoPromise.then(relistInfo => {
+		if (this.aborted) return rejection("Aborted");
+
 		const pageTitles = this.discussion.getPageTitles(null, {"moduledocs":true});
 		this.setTotalSteps(pageTitles.length);
 		return this.api.editWithRetry(

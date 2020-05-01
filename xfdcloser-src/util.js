@@ -164,6 +164,10 @@ const recursiveMerge = (target, source) => {
 	return result;
 };
 
+const rejection = function() {
+	return $.Deferred().reject(...arguments);
+};
+
 export { 
 	safeUnescape,
 	dmyDateString,
@@ -173,6 +177,7 @@ export {
 	arrayFromResponsePages,
 	pageFromResponse,
 	multiButtonConfirm,
-	recursiveMerge
+	recursiveMerge,
+	rejection
 };
 // </nowiki>

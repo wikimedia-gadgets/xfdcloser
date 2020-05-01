@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function TagTalkWithSpeedyTask(config) {
@@ -48,11 +49,13 @@ TagTalkWithSpeedyTask.prototype.doTask = function() {
 	return this.api.editWithRetry(
 		talkPagesToTag,
 		null,
-		() => ({
-			prependtext: "{{Db-talk}}\n",
-			summary: `[[WP:G8|G8]] Speedy deletion nomination, per [[:${this.discussion.getNomPageLink()}]] ${this.appConfig.script.advert}`,
-			nocreate: 1
-		}),
+		() => {
+			if (this.aborted) return rejection("Aborted");
+			return {
+				prependtext: "{{Db-talk}}\n",
+				summary: `[[WP:G8|G8]] Speedy deletion nomination, per [[:${this.discussion.getNomPageLink()}]] ${this.appConfig.script.advert}`,
+				nocreate: 1
+			};},
 		() => this.trackStep(),
 		(code, error, title) => {
 			const titleLink = extraJs.makeLink(title).get(0).outerHTML;

@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function RemoveCircularLinksTask(config) {
@@ -22,17 +23,19 @@ RemoveCircularLinksTask.prototype.doTask = function() {
 		.filter(page => !targets.includes(page));
 
 	const transform = page => {
+		if (this.aborted) return rejection("Aborted");
+
 		let newWikitext;
 		try {
 			newWikitext = this.venue.removeNomTemplate(page.content);
 		} catch(e){
 			// Error if multiple nom templates found
-			return $.Deferred().reject("couldNotUpdate", e);
+			return rejection("couldNotUpdate", e);
 		}
 		newWikitext = extraJs.unlink(newWikitext, unlinkPages);
 		if ( newWikitext === page.content ) {
 			// No links to unlink
-			return $.Deferred().reject("noCircularRedirects");
+			return rejection("noCircularRedirects");
 		}
 		return {
 			text: newWikitext,

@@ -1,4 +1,4 @@
-import {hasCorrectNamespace, multiButtonConfirm, setExistence} from "../../util";
+import {hasCorrectNamespace, multiButtonConfirm, setExistence, rejection} from "../../util";
 import appConfig from "../../config";
 import API from "../../api";
 import ResizingMixin from "../Mixins/ResizingMixin";
@@ -49,9 +49,10 @@ function TaskFormWidget( config ) {
 	this.formData = config.formData;
 	this.options = config.options;
 
-	// TODO: Add task group widget and task widgets
 	this.tasksFieldset = new OO.ui.FieldsetLayout({label: "Tasks"});
 	this.$element.append(this.tasksFieldset.$element);
+
+	this.tasks = [];
 
 	// Do sanity checks
 	this.doSanityChecks()
@@ -206,7 +207,12 @@ TaskFormWidget.prototype.resolveRedirects = function() {
 		});
 };
 
+/**
+ * @returns {Promise} resolved if all tasks completed successfully
+ */
 TaskFormWidget.prototype.initialiseTasks = function() {
+	if (this.aborted) return rejection("Aborted");
+
 	const baseConfig = {
 		appConfig: appConfig,
 		discussion: this.discussion,
@@ -226,16 +232,24 @@ TaskFormWidget.prototype.initialiseTasks = function() {
 	} else if (this.type === "relist") {
 		tasks = this.prepareRelistTasks(baseConfig);
 	}
-	tasks.forEach( task => task.connect(this, {"resize": "emitResize"}) );
+	tasks.forEach( task => task.connect(this, {
+		"resize": "emitResize",
+		"abort": "onAbort"
+	}) );
 	this.tasksFieldset.addItems( tasks );
 	this.emitResize();
 
-	return tasks[0].start().then(() => {
-		return $.when.apply(null,
-			tasks.slice(1).map(task => task.start())
-		);
-	});
-	
+	return tasks[0].start().then(() => $.when.apply(
+		null,
+		tasks.slice(1).map(task => task.start())
+	));
+};
+
+TaskFormWidget.prototype.onAbort = function() {
+	this.aborted = true;
+	this.tasksFieldset.setLabel("Aborted tasks");
+	this.tasksFieldset.items.forEach(task => task.abort());
+	this.emit("aborted");
 };
 
 /**

@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function RemoveNomTemplatesTask(config) {
@@ -12,6 +13,8 @@ function RemoveNomTemplatesTask(config) {
 OO.inheritClass( RemoveNomTemplatesTask, Task );
 
 const _transform = function(page, replacement) {
+	if (this.aborted) return rejection("Aborted");
+
 	// Check there's a corresponding nominated page
 	const pageObj = this.discussion.getPageByTitle(page.title, {"moduledocs": true});
 	if ( !pageObj ) {
@@ -55,7 +58,7 @@ RemoveNomTemplatesTask.prototype.doTask = function() {
 	const pageTitles = this.discussion.getPageTitles(this.pages, {"moduledocs": true});
 	if ( pageTitles.length === 0 ) {
 		this.addWarning("None found");
-		return $.Deferred().resolve("Failed");
+		return rejection("Failed");
 	}
 	this.setTotalSteps(pageTitles.length);
 

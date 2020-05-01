@@ -1,5 +1,5 @@
 import Task from "../Components/Task";
-import { multiButtonConfirm } from "../../util";
+import { multiButtonConfirm, rejection } from "../../util";
 // <nowiki>
 
 function DeleteRedirectsTask(config) {
@@ -20,9 +20,11 @@ DeleteRedirectsTask.prototype.doTask = function() {
 		prop: "info",
 		inprop: "talkid"
 	}).then(response => {
+		if (this.aborted) return rejection("Aborted");
+
 		if ( !response || !response.pages ) {
 			this.addWarning("none found");
-			return $.Deferred().reject("Skipped.");
+			return rejection("Skipped.");
 		}
 		const result = {
 			titles: response.pages.map(page => page.title),
@@ -69,6 +71,8 @@ DeleteRedirectsTask.prototype.doTask = function() {
 			return result;
 		});
 	}).then(result => {
+		if (this.aborted) return rejection("Aborted");
+
 		const makeReason = type => `[[WP:G8|G8]] (${type}): [[${this.discussion.getNomPageLink()}]] closed as ${this.result} ${this.appConfig.script.advert}`;
 
 		const deleteRedirectsPromise = this.api.deleteWithRetry(
@@ -103,7 +107,7 @@ DeleteRedirectsTask.prototype.doTask = function() {
 			deleteTalkpagesPromise.then( () => ({success: true}), () => ({success: false}) )
 		).then((deleteRedirectsResult, deleteTalkpagesResult) => {
 			if (!deleteRedirectsResult.success || !deleteTalkpagesResult.success) {
-				return $.Deferred().reject();
+				return rejection();
 			}
 		});
 	}).catch(code => {

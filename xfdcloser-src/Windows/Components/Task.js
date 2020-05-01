@@ -1,4 +1,5 @@
 import ResizingMixin from "../Mixins/ResizingMixin";
+import { rejection } from "../../util";
 // <nowiki>
 
 /**
@@ -72,12 +73,14 @@ function toSmallSnippet(content) {
  * @param {jqxhr} [config.jqxhr] Api error jqxhr object
  */
 Task.prototype.addError = function(errorMessage, config) {
+	
 	if (config && config.code) {
 		errorMessage = extraJs.makeErrorMsg(config.code, config.error) + " – " + errorMessage;
 	}
 	this.errorsList.push( toSmallSnippet(errorMessage) );
 	this.field.setErrors(this.errorsList);
 	if (config && config.abort) {
+		this.aborted = true;
 		this.api.abort();
 		this.emit("abort");
 	}
@@ -92,6 +95,15 @@ Task.prototype.addWarning = function(warningMessage) {
 	this.field.setWarnings(this.warningsList);
 	this.emitResize();
 };
+
+Task.prototype.abort = function() {
+	if (!this.aborted && !this.finished) {
+		this.aborted = true;
+		this.api.abort();
+		this.setNotice("Aborted");
+	}
+};
+
 
 /**
  * @param {String|jQuery|OO.ui.HtmlSnippet} label task description
@@ -147,9 +159,14 @@ Task.prototype.updateProgress = function() {
 
 Task.prototype.start = function() {
 	return $.when(this.delayStart).then( () => {
+		if (this.aborted) return rejection("Aborted");
+
 		this.setNotice("Processing...");
 		return this.doTask();
 	}).then( notice => {
+		if (this.aborted) return rejection("Aborted");
+
+		this.finished = true;
 		const currentLabel = this.field.getLabel();
 		this.setLabel( $("<span>").append([
 			currentLabel,
@@ -159,6 +176,12 @@ Task.prototype.start = function() {
 		this.progressbar.toggle(false);
 		this.field.setNotices([]);
 		this.emit("completed");
+	}).catch(() => {
+		if (this.steps.total === 1) {
+			this.progressbar.setProgress(0);
+		}
+		this.setNotice("Aborted");
+		return rejection("Aborted");
 	});
 };
 

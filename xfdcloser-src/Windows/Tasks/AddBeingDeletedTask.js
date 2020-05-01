@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function AddBeingDeletedTask(config) {
@@ -24,14 +25,15 @@ AddBeingDeletedTask.prototype.doTask = function() {
 
 	// Function to transform a simplified API page object into edit parameters for API.editWithRetry
 	const transform = (page) => {
+		if (this.aborted) return rejection("Aborted");
 		// Check there's a corresponding nominated page
 		var pageObj = this.discussion.getPageByTitle(page.title, {"moduledocs": true});
 		if ( !pageObj ) {
-			return $.Deferred().reject("unexpectedTitle");
+			return rejection("unexpectedTitle");
 		}
 		// Check corresponding page exists
 		if ( !pageObj.exists() ) {
-			return $.Deferred().reject("doesNotExist");
+			return rejection("doesNotExist");
 		}
 
 		const pageResult = this.pageResults

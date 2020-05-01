@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function UpdateNewLogPageTask(config, relistInfoPromise) {
@@ -16,6 +17,8 @@ OO.inheritClass( UpdateNewLogPageTask, Task );
 UpdateNewLogPageTask.prototype.doTask = function() {
 	this.setTotalSteps(1);
 	return this.relistInfoPromise.then(relistInfo => {
+		if (this.aborted) return rejection("Aborted");
+
 		const params = {
 			action: "edit",
 			title: this.venue.path + relistInfo.today,

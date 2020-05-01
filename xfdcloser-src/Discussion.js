@@ -268,54 +268,47 @@ Discussion.prototype.setStatus = function($status) {
  * @returns {Boolean} True if dialog was opened, false if another dialog is already open
  */
 Discussion.prototype.openDialog = function(isRelisting) {
-	// let currentWindow = windowManager.getCurrentWindow();
-	// if (currentWindow && ( currentWindow.isOpened() || currentWindow.isOpening() ) ) {
-	// 	// Another dialog window is already open
-	// 	return false;
-	// }
-	const winInstance = windowManager.openWindow("main", {
+	let currentWindow = windowManager.getCurrentWindow();
+	if (currentWindow && ( currentWindow.isOpened() || currentWindow.isOpening() ) ) {
+		// Another dialog window is already open
+		return false;
+	}
+	windowManager.openWindow("main", {
 		discussion: this,
 		venue: config.venue,
 		user: config.user,
 		type: isRelisting ? "relist" : "close"
-	});
-	if (!winInstance) {
-		return false;
-	}
-	winInstance.closed.then(winData => {
-		if (!winData || !winData.success) {
+	}).closed.then(winData => {
+		console.log("winData", winData);
+		switch(true){
+		case winData && winData.aborted:
+			this.setStatus(
+				$("<strong>").text(`Aborted ${isRelisting ? "relist" : "close"}`)
+			);
+			break;
+		case winData && winData.success && isRelisting:
+			this.setStatus( $("<span>").append(
+				"Discussion ",
+				$("<strong>").text("relisted"),
+				" (reload page to see the actual relist)"
+			) );
+			break;
+		case winData && winData.success:
+			this.setStatus( $("<span>").append(
+				"Closed as ",
+				$("<strong>").text(winData.result),
+				" (reload page to see the actual close)"
+			) );
+			break;
+		default: // cancelled
 			this.showLinks();
+			return;
 		}
-		console.log("success", winData);
+		this.get$status().prev().css("text-decoration", "line-through");
 	});
 	return true;
 };
-// Mark as finished
-Discussion.prototype.setFinished = function(aborted) {
-	var self = this;
-	var msg;
-	
-	if ( aborted != null ) {
-		msg = [
-			$("<strong>").text( ( self.dialog && self.dialog.relisting ) ? "Aborted relist" : "Aborted close" ),
-			( aborted === "" ) ? "" : ": " + aborted
-		];		
-	} else if ( self.dialog && self.dialog.relisting ) {
-		msg = [
-			"Discussion ",
-			$("<strong>").text("relisted"),
-			" (reload page to see the actual relist)"
-		];
-	} else {
-		msg = [
-			"Closed as ",
-			$("<strong>").text(self.taskManager.inputData.getResult()),
-			" (reload page to see the actual close)"
-		];
-	}
-	self.setStatus(msg);
-	self.get$status().prev().css("text-decoration", "line-through");
-};
+
 // Get notices element (jQuery object)
 Discussion.prototype.get$notices = function() {
 	return $("#"+this.id+"-notices");

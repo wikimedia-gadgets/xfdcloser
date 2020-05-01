@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 /**
@@ -33,13 +34,15 @@ CloseDiscussionTask.prototype.doTask = function() {
 		formatversion: "2"
 	} )
 		.then( response => {
+			if (this.aborted) return rejection("Aborted");
+
 			const revision = response.query.pages[0].revisions[0];
 			const contents = revision.slots.main.content;
 			const lastEditTime = revision.timestamp;
 		
 			// Check if already closed
 			if ( contents.includes(this.venue.wikitext.alreadyClosed) ) {
-				return $.Deferred().reject(
+				return rejection(
 					"abort", null,
 					"Discussion already closed (reload page to see the actual close)"
 				);
@@ -49,7 +52,7 @@ CloseDiscussionTask.prototype.doTask = function() {
 			if ( this.venue.type === "afd" || this.venue.type === "mfd" ) {
 				var editedSinceScriptStarted = appConfig.startTime < new Date(lastEditTime);
 				if ( editedSinceScriptStarted ) {
-					return $.Deferred().reject(
+					return rejection(
 						"abort", null,
 						"Edit conflict detected"
 					);
@@ -71,7 +74,7 @@ CloseDiscussionTask.prototype.doTask = function() {
 			);
 			const isCorrectSection = plain_section_heading === this.discussion.sectionHeader;
 			if ( !isCorrectSection ) {
-				return $.Deferred().reject(
+				return rejection(
 					"abort", null,
 					"Possible edit conflict (found section heading `" + plain_section_heading + "`)"
 				);
@@ -102,7 +105,7 @@ CloseDiscussionTask.prototype.doTask = function() {
 		} )
 		.then(
 			() => { this.trackStep(); },
-			(code, jqxhr, abortReason) => {
+			(code, error, abortReason) => {
 				if (code === "abort") {
 					this.addError(
 						abortReason ? "Aborted: " + abortReason : "Aborted",
@@ -111,10 +114,10 @@ CloseDiscussionTask.prototype.doTask = function() {
 				} else {
 					this.addError(
 						`Could not edit page ${extraJs.makeLink(this.discussion.nomPage).get(0).outerHTML}; could not close discussion`,
-						{code, jqxhr, abort: true}
+						{code, error, abort: true}
 					);
 				}
-				return $.Deferred().reject();
+				return rejection();
 			}
 		);
 

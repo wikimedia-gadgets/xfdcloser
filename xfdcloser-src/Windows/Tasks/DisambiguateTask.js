@@ -1,4 +1,5 @@
 import Task from "../Components/Task";
+import { rejection } from "../../util";
 // <nowiki>
 
 function DisambiguateTask(config) {
@@ -20,14 +21,15 @@ DisambiguateTask.prototype.doTask = function() {
 	this.setTotalSteps(pageTitles.length);
 
 	const transform = (page) => {
+		if (this.aborted) return rejection("Aborted");
 		// Check there's a corresponding nominated page
 		const pageObj = this.discussion.getPageByTitle(page.title, {"moduledocs": true});
 		if ( !pageObj ) {
-			return $.Deferred().reject("unexpectedTitle");
+			return rejection("unexpectedTitle");
 		}
 		// Check corresponding page exists
 		if ( !pageObj.exists() ) {
-			return $.Deferred().reject("doesNotExist");
+			return rejection("doesNotExist");
 		}
 		const oldWikitext = page.content;
 		let updatedWikitext = "";
@@ -82,8 +84,9 @@ DisambiguateTask.prototype.doTask = function() {
 		}
 	).catch( (errortype, code, error) => {
 		if ( errortype === "read" ) {
-			this.addError(code, error, 
-				`Could not read contents of nominated ${pageTitles.length > 1 ? "pages" : "page"}`
+			this.addError(
+				`Could not read contents of nominated ${pageTitles.length > 1 ? "pages" : "page"}`,
+				{code, error}
 			);
 			return "Failed";
 		}

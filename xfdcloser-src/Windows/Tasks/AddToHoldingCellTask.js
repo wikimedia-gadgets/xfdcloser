@@ -1,5 +1,5 @@
 import Task from "../Components/Task";
-import { hasCorrectNamespace } from "../../util";
+import { hasCorrectNamespace, rejection } from "../../util";
 // <nowiki>
 
 function AddToHoldingCellTask(config) {
@@ -26,6 +26,7 @@ AddToHoldingCellTask.prototype.doTask = function() {
 	this.setTotalSteps(1);
 	
 	const transform = holdingCellPage => {
+		if (this.aborted) return rejection("Aborted");
 		// Get page contents, split into section
 		const sectionsArray = holdingCellPage.content.split(/\n={3,}/).map(section => {
 			const headingSigns = /^[^=]+(=+)\n/.exec(section);
@@ -65,7 +66,7 @@ AddToHoldingCellTask.prototype.doTask = function() {
 
 		const changesMade = this.pageResults.map( addTfdlTemplate ).filter( isTrue ).length;
 		if ( !changesMade ) {
-			return $.Deferred().reject("noChangesMade");
+			return rejection("noChangesMade");
 		}
 
 		return {

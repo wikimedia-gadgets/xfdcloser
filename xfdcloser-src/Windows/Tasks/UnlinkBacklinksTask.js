@@ -1,5 +1,5 @@
 import Task from "../Components/Task";
-import { multiButtonConfirm, recursiveMerge } from "../../util";
+import { multiButtonConfirm, recursiveMerge, rejection } from "../../util";
 // <nowiki>
 
 function UnlinkBacklinksTask(config) {
@@ -11,6 +11,7 @@ function UnlinkBacklinksTask(config) {
 	UnlinkBacklinksTask.super.call( this, config );
 
 	this.finishedReadingApi = $.Deferred();
+	this.queuedPrompts = [];
 }
 OO.inheritClass( UnlinkBacklinksTask, Task );
 
@@ -25,17 +26,19 @@ const ignoreResultTitle = title => [
 	"Template:Did you know nominations"
 ].includes(title.split("/")[0]);
 
-const queuedPrompts = [];
 /**
  * Queue a multiButtonConfirm prompt to be shown, after waiting for any other queued prompts to be resolved
  *   
  * @param {*} params Parameters for multiButtonConfirm
  * @returns {Promise<String>} action selected by user
  */
-const queueMultiButtonConfirm = params => {
-	const previousPrompt = queuedPrompts.length && queuedPrompts[queuedPrompts.length-1];
-	const prompt = $.when(previousPrompt).then(() => multiButtonConfirm(params));
-	queuedPrompts.push(prompt);
+UnlinkBacklinksTask.prototype.queueMultiButtonConfirm = params => {
+	const previousPrompt = this.queuedPrompts.length && this.queuedPrompts[this.queuedPrompts.length-1];
+	const prompt = $.when(previousPrompt).then(() => {
+		if (this.aborted) return rejection("Aborted");
+		return multiButtonConfirm(params);
+	});
+	this.queuedPrompts.push(prompt);
 	return prompt;
 };
 
@@ -46,7 +49,8 @@ const queueMultiButtonConfirm = params => {
  * @param {Boolean} [isMajorEdit]
  * @returns {Promise} {String} updated wikitext, {Boolean} Edit should be considered major
  */
-const processListItems = (pageTitle, wikitext, isMajorEdit) => {
+UnlinkBacklinksTask.prototype.processListItems = (pageTitle, wikitext, isMajorEdit) => {
+	if (this.aborted) return rejection("Aborted");
 	// Find lines marked with {{subst:void}}, and the preceding section heading (if any)
 	var toReview = /^{{subst:void}}(.*)$/m.exec(wikitext);
 	if ( !toReview ) {
@@ -69,7 +73,7 @@ const processListItems = (pageTitle, wikitext, isMajorEdit) => {
 }]]
 	<pre>${toReview[1]}</pre>
 	<p>Please check if the item matches the list's [[WP:LISTCRITERIA|selection criteria]] before deciding to keep or remove the item from the list.</p>`;
-	return queueMultiButtonConfirm({
+	return this.queueMultiButtonConfirm({
 		title: "Review unlinked list item",
 		message,
 		actions: [
@@ -92,7 +96,7 @@ const processListItems = (pageTitle, wikitext, isMajorEdit) => {
 				isMajorEdit = true;
 			}
 			// Iterate, in case there is more to be reviewed
-			return processListItems(pageTitle, wikitext, isMajorEdit);
+			return this.processListItems(pageTitle, wikitext, isMajorEdit);
 		});
 };
 
@@ -129,6 +133,9 @@ UnlinkBacklinksTask.prototype.doTask = function() {
 		return results.reduce(recursiveMerge);
 	}).then(result => {
 		this.finishedReadingApi.resolve();
+
+		if (this.aborted) return rejection("Aborted");
+
 		if (!result.imageusage) {
 			result.imageusage = [];
 		}
@@ -160,6 +167,8 @@ Note that the use of high speed, high volume editing software (such as this tool
 			],
 			size: "medium"
 		}).then(action => {
+			if (this.aborted) return rejection("Aborted");
+
 			if (!action) {
 				this.addWarning("Cancelled by user");
 				return "Skipped";
@@ -191,6 +200,8 @@ Note that the use of high speed, high volume editing software (such as this tool
 				} // other errors handled above
 			};
 			const transform = page => {
+				if (this.aborted) return rejection("Aborted");
+
 				const oldWikitext = page.content;
 				const newWikitext = extraJs.unlink(
 					oldWikitext,
@@ -199,9 +210,9 @@ Note that the use of high speed, high volume editing software (such as this tool
 					!!page.categories
 				);
 				if (oldWikitext === newWikitext) {
-					return $.Deferred().reject("skippedNoLinks");
+					return rejection("skippedNoLinks");
 				}
-				return processListItems(page.title, newWikitext).then(
+				return this.processListItems(page.title, newWikitext).then(
 					(updatedWikitext, isMajorEdit) => {
 						const isFfd = this.venue.type === "ffd";
 						const thingsRemoved = `link(s)${isMajorEdit ? " / list item(s)" : ""}${isFfd ? " / file usage(s)" : ""}`;

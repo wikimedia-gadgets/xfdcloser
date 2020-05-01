@@ -1,5 +1,6 @@
 import Task from "../Components/Task";
 import {replaceNomTransform} from "./RemoveNomTemplatesTask";
+import { rejection } from "../../util";
 // <nowiki>
 
 function AddMergeTemplatesTask(config) {
@@ -51,6 +52,7 @@ AddMergeTemplatesTask.prototype.doTask = function() {
 	this.setTotalSteps(pageTitles.length + filteredTargets.length);
 
 	const transformTargetTalk = (page) => {
+		if (this.aborted) return rejection("Aborted");
 		// Check there is *not* a corresponding nominated page
 		const pageObj = this.discussion.getPageByTalkTitle(page.title);
 		if ( pageObj ) {
@@ -130,13 +132,14 @@ AddMergeTemplatesTask.prototype.doTask = function() {
 	} );
 
 	const transformNom = (page) => {
+		if (this.aborted) return rejection("Aborted");
 		const pageResult = this.pageResults.find(pageResult => page.title === pageResult.page.getPrefixedText());
 		if (!pageResult){
-			return $.Deferred().reject("Unexpected title");
+			return rejection("Unexpected title");
 		}
 		const target = targets.find(target => target.title === pageResult.data.target);
 		if (!target || !target.mergeToTemplate) {
-			return $.Deferred().reject("Unexpected merge target");
+			return rejection("Unexpected merge target");
 		}
 		return replaceNomTransform.call(this, page, target.mergeToTemplate);
 	};

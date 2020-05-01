@@ -331,7 +331,8 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 		});
 		this.taskForm.connect(this, {
 			"finished": "onTasksFinished",
-			"resize": "updateSize"
+			"resize": "updateSize",
+			"aborted": "onAborted"
 		});
 		this.tasksLayout.$element.append( this.taskForm.$element );
 		this.contentArea.setItem( this.tasksLayout );
@@ -358,8 +359,16 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 
 	} else if ( action === "finish" ) {
 		return new OO.ui.Process().next(
-			() => this.close( {success: true} )
+			() => this.close( {
+				success: !!this.success,
+				aborted: !!this.aborted,
+				result: !this.isRelisting && this.resultForm.resultWidget.getResultText()
+			} )
 		);
+
+	} else if ( action === "abort" ) {
+		this.getActions().setAbilities({abort: false});
+		this.taskForm.onAbort();
 
 	} else if (
 		!action &&
@@ -379,6 +388,16 @@ MainWindow.prototype.getActionProcess = function ( action ) {
 	}
 
 	return MainWindow.super.prototype.getActionProcess.call( this, action );
+};
+
+/**
+ * Overrides OO.ui.Dialog.prototype.onActionClick to allow abort actions to occur
+ * even if in a pending state.
+ */ 
+MainWindow.prototype.onActionClick = function ( action ) {
+	if ( !this.isPending() || action.getAction() === "abort" ) {
+		this.executeAction( action.getAction() );
+	}
 };
 
 // Use the getTeardownProcess() method to perform actions whenever the dialog is closed.
@@ -423,11 +442,17 @@ MainWindow.prototype.onShowOptions = function(resultData, isMultimode) {
 };
 
 MainWindow.prototype.onTasksFinished = function() {
+	this.success = true;
 	this.popPending();
 	this.getActions().setAbilities({
 		finish: true,
 		abort: false
 	});
+};
+MainWindow.prototype.onAborted = function() {
+	this.aborted = true;
+	this.popPending();
+	this.getActions().setAbilities({finish: true});
 };
 
 export default MainWindow;
