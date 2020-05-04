@@ -1,0 +1,85 @@
+	// Check for edit, history, diff, or oldid mode
+	if ( /(?:\?|&)(?:action|diff|oldid)=/.test(window.location.href) ) {
+		return;
+	}
+
+	// XFDcloser options
+	var options;
+	try {
+		options = JSON.parse(mw.user.options.get("userjs-xfdc")) || {};
+	} catch(e) {
+		options = {};
+	}
+
+	// Enable/disable beta mode by visiting [[Wikipedia:XFDcloser/beta]]
+	if ( mw.config.get("wgPageName") === "Wikipedia:XFDcloser/beta" ) {
+		var onButtonClick = function() {
+			var $button = $(this);
+			var originalButtonText = $button.text();
+			$(this).attr("disabled", true).text("Working, please wait...");
+			options.beta = !options.beta;
+			mw.loader.using("mediawiki.api")
+				.then(function() {
+					var API = new mw.Api( { ajax: { headers: { 
+						"Api-User-Agent": "XFDcloser/loader ( https://en.wikipedia.org/wiki/WP:XFDC )"
+					} } } );
+					return API.postWithToken("csrf", {
+						"action": "options",
+						"format": "json",
+						"formatversion": "2",
+						"optionname": "userjs-xfdc",
+						"optionvalue": JSON.stringify(options)
+					});
+				})
+				.then(
+					function() {
+						mw.notify("Reloading...", {
+							title: "XFDcloser beta succesfully " + (options.beta ? "enabled" : "disabled"),
+							type: "success"
+						});
+						window.setTimeout(function() { window.location.reload(); }, 5 * 1000);
+					},
+					function(code, error) {
+						var errorDetails = (code || "Unknown") + " error" +
+							(error && error.info ? ": " + error.info : "");
+						mw.notify(errorDetails, {
+							"title": "XFDcloser beta mode could not be " + (options.beta ? "enabled" : "disabled") + ":",
+							"type": "error"
+						});
+						// Reset state of options.beta and button 
+						options.beta = !options.beta;
+						$button.removeAttr("disabled").text(originalButtonText);
+					}
+				);
+		};
+		$.ready.then(function() {
+			$("#mw-content-text").prepend(
+				$("<p>")
+					.css({
+						"padding": "1em",
+						"background": options.beta ? "#b0ccdd" : "#dbafaf",
+						"border-radius": "1em",
+						"text-align": "center",
+						"font-size": "110%"
+					})
+					.append(
+						"Beta testing is currently ",
+						$("<strong>").text(options.beta ? "enabled" : "disabled"),
+						".",
+						$("<button>")
+							.css({
+								"font-size":"105%",
+								"margin-left":"1em"
+							})
+							.text(options.beta ? "Disable XFDcloser beta" : "Enable XFDcloser beta")
+							.click(onButtonClick)
+					)
+			);
+		});
+	}
+
+	// Check if on an XfD page
+	var xfdpage_regex = /(Articles_for_deletion\/|Miscellany_for_deletion|User:Cyberbot_I\/AfD's_requiring_attention|Wikipedia:WikiProject_Deletion_sorting\/(?!(Flat|Compact)$)|(Categories|Files|Templates|Redirects)_for_discussion(?!\/(Working|Holding_cell|Speedy)))(?!\/?(?:Administrator_instructions|Common_outcomes)$)/;
+	if ( !xfdpage_regex.test(mw.config.get("wgPageName")) ) {
+		return;
+	}

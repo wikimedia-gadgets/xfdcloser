@@ -1,7 +1,13 @@
-	importStylesheetURI("http://localhost:8125/styles-src/styles.css");
-	var scriptUrl = "http://localhost:8125/dist/core.js";
-	mw.loader.getScript(scriptUrl).catch(function(e) {
-		e.message += " " + scriptUrl;
-		console.error(e);
-	});
+	if ( options && options.beta ) {
+		console.log("[XFDC] isBetaTester", true);
+		importStylesheetURI("http://localhost:8125/styles-src/styles.css");
+		var scriptUrl = "http://localhost:8125/dist/core.js";
+		mw.loader.getScript(scriptUrl).catch(function(e) {
+			e.message += " " + scriptUrl;
+			console.error(e);
+		});
+	} else {
+		console.log("[XFDC] isBetaTester", false);
+		mw.loader.load("ext.gadget.XFDcloser-core");
+	}
 });

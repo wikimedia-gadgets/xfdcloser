@@ -1,2 +1,2 @@
-	mw.loader.load("ext.gadget.XFDcloser-core");
+	mw.loader.load( options && options.beta ? "ext.gadget.XFDcloser-core-beta" : "ext.gadget.XFDcloser-core");
 })();

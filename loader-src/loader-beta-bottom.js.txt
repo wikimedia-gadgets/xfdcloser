@@ -1,2 +1,0 @@
-	importScript("User:Evad37/XFDcloser/beta/core.js");
-});
