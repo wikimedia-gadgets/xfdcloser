@@ -16,7 +16,7 @@ const months = ["", "January", "February", "March", "April", "May", "June", "Jul
 let config = {
 	// Script info
 	script: {
-		advert: " ([[WP:XFDC|XFDcloser]])",
+		advert: `([[WP:XFDC#${scriptVersion}|XFDcloser]])`,
 		version: scriptVersion
 	},
 	// Mobile site detection, as that requires some special handling
