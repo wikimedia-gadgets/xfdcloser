@@ -297,7 +297,19 @@ Venue.newFromPageName = function(pageName) {
 	} else if ( isAfd ) {
 		return Venue.Afd(afdTranscludedOnly);
 	} else {
-		throw new Error("\"" + pageName + "\" is not an XFD page");
+		switch(mw.Title.newFromText(pageName).getNamespaceId()) {
+		case 0:
+			return Venue.Afd();
+		case 6:
+			return Venue.Ffd();
+		case 10:
+		case 828:
+			return Venue.Tfd();
+		case 14:
+			return Venue.Cfd();
+		default:
+			return Venue.Mfd();
+		}
 	}
 };
 

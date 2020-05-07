@@ -168,6 +168,12 @@ const rejection = function() {
 	return $.Deferred().reject(...arguments);
 };
 
+const timeout = function(delay) {
+	const deferred = $.Deferred();
+	setTimeout(deferred.resolve, delay);
+	return deferred.promise();
+};
+
 export { 
 	safeUnescape,
 	dmyDateString,
@@ -178,6 +184,7 @@ export {
 	pageFromResponse,
 	multiButtonConfirm,
 	recursiveMerge,
-	rejection
+	rejection,
+	timeout
 };
 // </nowiki>

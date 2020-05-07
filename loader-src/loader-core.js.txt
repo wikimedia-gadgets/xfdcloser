@@ -1,5 +1,14 @@
+	// Check if on a non-existent article/file/portal (to unlink backlinks)
+	var isNonexistentPage = mw.config.get("wgArticleId") === 0;
+	var isUnlinkableNamespace = [
+		0, // Article
+		6, // File
+		100 // Portal 
+	].includes(mw.config.get("wgNamespaceNumber"));
+	var isUnlinkablePage = isNonexistentPage && isUnlinkableNamespace;
+	
 	// Check for edit, history, diff, or oldid mode
-	if ( /(?:\?|&)(?:action|diff|oldid)=/.test(window.location.href) ) {
+	if ( !isUnlinkablePage && /(?:\?|&)(?:action|diff|oldid)=/.test(window.location.href) ) {
 		return;
 	}
 
@@ -80,6 +89,10 @@
 
 	// Check if on an XfD page
 	var xfdpage_regex = /(Articles_for_deletion\/|Miscellany_for_deletion|User:Cyberbot_I\/AfD's_requiring_attention|Wikipedia:WikiProject_Deletion_sorting\/(?!(Flat|Compact)$)|(Categories|Files|Templates|Redirects)_for_discussion(?!\/(Working|Holding_cell|Speedy)))(?!\/?(?:Administrator_instructions|Common_outcomes)$)/;
-	if ( !xfdpage_regex.test(mw.config.get("wgPageName")) ) {
+	var isXfdPage = xfdpage_regex.test(mw.config.get("wgPageName"));
+
+	// While version 4 is in beta, only load for unlinkable pages if beta testing is enabled 
+	var shouldLoadScript = options.beta ? (isXfdPage || isUnlinkablePage) : (isXfdPage);
+	if ( !shouldLoadScript ) {
 		return;
 	}

@@ -6,7 +6,8 @@ const scriptVersion = "4.0.0-alpha";
 let mwConfig = mw.config.get( [
 	"wgPageName",
 	"wgUserGroups",
-	"wgFormattedNamespaces"
+	"wgFormattedNamespaces",
+	"wgArticleId"
 ] );
 // Set custom version of namespaces with description for namespace 0
 mwConfig.namespaces = $.extend({}, mwConfig.wgFormattedNamespaces, {0: "article"});

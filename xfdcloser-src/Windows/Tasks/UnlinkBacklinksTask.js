@@ -10,6 +10,11 @@ function UnlinkBacklinksTask(config) {
 	// Call parent constructor
 	UnlinkBacklinksTask.super.call( this, config );
 
+	this.summaryReason = typeof config.summaryReason === "undefined"
+		? `[[${this.discussion.getNomPageLink()}]] closed as ${this.result}`
+		: config.summaryReason;
+	this.advert = this.appConfig.script.advert;
+
 	this.finishedReadingApi = $.Deferred();
 	this.queuedPrompts = [];
 }
@@ -32,7 +37,7 @@ const ignoreResultTitle = title => [
  * @param {*} params Parameters for multiButtonConfirm
  * @returns {Promise<String>} action selected by user
  */
-UnlinkBacklinksTask.prototype.queueMultiButtonConfirm = params => {
+UnlinkBacklinksTask.prototype.queueMultiButtonConfirm = function(params) {
 	const previousPrompt = this.queuedPrompts.length && this.queuedPrompts[this.queuedPrompts.length-1];
 	const prompt = $.when(previousPrompt).then(() => {
 		if (this.aborted) return rejection("Aborted");
@@ -49,7 +54,11 @@ UnlinkBacklinksTask.prototype.queueMultiButtonConfirm = params => {
  * @param {Boolean} [isMajorEdit]
  * @returns {Promise} {String} updated wikitext, {Boolean} Edit should be considered major
  */
-UnlinkBacklinksTask.prototype.processListItems = (pageTitle, wikitext, isMajorEdit) => {
+UnlinkBacklinksTask.prototype.processListItems = function(pageTitle, wikitext, isMajorEdit) {
+	if (!this) {
+		console.log("[XFDC][processListItems] `this` doesn't exist. Huh.");
+		debugger; // eslint-disable-line
+	}
 	if (this.aborted) return rejection("Aborted");
 	// Find lines marked with {{subst:void}}, and the preceding section heading (if any)
 	var toReview = /^{{subst:void}}(.*)$/m.exec(wikitext);
@@ -101,12 +110,67 @@ UnlinkBacklinksTask.prototype.processListItems = (pageTitle, wikitext, isMajorEd
 };
 
 UnlinkBacklinksTask.prototype.doTask = function() {
+	const onSuccess = () => { this.trackStep(); };
+	const onFailure = (code, error, title) => {
+		const titleLink = extraJs.makeLink(title).get(0).outerHTML; 
+		switch(code) {
+		case "skippedNoLinks":
+			this.addWarning(`Skipped ${titleLink} (no direct links)`);
+			this.trackStep();
+			break;
+		default:
+			this.addError(
+				`Could not edit page ${titleLink}`,
+				{code, error}
+			);
+			this.trackStep({failed: true});
+		}
+	};
+	const onReadFail = (errortype, code, error) => {
+		if ( errortype === "read" ) {
+			this.addError(
+				"Could not read contents of pages; could not remove backlinks",
+				{code, error}
+			);
+			return "Failed";
+		} // other errors handled above
+	};
+	const transform = (page, redirectTitles) => {
+		if (this.aborted) return rejection("Aborted");
+
+		const oldWikitext = page.content;
+		const newWikitext = extraJs.unlink(
+			oldWikitext,
+			[...this.pages.map(page => page.getPrefixedText()), ...redirectTitles],
+			page.ns,
+			!!page.categories
+		);
+		if (oldWikitext === newWikitext) {
+			return rejection("skippedNoLinks");
+		}
+		return this.processListItems(page.title, newWikitext).then(
+			(updatedWikitext, isMajorEdit) => {
+				const isFfd = this.venue.type === "ffd";
+				const thingsRemoved = `link(s)${isMajorEdit ? " / list item(s)" : ""}${isFfd ? " / file usage(s)" : ""}`;
+				const req = {
+					text: updatedWikitext,
+					summary: `Removing ${thingsRemoved}: ${this.summaryReason} ${this.advert}`,
+					nocreate: 1
+				};
+				if ( !isMajorEdit ) {
+					req.minor = 1;
+				}
+				return req;
+			}
+		);
+	};
+
 	const iuParams = (this.venue.type === "ffd")
 		? {
 			list: "backlinks|imageusage",
 			iufilterredir: "nonredirects",
 			iulimit: "max",
-			iunamespace: this.venue.xfd.ns_unlink,
+			iunamespace: this.venue.ns_unlink,
 			iuredirect: 1
 		}
 		: {};
@@ -174,61 +238,6 @@ Note that the use of high speed, high volume editing software (such as this tool
 				return "Skipped";
 			}
 			this.setTotalSteps(unlinkTitles.length);
-			const onSuccess = () => { this.trackStep(); };
-			const onFailure = (code, error, title) => {
-				const titleLink = extraJs.makeLink(title).get(0).outerHTML; 
-				switch(code) {
-				case "skippedNoLinks":
-					this.addWarning(`Skipped ${titleLink} (no direct links)`);
-					this.trackStep();
-					break;
-				default:
-					this.addError(
-						`Could not edit page ${titleLink}`,
-						{code, error}
-					);
-					this.trackStep({failed: true});
-				}
-			};
-			const onReadFail = (errortype, code, error) => {
-				if ( errortype === "read" ) {
-					this.addError(
-						"Could not read contents of pages; could not remove backlinks",
-						{code, error}
-					);
-					return "Failed";
-				} // other errors handled above
-			};
-			const transform = page => {
-				if (this.aborted) return rejection("Aborted");
-
-				const oldWikitext = page.content;
-				const newWikitext = extraJs.unlink(
-					oldWikitext,
-					[...this.pages.map(page => page.getPrefixedText()), ...redirectTitles],
-					page.ns,
-					!!page.categories
-				);
-				if (oldWikitext === newWikitext) {
-					return rejection("skippedNoLinks");
-				}
-				return this.processListItems(page.title, newWikitext).then(
-					(updatedWikitext, isMajorEdit) => {
-						const isFfd = this.venue.type === "ffd";
-						const thingsRemoved = `link(s)${isMajorEdit ? " / list item(s)" : ""}${isFfd ? " / file usage(s)" : ""}`;
-						const req = {
-							text: updatedWikitext,
-							summary: `Removing ${thingsRemoved}: [[${this.discussion.getNomPageLink()}]] closed as ${this.result} ${this.appConfig.script.advert}`,
-							nocreate: 1
-						};
-						if ( !isMajorEdit ) {
-							req.minor = 1;
-						}
-						return req;
-					}
-				);
-			};
-
 			const batchedTitles = unlinkTitles.reduce((batches, title) => {
 				if (batches[batches.length-1].length === 50) {
 					batches[batches.length] = [title];
@@ -245,9 +254,9 @@ Note that the use of high speed, high volume editing software (such as this tool
 						prop: "categories|revisions",
 						clcategories: "Category:All disambiguation pages",
 					},
-					transform,
-					onSuccess,
-					onFailure
+					page => transform(page, redirectTitles),
+					() => onSuccess(),
+					(code, error, title) => onFailure(code, error, title)
 				).catch(onReadFail)
 			);
 

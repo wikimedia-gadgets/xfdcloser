@@ -37,7 +37,7 @@ function Task(config) {
 	// Store api and data
 	this.api = config.api;
 	this.pageResults = config.pageResults;
-	this.pages = config.pageResults && config.pageResults.map(pageResult => pageResult.page);
+	this.pages = config.pages || config.pageResults && config.pageResults.map(pageResult => pageResult.page);
 	this.options = config.options;
 	this.discussion = config.discussion;
 	this.appConfig = config.appConfig;
@@ -158,9 +158,11 @@ Task.prototype.updateProgress = function() {
 };
 
 Task.prototype.start = function() {
+	this.emit("starting");
 	return $.when(this.delayStart).then( () => {
 		if (this.aborted) return rejection("Aborted");
 
+		this.emit("started");
 		this.setNotice("Processing...");
 		return this.doTask();
 	}).then( notice => {
