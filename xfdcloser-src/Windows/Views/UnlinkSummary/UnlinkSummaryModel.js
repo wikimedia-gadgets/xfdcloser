@@ -1,5 +1,10 @@
-import { timeout } from "../../../util";
+//import { timeout } from "../../../util";
 // <nowiki>
+const timeout = function(delay) {
+	const deferred = $.Deferred();
+	setTimeout(deferred.resolve, delay);
+	return deferred.promise();
+};
 
 /**
  * Model for UnlinkSummaryView

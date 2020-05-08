@@ -5,11 +5,11 @@
   "homepage": "https://github.com/evad37/xfdcloser",
   "browser": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --delay --require @babel/register --reporter list",
     "lint:es5": "jshint \"dist/loader-dev.js\" \"dist/loader-gadget.js\"",
     "lint:es5:dev": "jshint \"dist/loader-dev.js\"",
     "lint:css": "stylelint \"styles-src/**/*.css\" --fix",
-    "lint:es6": "eslint \"xfdcloser-src/**/*.js\" --fix",
+    "lint:es6": "eslint \"xfdcloser-src/**/*.js\" \"test/*\" --fix",
     "lint": "npm run lint:es6 && npm run lint:es5 && npm run lint:css",
     "lint:dev": "npm run lint:es6 && npm run lint:es5:dev && npm run lint:css",
     "build:loader:dev": "concat-cli -f \"loader-src/loader-dev-top.js.txt\" \"loader-src/loader-core.js.txt\" \"loader-src/loader-dev-bottom.js.txt\" -o dist/loader-dev.js",
@@ -19,8 +19,8 @@
     "build:minify": "uglifyjs dist/core.js --compress -b ascii_only=true,beautify=false --output dist/core.min.js",
     "build:concat": "concat-cli -f \"core-comment-top.js\" dist/core.min.js \"core-comment-bottom.js\" -o dist/core-gadget.js",
     "build:css": "concat-cli -f \"core-comment-top.js\" \"styles-src/styles.css\" \"core-comment-bottom.js\" -o dist/styles-gadget.css",
-    "build": "npm run build:loader && npm run lint && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
-    "build:dev": "npm run build:loader:dev && npm run lint:dev && npm run build:bundle "
+    "build": "npm run build:loader && npm run lint && npm run test && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
+    "build:dev": "npm run build:loader:dev && npm run lint:dev && npm run test && npm run build:bundle "
   },
   "author": {
     "name": "Evad37",
@@ -34,11 +34,16 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
+    "@babel/register": "^7.9.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
     "concat-cli": "^4.0.0",
     "eslint": "^6.5.1",
+    "jquery": "^3.5.1",
+    "jsdom": "^16.2.2",
     "jshint": "^2.10.2",
+    "mocha": "^7.1.2",
+    "oojs": "^5.0.0",
     "stylelint": "^13.3.3",
     "stylelint-config-standard": "^20.0.0",
     "uglify-js": "^3.8.0"
