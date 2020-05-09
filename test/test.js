@@ -26,8 +26,8 @@ const loadModel = (name, path) => new Promise((resolve,reject) =>
 	})
 );
 const setupModels = Promise.all([
-	loadModel("UnlinkSummaryModel", "./xfdcloser-src/Windows/Views/UnlinkSummary/UnlinkSummaryModel.js"),
-	loadModel("UnlinkTaskModel", "./xfdcloser-src/Windows/Views/UnlinkTask/UnlinkTaskModel.js"),
+	loadModel("UnlinkSummaryModel", "./xfdcloser-src/Views/UnlinkSummary/UnlinkSummaryModel.js"),
+	loadModel("UnlinkTaskModel", "./xfdcloser-src/Views/UnlinkTask/UnlinkTaskModel.js"),
 ]);
 
 // Run Mocha after setup is complete
@@ -62,7 +62,8 @@ describe("UnlinkSummaryModel", function() {
 						}
 					})
 				)
-			}
+			},
+			delay: 200
 		});
 	});
 	
@@ -98,7 +99,7 @@ describe("UnlinkSummaryModel", function() {
 		setTimeout(function() {
 			assert.equal(model.parsedSummary, "Removing link(s): Foo bar (advert)");
 			done();
-		}, 850);
+		}, 250);
 	});
 
 	it("does not set initially parsed summary if summary changes during delay", function(done) {
@@ -106,14 +107,14 @@ describe("UnlinkSummaryModel", function() {
 		model.setSummaryValue("Foo bar");
 		setTimeout(function() {
 			model.setSummaryValue("Qux");
-		}, 200);
+		}, 100);
 		setTimeout(function() {
 			assert.equal(model.parsedSummary, "");
-		}, 850);
+		}, 250);
 		setTimeout(function() {
 			assert.equal(model.parsedSummary, "Removing link(s): Qux (advert)");
 			done();
-		}, 1050);
+		}, 350);
 
 	});
 
@@ -122,11 +123,11 @@ describe("UnlinkSummaryModel", function() {
 		model.setSummaryValue("Foo bar");
 		setTimeout(function() {
 			model.setSummaryValue("");
-		}, 200);
+		}, 100);
 		setTimeout(function() {
 			assert.equal(model.parsedSummary, "");
 			done();
-		}, 900);
+		}, 350);
 	});
 });
 

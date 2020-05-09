@@ -1,7 +1,7 @@
 //import LoadDialog from "./Windows/LoadDialog";
-import MainWindow from "./Windows/MainWindow";
-import PrefsWindow from "./Windows/PrefsWindow";
-import UnlinkWindow from "./Windows/UnlinkWindow";
+import MainWindow from "./Windows/Main/MainWindow";
+import PrefsWindow from "./Windows/Prefs/PrefsWindow";
+import UnlinkWindow from "./Windows/Unlink/UnlinkWindow";
 
 var factory = new OO.Factory();
 
