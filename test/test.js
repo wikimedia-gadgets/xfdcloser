@@ -28,6 +28,7 @@ const loadModel = (name, path) => new Promise((resolve,reject) =>
 const setupModels = Promise.all([
 	loadModel("UnlinkSummaryModel", "./xfdcloser-src/Views/UnlinkSummary/UnlinkSummaryModel.js"),
 	loadModel("UnlinkTaskModel", "./xfdcloser-src/Views/UnlinkTask/UnlinkTaskModel.js"),
+	loadModel("UnlinkWindowModel", "./xfdcloser-src/Windows/Unlink/UnlinkWindowModel.js")
 ]);
 
 // Run Mocha after setup is complete
@@ -42,8 +43,9 @@ describe("Setup", function() {
 		assert.ok(OO);
 	});
 	it("has loaded the models", function() {
-		assert.ok(models.UnlinkSummaryModel);
-		assert.ok(models.UnlinkTaskModel);
+		["UnlinkSummaryModel", "UnlinkTaskModel", "UnlinkWindowModel"].forEach(modelName => {
+			assert.ok(models[modelName]);
+		});
 	});
 });
 
@@ -188,5 +190,42 @@ describe("UnlinkTaskModel", function() {
 		assert.equal(model.taskStarted, true);
 		assert.equal(model.taskAborted, false);
 		assert.equal(model.taskCompleted, false);
+	});
+});
+
+describe("UnlinkWindowModel", function() {
+	let model;
+	beforeEach(function() {
+		model = new models.UnlinkWindowModel({pageName: "Foo"});
+	});
+	it("initially has all actions disabled", function() {
+		assert.deepEqual(model.actionAbilities, {
+			start: false,
+			close: false,
+			abort: false,
+		});
+	});
+	it.skip("does not start task if start action is disabled", function() {
+		model.setStartability(false);
+		assert.throws(() => model.startTask() );
+	});
+	it("can start task if start action is enabled", function() {
+		model.setStartability(true);
+		assert.doesNotThrow(() => model.startTask());
+	})
+	it("updates view, mode, abilities when starting task", function() {
+		model.setStartability(true);
+		model.startTask();
+		assert.equal(model.viewName, "task");
+		assert.equal(model.mode, "task");
+		assert.equal(model.actionAbilities.abort, true);
+		assert.equal(model.actionAbilities.close, false);
+	});
+	it("updates abilities when task is completed", function() {
+		model.setStartability(true);
+		model.startTask();
+		model.setTaskEnded();
+		assert.equal(model.actionAbilities.abort, false);
+		assert.equal(model.actionAbilities.close, true);
 	});
 });
