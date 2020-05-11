@@ -56,7 +56,9 @@ UnlinkWindow.prototype.initialize = function () {
 	// Call the parent method.
 	UnlinkWindow.super.prototype.initialize.call( this );
 
-	this.model = new UnlinkWindowModel();
+	this.model = new UnlinkWindowModel({
+		pageName: appConfig.mw.wgPageName
+	});
 
 	this.unlinkSummaryView = new UnlinkSummaryView( {
 		data: {name: "summary"},
@@ -65,7 +67,6 @@ UnlinkWindow.prototype.initialize = function () {
 	this.unlinkTaskView = new UnlinkTaskView( {
 		data: {name: "task"},
 		padded: true,
-		pageName: appConfig.mw.wgPageName
 	}, this.model );
 	this.views = new OO.ui.StackLayout( {
 		items: [
@@ -76,18 +77,13 @@ UnlinkWindow.prototype.initialize = function () {
 		expanded: false
 	} );
 
-	// Proxy object to pass to controller, to make available relevant methods.
-	this.windowProxy = {
-		updateSize: () => this.updateSize(),
-		close: () => this.close()
-	};
-
 	this.controller = new UnlinkWindowController(this.model, {
-		unlinkSummaryView: this.unlinkSummaryView,
-		unlinkTaskView: this.unlinkTaskView,
 		views: this.views,
 		actions: this.actions,
-		window: this.windowProxy
+		window: {
+			updateSize: () => this.updateSize(),
+			close: () => this.close()
+		}
 	});
 
 	this.$body.append( this.views.$element );	
@@ -105,7 +101,7 @@ UnlinkWindow.prototype.getSetupProcess = function ( data ) {
 	return UnlinkWindow.super.prototype.getSetupProcess.call( this, data )
 		.next( function () {
 			// Set up contents based on data
-			this.unlinkSummaryView.model.setSummaryValue( data.summary || "" );
+			this.unlinkSummaryView.model.setSummary( data.summary || "" );
 			this.controller.updateFromModel();
 		}, this );
 };
@@ -114,8 +110,6 @@ UnlinkWindow.prototype.getReadyProcess = function ( data ) {
 	data = data || {};
 	return UnlinkWindow.super.prototype.getReadyProcess.call( this, data )
 		.next( () => {
-			// Update from model
-			//this.controller.updateFromModel();
 			// Set focus
 			this.unlinkSummaryView.summaryInput.focus();
 		});

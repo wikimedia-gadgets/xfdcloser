@@ -1,20 +1,13 @@
-import UnlinkSummaryModel from "./UnlinkSummaryModel";
 import UnlinkSummaryController from "./UnlinkSummaryController";
-import appConfig from "../../config";
-import API from "../../api";
 // <nowiki>
 
-function UnlinkSummaryView(config, windowModel) {
+function UnlinkSummaryView(config, model) {
 	// Configuration initialization
 	config = config || {};
 	// Call parent constructor
 	UnlinkSummaryView.super.call( this, config );
 
-	this.windowModel = windowModel;
-	this.model = new UnlinkSummaryModel({
-		advert: appConfig.script.advert,
-		api: API
-	});
+	this.model = model;
 
 	this.summaryInput = new OO.ui.TextInputWidget();
 	this.summaryPreview = new OO.ui.LabelWidget({classes: ["xu-preview"]});
@@ -27,7 +20,7 @@ function UnlinkSummaryView(config, windowModel) {
 		align: "top" 
 	} );
 
-	this.controller = new UnlinkSummaryController(this.model, this.windowModel, {
+	this.controller = new UnlinkSummaryController(this.model, {
 		summaryInput: this.summaryInput,
 		summaryPreview: this.summaryPreview,
 		summaryInputField: this.summaryInputField,

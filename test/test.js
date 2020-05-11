@@ -26,9 +26,8 @@ const loadModel = (name, path) => new Promise((resolve,reject) =>
 	})
 );
 const setupModels = Promise.all([
-	loadModel("UnlinkSummaryModel", "./xfdcloser-src/Views/UnlinkSummary/UnlinkSummaryModel.js"),
-	loadModel("UnlinkTaskModel", "./xfdcloser-src/Views/UnlinkTask/UnlinkTaskModel.js"),
-	loadModel("UnlinkWindowModel", "./xfdcloser-src/Windows/Unlink/UnlinkWindowModel.js")
+	loadModel("UnlinkWindowModel", "./xfdcloser-src/Windows/Unlink/UnlinkWindowModel.js"),
+	// TODO: more model tests
 ]);
 
 // Run Mocha after setup is complete
@@ -43,189 +42,140 @@ describe("Setup", function() {
 		assert.ok(OO);
 	});
 	it("has loaded the models", function() {
-		["UnlinkSummaryModel", "UnlinkTaskModel", "UnlinkWindowModel"].forEach(modelName => {
+		["UnlinkWindowModel" /* TODO: Other models */].forEach(modelName => {
 			assert.ok(models[modelName]);
 		});
 	});
 });
 
-describe("UnlinkSummaryModel", function() {
-	let model;
-	beforeEach(function() {
-		model = new models.UnlinkSummaryModel({
-			advert: "(advert)",
-			api: { // Mock Api
-				get: request => new Promise(
-					resolve => resolve({
-						parse: {
-							parsedsummary: request.summary
-								.replace(/\[\[(.+)\|(.+)]]/, "<a href=\"/wiki/$1\">$2</a>")
-								.replace(/\[\[(.+)]]/, "<a href=\"/wiki/$1\">$1</a>")
-						}
-					})
-				)
-			},
-			delay: 200
-		});
-	});
-	
-	it("is not valid initially", function() {
-		assert.equal(model.isValid, false);
-	});
-
-	it("becomes valid when given a summary", function() {
-		model.setSummaryValue("Foo bar");
-		assert.equal(model.isValid, true);
-	});
-
-	it("becomes invalid with an error message when summary is cleared", function() {
-		model.setSummaryValue("Foo bar");
-		model.setSummaryValue("");
-		assert.equal(model.isValid, false);
-		assert.equal(model.summaryErrors.length, 1);
-	});
-
-	it("becomes valid and clears error message when summary is given again", function() {
-		model.setSummaryValue("Foo bar");
-		model.setSummaryValue("");
-		assert.equal(model.isValid, false);
-		assert.equal(model.summaryErrors.length, 1);
-		model.setSummaryValue("Baz qux");
-		assert.equal(model.isValid, true);
-		assert.equal(model.summaryErrors.length, 0);
-	});
-
-	it("sets parsed summary after delay", function(done) {
-		assert.equal(model.parsedSummary, "");
-		model.setSummaryValue("Foo bar");
-		setTimeout(function() {
-			assert.equal(model.parsedSummary, "Removing link(s): Foo bar (advert)");
-			done();
-		}, 250);
-	});
-
-	it("does not set initially parsed summary if summary changes during delay", function(done) {
-		assert.equal(model.parsedSummary, "");
-		model.setSummaryValue("Foo bar");
-		setTimeout(function() {
-			model.setSummaryValue("Qux");
-		}, 100);
-		setTimeout(function() {
-			assert.equal(model.parsedSummary, "");
-		}, 250);
-		setTimeout(function() {
-			assert.equal(model.parsedSummary, "Removing link(s): Qux (advert)");
-			done();
-		}, 350);
-
-	});
-
-	it("does not set parsed summary if summary changes to invalid during delay", function(done) {
-		assert.equal(model.parsedSummary, "");
-		model.setSummaryValue("Foo bar");
-		setTimeout(function() {
-			model.setSummaryValue("");
-		}, 100);
-		setTimeout(function() {
-			assert.equal(model.parsedSummary, "");
-			done();
-		}, 350);
-	});
-});
-
-describe("UnlinkTaskModel", function() {
-	let model;
-	beforeEach(function() {
-		model = new models.UnlinkTaskModel({pageName: "Foo"});
-	});
-	it("initially has not summary", function() {
-		assert.equal(model.summary, "");
-	});
-	it("initially can update the summary", function() {
-		model.setSummary("Foo bar");
-		assert.equal(model.summary, "Foo bar");
-	});
-	it("initally is not started, aborted, or completed", function() {
-		assert.equal(model.taskStarted, false);
-		assert.equal(model.taskAborted, false);
-		assert.equal(model.taskCompleted, false);
-	});
-	it("can be started", function() {
-		model.setTaskStarted();
-		assert.equal(model.taskStarted, true);
-		assert.equal(model.taskAborted, false);
-		assert.equal(model.taskCompleted, false);
-	});
-	it("can be started then completed", function() {
-		model.setTaskStarted();
-		model.setTaskCompleted();
-		assert.equal(model.taskStarted, true);
-		assert.equal(model.taskAborted, false);
-		assert.equal(model.taskCompleted, true);
-	});
-	it("can be started then aborted", function() {
-		model.setTaskStarted();
-		model.setTaskAborted();
-		assert.equal(model.taskStarted, true);
-		assert.equal(model.taskAborted, true);
-		assert.equal(model.taskCompleted, false);
-	});
-	it("can be aborted without being started", function() {
-		model.setTaskAborted();
-		assert.equal(model.taskStarted, false);
-		assert.equal(model.taskAborted, true);
-		assert.equal(model.taskCompleted, false);
-	});
-	// TODO
-	it.skip("cannot be completed if not started", function() {
-		model.setTaskCompleted();
-		assert.equal(model.taskStarted, false);
-		assert.equal(model.taskAborted, false);
-		assert.equal(model.taskCompleted, false);
-	});
-	it.skip("cannot be aborted once completed", function() {
-		model.setTaskStarted();
-		model.setTaskCompleted();
-		model.setTaskAborted();
-		assert.equal(model.taskStarted, true);
-		assert.equal(model.taskAborted, false);
-		assert.equal(model.taskCompleted, false);
-	});
-});
-
 describe("UnlinkWindowModel", function() {
 	let model;
-	beforeEach(function() {
+	const resetModel = function() {
 		model = new models.UnlinkWindowModel({pageName: "Foo"});
-	});
-	it("initially has all actions disabled", function() {
-		assert.deepEqual(model.actionAbilities, {
-			start: false,
-			close: false,
-			abort: false,
+	};
+	describe("Summary", function() {
+		beforeEach(resetModel);
+		it("is not valid initially", function() {
+			assert.equal(model.summaryIsValid, false);
+		});
+		it("is valid when a summary value is set", function() {
+			model.setSummary("Foo bar");
+			assert.equal(model.summaryIsValid, true);
+		});
+		it("is not valid, with an error message, when summary value is whitespace", function() {
+			model.setSummary("    ");
+			assert.equal(model.summaryIsValid, false);
+			assert.equal(model.summaryErrors.length, 1);
+		});
+		it("is not valid, with an error message, when summary is cleared", function() {
+			model.setSummary("Foo bar");
+			model.setSummary("");
+			assert.equal(model.summaryIsValid, false);
+			assert.equal(model.summaryErrors.length, 1);
+		});
+		it("becomes valid, and clears error message, when summary is given again", function() {
+			model.setSummary("Foo bar");
+			model.setSummary("");
+			assert.equal(model.summaryIsValid, false);
+			assert.equal(model.summaryErrors.length, 1);
+			model.setSummary("Baz qux");
+			assert.equal(model.summaryIsValid, true);
+			assert.equal(model.summaryErrors.length, 0);
 		});
 	});
-	it.skip("does not start task if start action is disabled", function() {
-		model.setStartability(false);
-		assert.throws(() => model.startTask() );
+	describe("Parsed summary", function() {
+		beforeEach(resetModel);
+		it("can be set", function() {
+			model.setParsedSummary("Foo");
+			assert.equal(model.parsedSummary, "Foo");
+		});
+		it("can have error set based on error code", function() {
+			model.setParseError("somecode");
+			assert.deepEqual(model.parseErrors, ["Preview failed: somecode error"]);
+		});
+		it("can have unknown error set if no error code given", function() {
+			model.setParseError();
+			assert.equal(model.parseErrors[0], "Preview failed: unknown error");
+		});
+		it("is cleared if an error is set", function() {
+			model.setParsedSummary("Foo");
+			assert.equal(model.parsedSummary, "Foo");
+			model.setParseError("Bar");
+			assert.equal(model.parsedSummary, "");
+		});
+		it("clears errors when it is set", function() {
+			model.setParseError("Bar");
+			assert.equal(model.parseErrors.length, 1);
+			model.setParsedSummary("Foo");
+			assert.equal(model.parseErrors.length, 0);
+		});
 	});
-	it("can start task if start action is enabled", function() {
-		model.setStartability(true);
-		assert.doesNotThrow(() => model.startTask());
-	})
-	it("updates view, mode, abilities when starting task", function() {
-		model.setStartability(true);
-		model.startTask();
-		assert.equal(model.viewName, "task");
-		assert.equal(model.mode, "task");
-		assert.equal(model.actionAbilities.abort, true);
-		assert.equal(model.actionAbilities.close, false);
-	});
-	it("updates abilities when task is completed", function() {
-		model.setStartability(true);
-		model.startTask();
-		model.setTaskEnded();
-		assert.equal(model.actionAbilities.abort, false);
-		assert.equal(model.actionAbilities.close, true);
+	describe("Window", function() {
+		beforeEach(resetModel);
+		it("initially has start action disabled", function() {
+			assert.equal(model.actionAbilities.start, false);
+		});
+		it("is initially in \"initial\" view and \"summary\" mode", function() {
+			assert.equal(model.mode, "initial");
+			assert.equal(model.viewName, "summary");
+		});
+		it("sets \"task\" view and mode, and startRequested:true, when starting the task", function() {
+			model.startTask();
+			assert.equal(model.mode, "task");
+			assert.equal(model.viewName, "task");
+			assert.equal(model.startRequested, true);
+		});
+		it("does not start task again when already started", function() {
+			model.startTask();	
+			assert.equal(model.mode, "task");
+			assert.equal(model.viewName, "task");
+			assert.equal(model.startRequested, true);
+			// Adjust values so can check they aren't changed when startTask is called again
+			model.mode = "foo";
+			model.viewName = "bar";
+			model.startRequested = "truthy";
+			model.startTask();	
+			assert.equal(model.mode, "foo");
+			assert.equal(model.viewName, "bar");
+			assert.equal(model.startRequested, "truthy");
+		});
+		it("does not start task when already aborted", function() {
+			model.abortTask();
+			model.startTask();
+			assert.equal(model.aborted, true);
+			assert.equal(model.startRequested, false);
+		});
+		it("updates action abilities when starting task", function() {
+			model.startTask();
+			assert.equal(model.actionAbilities.abort, true);
+			assert.equal(model.actionAbilities.close, false);
+		});
+		it("updates action abilities when task is completed", function() {
+			model.startTask();
+			model.setCompleted();
+			assert.equal(model.actionAbilities.abort, false);
+			assert.equal(model.actionAbilities.close, true);
+		});
+		it("updates action abilities when task is aborted", function() {
+			model.startTask();
+			model.abortTask();
+			assert.equal(model.actionAbilities.abort, false);
+			assert.equal(model.actionAbilities.close, true);
+		});
+		it("can abort task when already started", function() {
+			model.startTask();
+			model.abortTask();
+			assert.equal(model.aborted, true);
+		});
+		it("can abort task when not started", function() {
+			model.abortTask();
+			assert.equal(model.aborted, true);
+		});
+		it("can not abort task if already completed", function() {
+			model.startTask();
+			model.setCompleted();
+			model.abortTask();
+			assert.equal(model.aborted, false);
+		});
 	});
 });

@@ -1,48 +1,47 @@
 // <nowiki>
 class UnlinkTaskController {
-	constructor(model, windowModel, widgets) {
+	constructor(model, widgets) {
 		// Models
 		this.model = model;
-		this.windowModel = windowModel;
 		// Widget
 		this.task = widgets.task;
 		// Connect models and widget
-		this.model.connect(this, { update: "updateFromModel" });
-		this.windowModel.connect(this, {
-			abort: "onAbort",
-			startTask: "onWindowStartTask"
+		this.model.connect(this, {
+			update: "updateFromModel"
 		});
 		this.task.connect(this, {
-			starting: "onTaskStart",
+			starting: "onTaskStarting",
+			started: "onTaskStarted",
 			abort: "onAbort",
 			completed: "onTaskCompleted",
 			resize: "onTaskResize"
 		});
+		this._taskStartCalled = false;
 	}
 	updateFromModel() {
 		this.task.summaryReason = this.model.summary;
-		if (this.model.taskAborted && !this.task.aborted) {
+		if (this.model.aborted && !this.task.aborted) {
 			this.task.abort();
 		}
-		if (this.model.taskAborted || this.model.taskCompleted) {
-			this.windowModel.setTaskEnded();
+		if (this.model.startRequested && !this._taskStartCalled) {
+			this._taskStartCalled = true;
+			this.task.start();
 		}
 	}
-	onWindowStartTask(summary) {
-		this.model.setSummary(summary);
-		this.task.start();
+	onTaskStarting() {
+		this.model.setStarting();
 	}
-	onTaskStart() {
-		this.model.setTaskStarted();
+	onTaskStarted() {
+		this.model.setStarted();
 	}
 	onAbort() {
-		this.model.setTaskAborted();
+		this.model.abortTask();
 	}
 	onTaskCompleted() {
-		this.model.setTaskCompleted();
+		this.model.setCompleted();
 	}
 	onTaskResize() {
-		this.windowModel.requestResize();
+		this.model.requestResize();
 	}
 }
 

@@ -1,9 +1,13 @@
+import API from "../../api";
+import appConfig from "../../config";
+import { timeout } from "../../util";
 // <nowiki>
+
 class UnlinkSummaryController {
-	constructor(model, windowModel, widgets) {
+	constructor(model, widgets) {
+		this._requestId = 0;
 		// Models
 		this.model = model;
-		this.windowModel = windowModel;
 		// Widgets
 		this.summaryInput = widgets.summaryInput;
 		this.summaryInputField = widgets.summaryInputField;
@@ -21,7 +25,7 @@ class UnlinkSummaryController {
 	updateFromModel() {
 		this.summaryInput.setValue(this.model.summary);
 		this.summaryInputField.setErrors(this.model.summaryErrors);
-		if (this.model.parsedSummary) {
+		if (this.model.parsedSummary && this.model.summaryIsValid) {
 			const $preview = $("<p>").append(this.model.parsedSummary);
 			$preview.find("a").attr("target", "_blank");
 			this.summaryPreview.setLabel($preview);
@@ -29,15 +33,41 @@ class UnlinkSummaryController {
 			this.summaryPreview.setLabel("");
 		}
 		this.summaryPreviewField.setErrors(this.model.parseErrors);
-		this.windowModel.setSummary(this.model.summary);
-		this.windowModel.setStartability(this.model.isValid);
 	}
 	onInputChange(value) {
-		this.model.setSummaryValue(value);
+		this.model.setSummary(value);
+		const requestId = ++this._requestId;
+		// Wait for a short delay and check if this is still the latest requestId,
+		// to avoid making unnessary api calls.
+		timeout(this._delay).then(() => {
+			if (requestId < this._requestId || !this.model.summaryIsValid)
+				return;
+			API.get({
+				action: "parse",
+				contentmodel: "wikitext",
+				summary: `Removing link(s): ${this.model.summary} ${appConfig.script.advert}`,
+				prop: "text",
+				disablelimitreport: 1,
+				format: "json",
+				formatversion: "2"
+			}).then(result => {
+				// Prevent older requests overwriting newer requests
+				if (requestId < this._requestId || !this.model.summaryIsValid) {
+					return;
+				}
+				this.model.setParsedSummary(result.parse.parsedsummary);
+			}, errorCode => {
+				// Prevent older requests overwriting newer requests
+				if (requestId < this._requestId || !this.model.summaryIsValid) {
+					return false;
+				}
+				this.model.setParseError(errorCode);
+			});
+		});
 	}
 	onInputEnter() {
-		if (this.model.isValid) {
-			this.windowModel.startTask();
+		if (this.model.summaryIsValid) {
+			this.model.startTask();
 		}
 	}
 }

@@ -1,28 +1,26 @@
 import UnlinkBacklinksTask from "../../Tasks/UnlinkBacklinksTask";
 import UnlinkTaskController from "./UnlinkTaskController";
-import UnlinkTaskModel from "./UnlinkTaskModel";
 import API from "../../api";
 import appConfig from "../../config";
 // <nowiki>
 
-function UnlinkTaskView(config, windowModel) {
+function UnlinkTaskView(config, model) {
 	// Configuration initialization
 	config = config || {};
 	// Call parent constructor
 	UnlinkTaskView.super.call( this, config );
 
-	this.windowModel = windowModel;
-	this.model = new UnlinkTaskModel();
+	this.model = model;
 
 	this.task = new UnlinkBacklinksTask({
 		api: API,
-		pages: [mw.Title.newFromText(config.pageName)],
+		pages: [mw.Title.newFromText(this.model.pageName)],
 		summaryReason: this.model.summary,
 		appConfig: appConfig,
 		venue: appConfig.venue
 	});
 
-	this.controller = new UnlinkTaskController(this.model, this.windowModel, {
+	this.controller = new UnlinkTaskController(this.model, {
 		task: this.task
 	});
 
