@@ -1,11 +1,25 @@
 
 /* Inline links */
 .xfdc-status {
-	font-size: 85%;
+	font-size: small;
 	margin-left: 13px;
 	font-weight: normal;
 }
-.xfdc-action { margin-left: 13px; }
+
+.skin-timeless .xfdc-status {
+	font-size: 0.98rem;
+}
+
+.skin-minerva .xfdc-status {
+	font-size: 0.98rem;
+	display: block;
+	margin: -1rem 0 1rem;
+}
+
+.xfdc-action {
+	margin-left: 13px; /* DEPRECATED, retain until beta testing is finished */
+	font-weight: normal;
+}
 .xfdc-action a { cursor: pointer; }
 
 .xfdc-qc-cancel {
@@ -51,4 +65,14 @@
 
 .oo-ui-textInputWidget.oo-ui-textInputWidget-labelPosition-before.padLeft4em .oo-ui-inputWidget-input {
 	padding-left: 4em !important;
+}
+
+/* Consistent padding for menu option widgets (is inexplicably different in skins using Apex theme instead of MediaWikiUi theme) */
+.xfdc-menuOptionWidget.oo-ui-decoratedOptionWidget {
+	padding: 7px 12px;
+}
+
+/* Force task notices, warnings, and errors to all be shown on their own line */
+.xfdc-taskItemWidget > .oo-ui-fieldLayout-messages {
+	clear: both;
 }

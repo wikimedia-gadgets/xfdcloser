@@ -5,13 +5,17 @@
   "homepage": "https://github.com/evad37/xfdcloser",
   "browser": "index.js",
   "scripts": {
-    "test": "mocha --delay --require @babel/register --reporter list",
+    "test": "npm run globals:node && mocha --require @babel/register --reporter list && npm run globals:window",
+    "test:all": "node testall && npm run test",
+    "test:delay": "mocha --delay --require @babel/register --reporter list",
     "lint:es5": "jshint \"dist/loader-dev.js\" \"dist/loader-gadget.js\"",
     "lint:es5:dev": "jshint \"dist/loader-dev.js\"",
     "lint:css": "stylelint \"styles-src/**/*.css\" --fix",
     "lint:es6": "eslint \"xfdcloser-src/**/*.js\" \"test/*\" --fix",
     "lint": "npm run lint:es6 && npm run lint:es5 && npm run lint:css",
     "lint:dev": "npm run lint:es6 && npm run lint:es5:dev && npm run lint:css",
+    "globals:node": "concat-cli -f \"globals-src/comment.js\" \"globals-src/node.js\" -o \"globals.js\"",
+    "globals:window": "concat-cli -f \"globals-src/comment.js\" \"globals-src/window.js\" -o \"globals.js\"",
     "build:loader:dev": "concat-cli -f \"loader-src/loader-dev-top.js.txt\" \"loader-src/loader-core.js.txt\" \"loader-src/loader-dev-bottom.js.txt\" -o dist/loader-dev.js",
     "build:loader:gadget": "concat-cli -f \"core-comment-top.js\" \"loader-src/loader-gadget-top.js.txt\" \"loader-src/loader-core.js.txt\" \"loader-src/loader-gadget-bottom.js.txt\" \"core-comment-bottom.js\" -o dist/loader-gadget.js",
     "build:loader": "npm run build:loader:dev && npm run build:loader:gadget",
@@ -19,8 +23,8 @@
     "build:minify": "uglifyjs dist/core.js --compress -b ascii_only=true,beautify=false --output dist/core.min.js",
     "build:concat": "concat-cli -f \"core-comment-top.js\" dist/core.min.js \"core-comment-bottom.js\" -o dist/core-gadget.js",
     "build:css": "concat-cli -f \"core-comment-top.js\" \"styles-src/styles.css\" \"core-comment-bottom.js\" -o dist/styles-gadget.css",
-    "build": "npm run build:loader && npm run lint && npm run test && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
-    "build:dev": "npm run build:loader:dev && npm run lint:dev && npm run test && npm run build:bundle "
+    "build": "npm run globals:window && npm run build:loader && npm run lint && npm run test:all && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
+    "build:dev": "npm run globals:window && npm run build:loader:dev && npm run lint:dev && npm run test:all && npm run build:bundle "
   },
   "author": {
     "name": "Evad37",
@@ -33,8 +37,10 @@
   "license": "(MIT OR CC-BY-4.0)",
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.9.0",
     "@babel/register": "^7.9.0",
+    "babel-eslint": "^10.1.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
     "concat-cli": "^4.0.0",
@@ -42,8 +48,10 @@
     "jquery": "^3.5.1",
     "jsdom": "^16.2.2",
     "jshint": "^2.10.2",
+    "mediawiki-title": "^0.7.2",
     "mocha": "^7.1.2",
     "oojs": "^5.0.0",
+    "replace-in-file": "^6.0.0",
     "stylelint": "^13.3.3",
     "stylelint-config-standard": "^20.0.0",
     "uglify-js": "^3.8.0"

@@ -7,9 +7,9 @@
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
-        "$": "readonly",
-        "mw": "readonly",
-        "OO": "readonly",
+        "$": "off",
+        "mw": "off",
+        "OO": "off",
         "importScript": "readonly",
         "importStylesheet": "readonly",
         "extraJs": "readonly"
@@ -35,5 +35,6 @@
             "error",
             "always"
         ]
-    }
+    },
+    "parser": "babel-eslint"
 }

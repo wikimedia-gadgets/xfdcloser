@@ -1,3 +1,4 @@
+import { $, mw, OO } from "../globals";
 import {hasCorrectNamespace, multiButtonConfirm, setExistence, rejection} from "../util";
 import appConfig from "../config";
 import API from "../api";

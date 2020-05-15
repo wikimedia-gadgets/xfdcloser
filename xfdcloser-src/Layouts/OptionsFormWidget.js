@@ -1,3 +1,4 @@
+import { OO } from "../globals";
 import OptionsGroupWidget from "../Components/OptionsGroupWidget";
 import ResizingMixin from "../Mixins/ResizingMixin";
 

@@ -1,3 +1,4 @@
+import { $ } from "../globals";
 // <nowiki>
 /* ========== ShowHideTag class =================================================================
    The 'tag' at the bottom of screen that toggles the visibility of closed discussions.

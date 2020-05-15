@@ -1,7 +1,8 @@
+import { $, mw } from "../globals";
 import config from "./config";
 import ShowHideTag from "./ShowHideTag";
-import Discussion from "./Discussion";
 import windowManager from "./windowManager";
+import DiscussionView from "./Views/DiscussionView";
 // <nowiki>
 
 (function App() {
@@ -57,7 +58,8 @@ import windowManager from "./windowManager";
 					.slice(1,-1);
 			}
 			windowManager.openWindow("unlink", {
-				summary: comment
+				summary: comment,
+				pageName: config.mw.wgPageName
 			});
 		});
 	} else {
@@ -67,39 +69,23 @@ import windowManager from "./windowManager";
 		// Set up discussion object for each discussion
 		$(config.xfd.html.head + " > span.mw-headline")
 			.not(".XFDcloser-ignore")
-			.each(function(i) {
-				var d = Discussion.newFromHeadlineSpan(i, this);
-				if ( d ) {
-					try {
-						if ( d.isBasicMode() ) {
-							d.showLinks();
-						} else if (d.pages.length > 50 && !config.user.isSysop) {
-							d.setStatus(
-								extraJs.addTooltip(
-									$("<span>")
-										.addClass("xfdc-status")
-										.css({"color":"#9900A2"})
-										.text("[Too many pages]"),
-									"Only administrators can close or relist discussions with more than "+
-								"50 nominated pages using XFDcloser."
-								)
-							);
-						} else {
-							d.retrieveExtraInfo()
-								.then(
-									function() { d.showLinks(); },
-									function(failMessage) {
-										// set "basic" mode, show "basic" links with the failure message 
-										d.pages = false;
-										d.showLinks(failMessage);
-									}
-								);
-						}
-					} catch(e) {
-						console.warn("[XFDcloser] Could not retrieve page info for " + $(this).text() +
-					" [see error below]");
-						console.warn(e);
+			.each(function(index) {
+				try {
+					var discussionView = DiscussionView.newFromHeadline({
+						headingIndex: index,
+						context: this,
+						venue: config.venue,
+						currentPageName: config.mw.wgPageName,
+						userIsSysop: config.user.isSysop
+					});
+					if ( discussionView && config.isMobileSite ) {
+						$(this).parent().next().prepend(discussionView.$element);
+					} else if ( discussionView ) {
+						$(this).after(discussionView.$element);
 					}
+					//discussionView.fixButtonMenuWidth();
+				} catch(e) {
+					console.warn("[XFDcloser] Could not retrieve page info for " + $(this).text(), e);
 				}
 			});
 

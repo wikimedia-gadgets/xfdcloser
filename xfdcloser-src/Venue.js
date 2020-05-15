@@ -1,8 +1,14 @@
+import { mw } from "../globals";
 // <nowiki>
 /* ========== Venue class ====================================================================
    Each instance represents an XfD venue, with properties/function specific to that venue
    ---------------------------------------------------------------------------------------------- */
 // Constructor
+/**
+ * 
+ * @param {String} type 
+ * @param {Object} settings 
+ */
 var Venue = function(type, settings) {
 	this.type = type;
 	for ( var key in settings ) {
@@ -45,6 +51,7 @@ Venue.prototype.updateNomTemplateAfterRelist = function(wikitext, today, section
 Venue.Mfd = () => new Venue("mfd", {
 	path:		 "Wikipedia:Miscellany for deletion",
 	subpagePath: "Wikipedia:Miscellany for deletion/",
+	hasIndividualSubpages: true,
 	ns_number:	 null,
 	html: {
 		head:			"h4",
@@ -63,7 +70,8 @@ Venue.Mfd = () => new Venue("mfd", {
 	},
 	regex: {
 		nomTemplate:	/(?:<noinclude>\s*)?(?:{{mfd[^}}]*}}|<span id="mfd".*?<\/span>&nbsp;\[\[Category:Miscellaneous pages for deletion\|?.*\]\]\s*)(?:\s*<\/noinclude>)?/gi
-	}
+	},
+	relistTasks:		["UpdateDiscussion"]
 });
 
 // CFD
@@ -138,7 +146,8 @@ Venue.Ffd = () => new Venue("ffd", {
 	regex: {
 		nomTemplate:	/{{ffd[^}}]*}}/gi,
 		relistPattern:	/{{\s*ffd\s*\|\s*log\s*=\s*[^|}}]*/gi
-	}
+	},
+	relistTasks:		["UpdateOldLogPage", "UpdateNewLogPage", "UpdateNomTemplates"]
 });
 
 // TFD
@@ -178,7 +187,8 @@ Venue.Tfd = () => {
 			"substitute":		13,
 			"orphan":			14,
 			"ready":			15	// (ready for deletion)
-		}
+		},
+		relistTasks:		["UpdateOldLogPage", "UpdateNewLogPage", "UpdateNomTemplates"]
 	});
 	// Override prototype
 	tfdVenue.removeNomTemplate = function(wikitext) {
@@ -244,6 +254,8 @@ Venue.Rfd = () => {
 			relistPattern:  	/#invoke:RfD\|\|\|/gi
 			
 		},
+		relistTasks:		["UpdateOldLogPage", "UpdateNewLogPage", "UpdateNomTemplates"],
+		expectRedirects:	true
 	});
 	// Override prototype
 	rfdVenue.removeNomTemplate = function(wikitext) {
@@ -258,6 +270,7 @@ Venue.Afd = transcludedOnly => new Venue("afd", {
 	type:		 "afd",
 	path:		 "Wikipedia:Articles for deletion/Log/",
 	subpagePath: "Wikipedia:Articles for deletion/",
+	hasIndividualSubpages: true,
 	ns_number:	 [0], // main
 	ns_logpages: 4, // Wikipedia
 	ns_unlink:   ["0", "10", "100", "118"], // main, Template, Portal, Draft
@@ -277,7 +290,8 @@ Venue.Afd = transcludedOnly => new Venue("afd", {
 	regex: {
 		nomTemplate:	/(?:{{[Aa](?:rticle for deletion\/dated|fDM|fd\/dated)|<!-- Please do not remove or change this AfD message)(?:.|\n)*?}}(?:(?:.|\n)+this point -->)?\s*/g
 	},
-	transcludedOnly:	transcludedOnly
+	transcludedOnly:	transcludedOnly,
+	relistTasks:		["UpdateDiscussion", "UpdateOldLogPage", "UpdateNewLogPage"]
 });
 
 Venue.newFromPageName = function(pageName) {

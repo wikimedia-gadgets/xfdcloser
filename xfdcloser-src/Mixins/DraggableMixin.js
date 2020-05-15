@@ -1,3 +1,4 @@
+import { $, mw, OO } from "../../globals";
 // <nowiki>
 
 // CSS to override OOUI window manager preventing background scrolling/interaction

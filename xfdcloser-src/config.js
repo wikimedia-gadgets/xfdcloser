@@ -1,3 +1,4 @@
+import { $, mw } from "../globals";
 import Venue from "./Venue";
 
 // <nowiki>

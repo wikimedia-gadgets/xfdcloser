@@ -1,3 +1,4 @@
+import { $, OO } from "../../globals";
 import LookupMenuSelectWidget from "./LookupMenuSelectWidget";
 // <nowiki>
 
