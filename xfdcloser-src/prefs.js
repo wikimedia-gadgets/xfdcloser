@@ -1,3 +1,4 @@
+import { $, mw } from "../globals";
 import API from "./api";
 import config from "./config";
 // <nowiki>

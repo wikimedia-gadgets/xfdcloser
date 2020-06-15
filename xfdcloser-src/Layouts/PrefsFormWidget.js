@@ -1,3 +1,4 @@
+import { OO } from "../../globals";
 import appConfig from "../config";
 // <nowiki>
 

@@ -5,7 +5,9 @@
 const resultsData = [
 	// Keep
 	{
-		result: "keep",
+		name: "keep",
+		label: "Keep",
+		title: "Close discussion as \"keep\"",
 		allowSpeedy: true,
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 		actions: ["updatePages", "noActions"]
@@ -13,7 +15,9 @@ const resultsData = [
 
 	// Delete (not CFD/TFD)
 	{
-		result: "delete",
+		name: "delete",
+		label: "Delete",
+		title: "Close discussion as \"deep\"",
 		allowSpeedy: true,
 		allowSoft: true,
 		sysopOnly: true,
@@ -22,7 +26,9 @@ const resultsData = [
 	},
 	// Delete (CFD)
 	{
-		result: "delete",
+		name: "delete",
+		label: "Delete",
+		title: "Close discussion as \"delete\"",
 		allowSpeedy: true,
 		allowSoft: true,
 		sysopOnly: true,
@@ -31,7 +37,9 @@ const resultsData = [
 	},
 	// Delete (sysop, TFD)
 	{
-		result: "delete",
+		name: "delete",
+		label: "Delete",
+		title: "Close discussion as \"delete\"",
 		allowSpeedy: true,
 		allowSoft: true,
 		sysopOnly: true,
@@ -40,7 +48,9 @@ const resultsData = [
 	},
 	// Delete (non-sysop, TFD)
 	{
-		result: "delete",
+		name: "delete",
+		label: "Delete",
+		title: "Close discussion as \"delete\"",
 		nonSysopOnly: true,
 		venues: ["tfd"],
 		actions: ["holdingCell", "noActions"]
@@ -48,7 +58,9 @@ const resultsData = [
 
 	// Redirect (sysop, AFD/MFD)
 	{
-		result: "redirect",
+		name: "redirect",
+		label: "Redirect",
+		title: "Close discussion as \"redirect\"",
 		requireTarget: true,
 		allowSoft: true,
 		allowDeleteFirst: true,
@@ -58,7 +70,9 @@ const resultsData = [
 	},
 	// Redirect (non-sysop, AFD/MFD)
 	{
-		result: "redirect",
+		name: "redirect",
+		label: "Redirect",
+		title: "Close discussion as \"redirect\"",
 		requireTarget: true,
 		allowSoft: true,
 		nonSysopOnly: true,
@@ -67,14 +81,18 @@ const resultsData = [
 	},
 	// Redirect (CFD)
 	{
-		result: "redirect",
+		name: "redirect",
+		label: "Redirect",
+		title: "Close discussion as \"redirect\"",
 		requireTarget: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
 	},
-	// Redirect (non-sysop, TFD)
+	// Redirect (sysop, TFD)
 	{
-		result: "redirect",
+		name: "redirect",
+		label: "Redirect",
+		title: "Close discussion as \"redirect\"",
 		requireTarget: true,
 		allowDeleteFirst: true,
 		sysopOnly: true,
@@ -83,7 +101,9 @@ const resultsData = [
 	},
 	// Redirect (non-sysop, TFD)
 	{
-		result: "redirect",
+		name: "redirect",
+		label: "Redirect",
+		title: "Close discussion as \"redirect\"",
 		requireTarget: true,
 		nonSysopOnly: true,
 		venues: ["tfd"],
@@ -92,7 +112,9 @@ const resultsData = [
 
 	// Rename (CFD)
 	{
-		result: "rename",
+		name: "rename",
+		label: "Rename",
+		title: "Close discussion as \"rename\"",
 		requireTarget: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
@@ -100,7 +122,9 @@ const resultsData = [
 
 	// Retarget (sysop, RFD)
 	{
-		result: "retarget",
+		name: "retarget",
+		label: "Retarget",
+		title: "Close discussion as \"retarget\"",
 		requireTarget: true,
 		allowSoft: true,
 		allowDeleteFirst: true,
@@ -110,7 +134,9 @@ const resultsData = [
 	},
 	// Retarget (non-sysop, RFD)
 	{
-		result: "retarget",
+		name: "retarget",
+		label: "Retarget",
+		title: "Close discussion as \"retarget\"",
 		requireTarget: true,
 		allowSoft: true,
 		nonSysopOnly: true,
@@ -120,7 +146,9 @@ const resultsData = [
 
 	// Soft redirect (RFD)
 	{
-		result: "soft redirect",
+		name: "soft redirect",
+		label: "Soft redirect",
+		title: "Close discussion as \"soft redirect\"",
 		requireTarget: true,
 		venues: ["rfd"],
 		actions: ["redirectAndUpdate", "noActions"]
@@ -128,28 +156,36 @@ const resultsData = [
 
 	// Disambiguate (RFD)
 	{
-		result: "disambiguate",
+		name: "disambiguate",
+		label: "Disambiguate",
+		title: "Close discussion as \"disambiguate\"",
 		venues: ["rfd"],
 		actions: ["disambiguateAndUpdate", "noActions"]
 	},
 
 	// Merge (AFD/MFD)
 	{
-		result: "merge",
+		name: "merge",
+		label: "Merge",
+		title: "Close discussion as \"merge\"",
 		requireTarget: true,
 		venues: ["afd", "mfd"],
 		actions: ["mergeAndUpdate", "noActions"]
 	},
 	// Merge (CFD)
 	{
-		result: "merge",
+		name: "merge",
+		label: "Merge",
+		title: "Close discussion as \"merge\"",
 		requireTarget: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
 	},
 	// Merge (TFD)
 	{
-		result: "merge",
+		name: "merge",
+		label: "Merge",
+		title: "Close discussion as \"merge\"",
 		requireTarget: true,
 		venues: ["tfd"],
 		actions: ["holdingCellMerge", "noActions"]
@@ -157,28 +193,36 @@ const resultsData = [
 
 	// No consensus
 	{
-		result: "no consensus",
+		name: "no consensus",
+		label: "No consensus",
+		title: "Close discussion as \"no consensus\"",
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 		actions: ["updatePages", "noActions"]
 	},
 
-	// Custom (sysop)
+	// Custom (sysop, not CFD)
 	{
-		result: "custom",
+		name: "custom",
+		label: "Custom",
+		title: "Close discussion with a custom result",
 		sysopOnly: true,
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 		actions: ["updatePages", "deletePages", "noActions"]
 	},
 	// Custom (sysop, CFD)
 	{
-		result: "custom",
+		name: "custom",
+		label: "Custom",
+		title: "Close discussion with a custom result",
 		sysopOnly: true,
 		venues: ["cfd"],
 		actions: ["updatePages", "noActions"]
 	},
 	// Custom (non-sysop)
 	{
-		result: "custom",
+		name: "custom",
+		label: "Custom",
+		title: "Close discussion with a custom result",
 		nonSysopOnly: true,
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
 		actions: ["updatePages", "noActions"]
@@ -404,129 +448,171 @@ const rcats = [
 const actions = [
 	{
 		label: "Remove nomination templates, tag talk pages",
-		data: {
-			name: "updatePages"
-		},
+		name: "updatePages"
 	},
 	{
 		label: "Delete pages",
-		data: {
-			name: "deletePages",
-			options: [
-				{
-					name: "deleteTalk",
-					label: "Delete talk pages",
-					type: "toggleSwitch",
-					venue: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
-					sysopOnly: true,
-					initialValue: true
-				},
-				{
-					name: "deleteRedir",
-					label: "Delete redirects",
-					type: "toggleSwitch",
-					venue: ["afd", "cfd", "ffd", "mfd", "tfd"],
-					initialValue: true
-				},
-				{
-					name: "unlink",
-					label: "Unlink backlinks",
-					type: "toggleSwitch",
-					for: "deletePages",
-					venue: ["afd", "ffd"],
-					initialValue: true
-				}
-			]
-		}
+		name: "deletePages",
+		options: ["deleteTalk", "deleteRedir", "unlink"]
 	},
 	{
 		label: "List pages at holding cell",
-		data: {
-			name: "holdingCell",
-			options: [
-				{
-					name: "holdcellSection",
-					label: "Holding cell section",
-					type: "dropdown",
-					venue: ["tfd"],
-					items: [
-						{label: "Review", data:"review"},
-						{label: "Convert", data:"convert"},
-						{label: "Substitute", data:"substitute"},
-						{label: "Orphan", data:"orphan"},
-						{label: "Ready for deletion", data:"ready"}
-					]
-				},
-				{
-					name: "tagTalk",
-					label: "Tag talk pages for deletion",
-					type: "toggleSwitch",
-					for: "deletePages",
-					venue: ["tfd"],
-					nonSysopOnly: true
-				}
-			]
-		}
+		name: "holdingCell",
+		options: ["holdcellSection", "tagTalk"]
 	},
 	{
 		label: "List pages at holding cell",
-		data: {
-			name: "holdingCellMerge",
-			options: [
-				{
-					name: "holdcellSection",
-					label: "Holding cell section",
-					type: "dropdown",
-					venue: ["tfd"],
-					items: [
-						{label: "Merge (Arts)", data:"merge-arts"},
-						{label: "Merge (Geography, politics and governance)", data:"merge-geopolgov"},
-						{label: "Merge (Religion)", data:"merge-religion"},
-						{label: "Merge (Sports)", data:"merge-sports"},
-						{label: "Merge (Transport)", data:"merge-transport"},
-						{label: "Merge (Other)", data:"merge-other"},
-						{label: "Merge (Meta)", data:"merge-meta"}
-					]
-				}
-			]
-		},
+		name: "holdingCellMerge",
+		options: ["holdcellMergeSection"]
 	},
 	{
 		label: "Redirect pages, tag talk pages",
-		data: {
-			name: "redirectAndUpdate",
-			options: [
-				{
-					name: "rcats",
-					label: "Rcats",
-					type: "rcatMulitSelect",
-					venue: ["cfd", "mfd", "rfd", "tfd"],
-					items: rcats
-				},
-				{
-					name: "rcats",
-					label: "Rcats",
-					type: "rcatMulitSelect",
-					venue: ["afd"],
-					items: rcats,
-					initialValue: "{{R to related topic}}"
-				}
-			]
-		},
+		name: "redirectAndUpdate",
+		options: ["rcats"]
 	},
 	{
 		label: "Remove nomination templates, tag talk pages",
-		data: {name: "disambiguateAndUpdate"}
+		name: "disambiguateAndUpdate"
 	},
 	{
 		label: "Add merge templates, tag talk pages",
-		data: {name: "mergeAndUpdate"}
+		name: "mergeAndUpdate"
 	},
 	{
 		label: "No automated actions",
-		data: {name: "noActions"},
+		name: "noActions",
 	}
 ];
 
-export {resultsData, actions};
+const options = [
+	{
+		name: "deleteTalk",
+		label: "Delete talk pages",
+		type: "toggleSwitch",
+		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+		sysopOnly: true,
+		value: true // initial value
+	},
+	{
+		name: "deleteRedir",
+		label: "Delete redirects",
+		type: "toggleSwitch",
+		venues: ["afd", "cfd", "ffd", "mfd", "tfd"],
+		value: true // initial value
+	},
+	{
+		name: "unlink",
+		label: "Unlink backlinks",
+		type: "toggleSwitch",
+		for: "deletePages",
+		venues: ["afd", "ffd"],
+		value: true // initial value
+	},
+	{
+		name: "holdcellSection",
+		label: "Holding cell section",
+		type: "dropdown",
+		venues: ["tfd"],
+		items: [
+			{label: "Review", data:"review"},
+			{label: "Convert", data:"convert"},
+			{label: "Substitute", data:"substitute"},
+			{label: "Orphan", data:"orphan"},
+			{label: "Ready for deletion", data:"ready"}
+		]
+	},
+	{
+		name: "tagTalk",
+		label: "Tag talk pages for deletion",
+		type: "toggleSwitch",
+		for: "deletePages",
+		venues: ["tfd"],
+		nonSysopOnly: true
+	},
+	{
+		name: "holdcellMergeSection",
+		label: "Holding cell section",
+		type: "dropdown",
+		venues: ["tfd"],
+		items: [
+			{label: "Merge (Arts)", data:"merge-arts"},
+			{label: "Merge (Geography, politics and governance)", data:"merge-geopolgov"},
+			{label: "Merge (Religion)", data:"merge-religion"},
+			{label: "Merge (Sports)", data:"merge-sports"},
+			{label: "Merge (Transport)", data:"merge-transport"},
+			{label: "Merge (Other)", data:"merge-other"},
+			{label: "Merge (Meta)", data:"merge-meta"}
+		]
+	},
+	{
+		name: "rcats",
+		label: "Rcats",
+		type: "lookupMenuTagMultiselect",
+		venues: ["cfd", "mfd", "rfd", "tfd"],
+		items: rcats,
+		value: []
+	},
+	{
+		name: "rcats",
+		label: "Rcats",
+		type: "lookupMenuTagMultiselect",
+		venues: ["afd"],
+		items: rcats,
+		value: ["{{R to related topic}}"]
+	}
+];
+
+/**
+ * @param {String} venueType type of venue, e.g. "afd"
+ * @param {Boolean} userIsSysop
+ * @returns {function(Object): boolean} 
+ */
+const isRelevant = (venueType, userIsSysop) => data => (
+	(!Array.isArray(data.venues) || data.venues.includes(venueType)) &&
+	(data.sysopOnly ? userIsSysop : true) &&
+	(data.nonSysopOnly ? !userIsSysop : true)
+);
+
+/**
+ * Get the resultsData filtered by venue and sysop stasus
+ * 
+ * @param {String} venueType type of venue, e.g. "afd"
+ * @param {Boolean} userIsSysop 
+ * @returns {Object[]} relevant resultsData
+ */
+const getRelevantResults = function(venueType, userIsSysop) {
+	return resultsData.filter(isRelevant(venueType, userIsSysop));
+};
+
+/**
+ * @param {String} venueType type of venue, e.g. "afd"
+ * @param {Boolean} userIsSysop
+ * @param {String} result
+ * @returns {Object[]} relevant actions with only relevant options
+ */
+const getRelevantActions = function(venueType, userIsSysop, result) {
+	const resultData = getRelevantResults(venueType, userIsSysop).find(resData => resData.name === result);
+	if ( !resultData ) {
+		console.log("No results data for", {venueType, userIsSysop, result});
+		
+	}
+	return actions.filter(action => resultData.actions.includes(action.name));
+};
+
+/**
+ * @param {String} venueType type of venue, e.g. "afd"
+ * @param {Boolean} userIsSysop
+ * @param {String} result
+ * @returns {Object[]} relevant actions with only relevant options
+ */
+const getRelevantOptions = function(venueType, userIsSysop, actions) {
+	const actionOptions = actions.flatMap(action => action.options || []);
+	return options.filter(option => (
+		actionOptions.includes(option.name) && isRelevant(venueType, userIsSysop)(option)
+	)).map(option => ({...option})); // Make copies of objects, so the originals here are not touched
+};
+
+export { getRelevantResults, getRelevantActions, getRelevantOptions };
+
+export {resultsData, actions, options};
 // </nowiki>

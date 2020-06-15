@@ -1,3 +1,4 @@
+import { $, mw, OO } from "../globals";
 import NoteWidget from "../Components/NoteWidget";
 import ResultWidget from "../Components/ResultWidget";
 import RationaleWidget from "../Components/RationaleWidget";

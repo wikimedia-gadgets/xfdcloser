@@ -1,3 +1,4 @@
+import { $, OO } from "../../globals";
 // <nowiki>
 
 /**
@@ -46,20 +47,18 @@ function NoteWidget(config) {
 			this.noteContent.$element
 		);
 
-	this.showButton.connect( this, { "click": "onShowClick" } );
-	this.hideButton.connect( this, { "click": "onHideClick" } );
+	this.showButton.connect( this, { "click": ["emit", "expand"] } );
+	this.hideButton.connect( this, { "click": ["emit", "unexpand"] } );
 }
 OO.inheritClass( NoteWidget, OO.ui.Widget );
 
-NoteWidget.prototype.onShowClick = function() {
-	this.showButton.toggle(false);
-	this.hideButton.toggle(true);
-	this.noteContent.toggle(true);
-};
-NoteWidget.prototype.onHideClick = function() {
-	this.showButton.toggle(true);
-	this.hideButton.toggle(false);
-	this.noteContent.toggle(false);
+/**
+ * @param {Boolean} expand 
+ */
+NoteWidget.prototype.setExpanded = function(expand) {
+	this.showButton.toggle(!expand);
+	this.hideButton.toggle(!!expand);
+	this.noteContent.toggle(!!expand);
 };
 
 export default NoteWidget;
