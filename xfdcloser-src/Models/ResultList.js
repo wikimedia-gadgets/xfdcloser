@@ -19,6 +19,8 @@ class ResultList {
 				pageName: pageName
 			}))
 		);
+		this.aggregate({"update": "itemUpdate"});
+		this.connect(this, {itemUpdate: ["emit", "update"]});
 	}
 
 	onItemUpdate() {

@@ -6,488 +6,240 @@ import Result from "../xfdcloser-src/Models/Result";
 import Discussion from "../xfdcloser-src/Models/Discussion";
 import Venue from "../xfdcloser-src/Venue";
 
-describe.skip("Options", function() {
-	let model;
-	describe.skip("Initialising", function() {
-		const resetModel = function() {
-			model = new Options();
-		};
-		beforeEach(resetModel);
-		it("initially has no result options", function() {
-			assert.strictEqual(model.resultOptions.length, 0);
-		});
-		it("can be initialised", function() {
-			model.initialiseResultOptions([{result: "keep", actions:["updatePages", "noActions"]}]);
-			assert.strictEqual(model.resultOptions.length, 1, "one resultOption object");
-			assert.deepStrictEqual(model.resultOptions[0], {
-				result: "keep",
-				label: "\"Keep\" options",
-				actions: [
-					{
-						label: "Remove nomination templates, tag talk pages",
-						data: {
-							name: "updatePages"
-						},
-					},
-					{
-						label: "No automated actions",
-						data: {name: "noActions"},
-					}
-				],
-				selectedActionIndex: 0,
-				options: []
-			});
-		});
-		it("can be re-initialised with different result", function() {
-			model.initialiseResultOptions([{result: "keep", actions:["updatePages", "noActions"]}]);
-			model.initialiseResultOptions([{result: "merge", actions:["mergeAndUpdate", "noActions"]}]);
-			assert.strictEqual(model.resultOptions.length, 1, "one resultOption object");
-			assert.deepStrictEqual(model.resultOptions[0], {
-				result: "merge",
-				label: "\"Merge\" options",
-				actions: [
-					{
-						label: "Add merge templates, tag talk pages",
-						data: {
-							name: "mergeAndUpdate"
-						},
-					},
-					{
-						label: "No automated actions",
-						data: {name: "noActions"},
-					}
-				],
-				selectedActionIndex: 0,
-				options: []
-			});
-		});
-		it("can be re-initialised with the same result and not loose changes", function() {
-			model.initialiseResultOptions([{result: "keep", actions:["updatePages", "noActions"]}]);
-			model.resultOptions[0].selectedActionIndex = 1;
-			model.initialiseResultOptions([{result: "keep", actions:["updatePages", "noActions"]}]);
-			assert.strictEqual(model.resultOptions.length, 1, "one resultOption object");
-			assert.deepStrictEqual(model.resultOptions[0], {
-				result: "keep",
-				label: "\"Keep\" options",
-				actions: [
-					{
-						label: "Remove nomination templates, tag talk pages",
-						data: {
-							name: "updatePages"
-						},
-					},
-					{
-						label: "No automated actions",
-						data: {name: "noActions"},
-					}
-				],
-				selectedActionIndex: 1,
-				options: []
-			});
-		});
-		it("can be initialised with multiple results", function() {
-			model.initialiseResultOptions([
-				{result: "keep", actions:["updatePages", "noActions"]},
-				{result: "merge", actions:["mergeAndUpdate", "noActions"]}
-			]);
-			assert.strictEqual(model.resultOptions.length, 2, "two resultOption objects");
-			assert.deepStrictEqual(model.resultOptions[0], {
-				result: "keep",
-				label: "\"Keep\" options",
-				actions: [
-					{
-						label: "Remove nomination templates, tag talk pages",
-						data: {
-							name: "updatePages"
-						},
-					},
-					{
-						label: "No automated actions",
-						data: {name: "noActions"},
-					}
-				],
-				selectedActionIndex: 0,
-				options: []
-			});
-			assert.deepStrictEqual(model.resultOptions[1], {
-				result: "merge",
-				label: "\"Merge\" options",
-				actions: [
-					{
-						label: "Add merge templates, tag talk pages",
-						data: {
-							name: "mergeAndUpdate"
-						},
-					},
-					{
-						label: "No automated actions",
-						data: {name: "noActions"},
-					}
-				],
-				selectedActionIndex: 0,
-				options: []
-			});
-		});
-		
-		it("can be re-initialised with a second result and not loose changes", function() {
-			model.initialiseResultOptions([{result: "keep", actions:["updatePages", "noActions"]}]);
-			model.resultOptions[0].selectedActionIndex = 1;
-			model.initialiseResultOptions([
-				{result: "keep", actions:["updatePages", "noActions"]},
-				{result: "merge", actions:["mergeAndUpdate", "noActions"]}
-			]);
-
-			assert.strictEqual(model.resultOptions.length, 2, "two resultOption objects");
-			assert.deepStrictEqual(model.resultOptions[0], {
-				result: "keep",
-				label: "\"Keep\" options",
-				actions: [
-					{
-						label: "Remove nomination templates, tag talk pages",
-						data: {
-							name: "updatePages"
-						},
-					},
-					{
-						label: "No automated actions",
-						data: {name: "noActions"},
-					}
-				],
-				selectedActionIndex: 1,
-				options: []
-			});
-			assert.deepStrictEqual(model.resultOptions[1], {
-				result: "merge",
-				label: "\"Merge\" options",
-				actions: [
-					{
-						label: "Add merge templates, tag talk pages",
-						data: {
-							name: "mergeAndUpdate"
-						},
-					},
-					{
-						label: "No automated actions",
-						data: {name: "noActions"},
-					}
-				],
-				selectedActionIndex: 0,
-				options: []
-			});
-		});
-	});
-	describe("Initialised", function() {
+describe("Options", function() {
+	let model, discussion, result, venue, userIsSysop;
+	describe("list", function() {
 		beforeEach(function() {
-			const venue = Venue.Tfd();
-			const result = new Result({
-				discussion: new Discussion({
-					id: "123",
-					venue,
-					pages: [ mw.Title.newFromText("Foo"), mw.Title.newFromText("Bar"), mw.Title.newFromText("Qux") ],
-					discussionPageName: "Wikipedia:Templates for deletion/Foo",
-					sectionHeader: "Foo",
-					sectionNumber: "1",
-					firstCommentDate: new Date(2020, 5, 1),
-					isRelisted: false,
-				}),
+			userIsSysop = true;
+			venue = Venue.Afd();
+			discussion = new Discussion({
+				id: "123",
+				venue,
+				pages: ["Foo", "Bar"].map(t => mw.Title.newFromText(t)),
+				discussionPageName: "Wikipedia:Articles for deletion/Foo",
+				sectionHeader: "Foo",
+				sectionNumber: "1",
+				firstCommentDate: new Date(2020, 5, 1),
+				isRelisted: false,
+				userIsSysop
+			});
+			result = new Result({
+				discussion,
 				type: "close",
-				userIsSysop: true
+				userIsSysop
 			});
 			model = new Options({
-				result, venue, userIsSysop:true
+				result,
+				venue,
+				userIsSysop,
+			});
+		});
+		it("has no option items", function() {
+			assert.strictEqual(model.items.length, 0);
+		});
+		it("has an option item when a result is selected", function() {
+			result.singleModeResult.setSelectedResultName("keep");
+			assert.strictEqual(model.items.length, 1, "one option item");
+			assert.strictEqual(model.items[0].name, "keep", "item is for \"keep\"");
+			assert.strictEqual(model.items[0].constructor.name, "OptionsItem", "item is an OptionsItem");
+		});
+		it("has a different option item when selected result is changed", function() {
+			result.singleModeResult.setSelectedResultName("keep");
+			result.singleModeResult.setSelectedResultName("merge");
+			assert.strictEqual(model.items.length, 1, "one option item");
+			assert.strictEqual(model.items[0].name, "merge", "item is for \"merge\"");
+			assert.strictEqual(model.items[0].constructor.name, "OptionsItem", "item is an OptionsItem");
+		});
+		it("can be re-initialised with the same result and not loose changes", function() {
+			result.singleModeResult.setSelectedResultName("keep");
+			model.items[0].setSelectedActionName("noActions");
+			assert.strictEqual(model.items[0].selectedActionName, "noActions", "action set");
+			result.singleModeResult.setSelectedResultName("keep");
+			assert.strictEqual(model.items.length, 1, "still one option item");
+			assert.strictEqual(model.items[0].name, "keep", "item is still for \"keep\"");
+			assert.strictEqual(model.items[0].constructor.name, "OptionsItem", "item is still an OptionsItem");
+			assert.strictEqual(model.items[0].selectedActionName, "noActions", "action is still set");
+		});
+		it("has two option items when two results selected", function() {
+			result.setMultimode(true);
+			result.multimodeResults.getItems()[0].setSelectedResultName("keep");
+			result.multimodeResults.getItems()[1].setSelectedResultName("merge");
+			//result.emit("update");
+			assert.strictEqual(model.items.length, 2, "two option items");
+			assert.strictEqual(model.items[0].name, "keep", "first item is for \"keep\"");
+			assert.strictEqual(model.items[0].constructor.name, "OptionsItem", "first item is an OptionsItem");
+			assert.strictEqual(model.items[1].name, "merge", "second item is for \"merge\"");
+			assert.strictEqual(model.items[1].constructor.name, "OptionsItem", "second item is an OptionsItem");
+		});
+		it("does not loose changes when a second result is selected", function() {
+			result.setMultimode(true);
+			result.multimodeResults.getItems()[0].setSelectedResultName("keep");
+			model.items[0].setSelectedActionName("noActions");
+			assert.strictEqual(model.items.length, 1, "one option item");
+			assert.strictEqual(model.items[0].name, "keep", "item is for \"keep\"");
+			assert.strictEqual(model.items[0].constructor.name, "OptionsItem", "item is an OptionsItem");
+			assert.strictEqual(model.items[0].selectedActionName, "noActions", "item action set to \"noActions\"");
+
+			result.multimodeResults.getItems()[1].setSelectedResultName("merge");
+			assert.strictEqual(model.items[0].name, "keep", "first item is still for \"keep\"");
+			assert.strictEqual(model.items[0].constructor.name, "OptionsItem", "first item is still an OptionsItem");
+			assert.strictEqual(model.items[0].selectedActionName, "noActions", "first item action is still set to \"noActions\"");
+		});
+	});
+	describe("item", function() {
+		
+		beforeEach(function() {
+			userIsSysop = true;
+			venue = Venue.Tfd();
+			discussion = new Discussion({
+				id: "123",
+				venue,
+				pages: ["Foo", "Bar", "Baz"].map(t => mw.Title.newFromText("Template:"+t)),
+				discussionPageName: "Wikipedia:Articles for deletion/Foo",
+				sectionHeader: "Foo",
+				sectionNumber: "1",
+				firstCommentDate: new Date(2020, 5, 1),
+				isRelisted: false,
+				userIsSysop
+			});
+			result = new Result({
+				discussion,
+				type: "close",
+				userIsSysop
+			});
+			model = new Options({
+				result,
+				venue,
+				userIsSysop,
 			});
 			result.setMultimode(true);
-			result.setResultSummary("summary");
-			result.updateMultimodeResult({
-				pageName: "Foo",
-				selectedResultIndex: 0 /* keep */
-			});
-			result.updateMultimodeResult({
-				pageName: "Bar",
-				selectedResultIndex: 2 /* redirect */
-			});
-			result.updateMultimodeResult({
-				pageName: "Bar",
-				targetPageName: "Pub"
-			});
-			result.updateMultimodeResult({
-				pageName: "Qux",
-				selectedResultIndex: 1 /* delete */
-			});
-			//model.onResultUpdate();
+			result.setResultSummary("summary");	
+			result.multimodeResults.getItems()[0].setSelectedResultName("keep");
+			result.multimodeResults.getItems()[1].setSelectedResultName("redirect");
+			result.multimodeResults.getItems()[1].setTargetPageName("Pub");
+			result.multimodeResults.getItems()[2].setSelectedResultName("delete");
+		});
+		it("has action set initially", function() {
+			assert.strictEqual(model.items[0].selectedActionName, "updatePages");
+			assert.strictEqual(model.items[1].selectedActionName, "redirectAndUpdate");
+			assert.strictEqual(model.items[2].selectedActionName, "deletePages");
 		});
 		it("can set action", function() {
-			assert.strictEqual(model.resultOptions[0] && model.resultOptions[0].selectedActionIndex, 0);
-			model.setActionIndex("keep", 1);
-			assert.strictEqual(model.resultOptions[0] && model.resultOptions[0].selectedActionIndex, 1);
-			
-			assert.strictEqual(model.resultOptions[2] && model.resultOptions[2].selectedActionIndex, 0);
-			model.setActionIndex("delete", 2);
-			assert.strictEqual(model.resultOptions[2] && model.resultOptions[2].selectedActionIndex, 2);
-			model.setActionIndex("delete", 1);
-			assert.strictEqual(model.resultOptions[2] && model.resultOptions[2].selectedActionIndex, 1);
-			model.setActionIndex("delete", 0);
-			assert.strictEqual(model.resultOptions[2] && model.resultOptions[2].selectedActionIndex, 0);
-
-			assert.throws(() => { model.setActionIndex("notOneOfTheResults", 1); });
+			model.items[0].setSelectedActionName("noActions");
+			assert.strictEqual(model.items[0].selectedActionName, "noActions");
+			model.items[0].setSelectedActionName("updatePages");
+			assert.strictEqual(model.items[0].selectedActionName, "updatePages");
+			model.items[1].setSelectedActionName("noActions");
+			assert.strictEqual(model.items[1].selectedActionName, "noActions");
+			model.items[2].setSelectedActionName("holdingCell");
+			assert.strictEqual(model.items[2].selectedActionName, "holdingCell");
+			assert.strictEqual(model.items[2].setSelectedActionName("holdingCell"), false, "returns false if setting to current value");
 		});
-		it("can set options", function() {
-			assert.strictEqual(model.resultOptions[2].options.length, 3, "0: delete has three options");
-			assert.strictEqual(model.resultOptions[2].options[0].value, true, "0: first toggle is on");
-			assert.strictEqual(model.resultOptions[2].options[1].value, true, "0: second toggle is on");
-			assert.strictEqual(model.resultOptions[2].options[2].selectedItemIndex, -1, "0: menu has nothing selected");
-
-			model.setOptions("delete",  [
-				{
-					name: "deleteTalk",
-					prop: "value",
-					val: true
-				}, {
-					name: "deleteRedir",
-					prop: "value",
-					val: false,
-				}, {
-					name: "holdcellSection",
-					prop: "selectedItemIndex",
-					val: -1
-				}
-			]);
-			assert.strictEqual(model.resultOptions[2].options[0].value, true, "1: first toggle is on");
-			assert.strictEqual(model.resultOptions[2].options[1].value, false, "1: second toggle is off");
-			assert.strictEqual(model.resultOptions[2].options[2].selectedItemIndex, -1, "1: menu has nothing selected");
-			
-			model.setOptions("delete",  [
-				{
-					name: "deleteTalk",
-					prop: "value",
-					val: true
-				}, {
-					name: "deleteRedir",
-					prop: "value",
-					val: false,
-				}, {
-					name: "holdcellSection",
-					prop: "selectedItemIndex",
-					val: 1
-				}
-			]);
-			assert.strictEqual(model.resultOptions[2].options[0].value, true, "2: first toggle is on");
-			assert.strictEqual(model.resultOptions[2].options[1].value, false, "2: second toggle is off");
-			assert.strictEqual(model.resultOptions[2].options[2].selectedItemIndex, 1, "2: menu has index 1 selected");
-
-			model.setOptions("delete",  [
-				{
-					name: "deleteTalk",
-					prop: "value",
-					val: false
-				}, {
-					name: "deleteRedir",
-					prop: "value",
-					val: false,
-				}, {
-					name: "holdcellSection",
-					prop: "selectedItemIndex",
-					val: 1
-				}
-			]);
-			assert.strictEqual(model.resultOptions[2].options[0].value, false);
-			assert.strictEqual(model.resultOptions[2].options[1].value, false);
-			assert.strictEqual(model.resultOptions[2].options[2].selectedItemIndex, 1);
-
-			let returnVal = model.setOptions("delete",  [
-				{
-					name: "deleteTalk",
-					prop: "value",
-					val: false
-				}, {
-					name: "deleteRedir",
-					prop: "value",
-					val: false,
-				}, {
-					name: "holdcellSection",
-					prop: "selectedItemIndex",
-					val: 1
-				}
-			]);
-			assert.strictEqual(returnVal, false);
-
-			assert.strictEqual(model.resultOptions[1].options.length, 1);
-			assert.strictEqual(model.resultOptions[1].options[0].selectedItemsData.length, 0);
-
-			model.setOptions("redirect", [
-				{
-					name: "rcats",
-					prop: "selectedItemsData",
-					val: ["foo"]
-				}
-			]);
-			assert.deepStrictEqual(model.resultOptions[1].options[0].selectedItemsData, ["foo"]);
-
-			model.setOptions("redirect", [
-				{
-					name: "rcats",
-					prop: "selectedItemsData",
-					val: ["foo", "bar"]
-				}
-			]);
-			assert.deepStrictEqual(model.resultOptions[1].options[0].selectedItemsData, ["foo", "bar"]);
-
-			model.setOptions("redirect", [
-				{
-					name: "rcats",
-					prop: "selectedItemsData",
-					val: []
-				}
-			]);
-			assert.deepStrictEqual(model.resultOptions[1].options[0].selectedItemsData, []);
-		});
-		it("gets option values", function() {
-			assert.deepStrictEqual(model.getOptionValues("keep"), {
-				action: "updatePages",
-				result: "keep"
-			}, "action without options");
-
-			assert.deepStrictEqual(model.getOptionValues("delete"), {
+		it("has initial option values", function() {
+			assert.deepStrictEqual(model.items[0].values, {
+				action: "updatePages"
+			});
+			assert.deepStrictEqual(model.items[1].values, {
+				action: "redirectAndUpdate",
+				rcats: []
+			});
+			assert.deepStrictEqual(model.items[2].values, {
 				action: "deletePages",
-				result: "delete",
 				deleteTalk: true,
 				deleteRedir: true
-			}, "action with toggle options (both on)");
-
-			model.setOptions("delete",  [
-				{
-					name: "deleteTalk",
-					prop: "value",
-					val: false
-				}
-			]);
-			assert.deepStrictEqual(model.getOptionValues("delete"), {
+			});
+		});
+		it("can set boolean option values", function() {
+			model.items[2].setOptionValue("deleteTalk", false);
+			assert.deepStrictEqual(model.items[2].values, {
 				action: "deletePages",
-				result: "delete",
 				deleteTalk: false,
 				deleteRedir: true
-			}, "action with toggle options (one off)");
-
-			assert.ok(model.getOptionValues("redirect"), {
-				action: "redirectAndUpdate",
-				result: "redirect",
-				rcats: ""
-			}, "action with multiselect option");
-
-			model.setActionIndex("delete", 2);
-			assert.deepStrictEqual(model.getOptionValues("delete"), {
-				action: "noActions",
-				result: "delete",
-			}, "action changed");
-
-			model.setActionIndex("delete", 1);
-			assert.deepStrictEqual(model.getOptionValues("delete"), {
-				action: "holdingCell",
-				result: "delete",
-				holdcellSection: null
-			}, "dropdown option not selected");
-
-			model.setOptions("delete",  [
-				{
-					name: "holdcellSection",
-					prop: "selectedItemIndex",
-					val: 2
-				}
-			]);
-			assert.deepStrictEqual(model.getOptionValues("delete"), {
-				action: "holdingCell",
-				result: "delete",
-				holdcellSection: "substitute"
-			}, "dropdown option selected");
-		});
-		it("validates a result option", function() {
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[0] ), true,
-				"action without options"
-			);
-
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[2] ), true,
-				"action with toggle options (both on)"
-			);
-
-			model.setOptions("delete",  [
-				{
-					name: "deleteTalk",
-					prop: "value",
-					val: false
-				}
-			]);
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[2] ), true,
-				"action with toggle options (one off)"
-			);
-
-			model.setActionIndex("delete", 1);
-			assert.deepStrictEqual(model.getOptionValues("delete"), {
-				action: "holdingCell",
-				result: "delete",
-				holdcellSection: null
-			}, "dropdown option is not selected");
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[2] ), false,
-				"action with dropdown option not selected"
-			);
-
-			model.setOptions("delete",  [
-				{
-					name: "holdcellSection",
-					prop: "selectedItemIndex",
-					val: 2
-				}
-			]);
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[2] ), true,
-				"action with dropdown option selected"
-			);
+			});
 			
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[1] ), true,
-				"action with multiselect (no selections)"
-			);
-
-			model.setOptions("redirect", [
-				{
-					name: "rcats",
-					prop: "selectedItemsData",
-					val: ["foo"]
-				}
-			]);
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[1] ), true,
-				"action with multiselect (one selection)"
-			);
-
-			model.setOptions("redirect", [
-				{
-					name: "rcats",
-					prop: "selectedItemsData",
-					val: ["foo", "bar"]
-				}
-			]);
-			assert.strictEqual(
-				model.resultOptionIsValid( model.resultOptions[1] ), true,
-				"action with multiselect (multiple selections)"
-			);
+			model.items[2].setOptionValue("deleteRedir", false);
+			assert.deepStrictEqual(model.items[2].values, {
+				action: "deletePages",
+				deleteTalk: false,
+				deleteRedir: false
+			});
+			
+			model.items[2].setOptionValue("deleteTalk", true);
+			assert.deepStrictEqual(model.items[2].values, {
+				action: "deletePages",
+				deleteTalk: true,
+				deleteRedir: false
+			});
 		});
-		it("validates all result options", function() {
+		it("can set menu option value", function() {
+			model.items[2].setSelectedActionName("holdingCell");
+			assert.deepStrictEqual(model.items[2].values, {
+				action: "holdingCell",
+				holdcellSection: undefined
+			});
+			model.items[2].setOptionValue("holdcellSection", "review");
+			assert.deepStrictEqual(model.items[2].values, {
+				action: "holdingCell",
+				holdcellSection: "review"
+			});
+			model.items[2].setOptionValue("holdcellSection", "convert");
+			assert.deepStrictEqual(model.items[2].values, {
+				action: "holdingCell",
+				holdcellSection: "convert"
+			});
+		});
+		it("can set menuTag option values", function() {
+			model.items[1].setOptionValue("rcats", ["foo"]);
+			assert.deepStrictEqual(model.items[1].values, {
+				action: "redirectAndUpdate",
+				rcats: ["foo"]
+			});
+			model.items[1].setOptionValue("rcats", ["foo", "bar"]);
+			assert.deepStrictEqual(model.items[1].values, {
+				action: "redirectAndUpdate",
+				rcats: ["foo", "bar"]
+			});
+			model.items[1].setOptionValue("rcats", ["bar"]);
+			assert.deepStrictEqual(model.items[1].values, {
+				action: "redirectAndUpdate",
+				rcats: ["bar"]
+			});
+			model.items[1].setOptionValue("rcats", []);
+			assert.deepStrictEqual(model.items[1].values, {
+				action: "redirectAndUpdate",
+				rcats: []
+			});
+		});
+		it("validates when action has no options", function() {
+			assert.strictEqual(model.items[0].isValid, true, "action without options");
+		});
+		it("validates when action with toggle options", function() {
+			assert.strictEqual(model.items[2].isValid, true, "action with toggle options (both on)");
+			model.items[2].setOptionValue("deleteTalk", false);
+			assert.strictEqual(model.items[2].isValid, true, "action with toggle options (one on, one off)");
+			model.items[2].setOptionValue("deleteRedir", false);
+			assert.strictEqual(model.items[2].isValid, true, "action with toggle options (both off)");
+		});
+		it("validates when action has dropdown menu option", function() {
+			model.items[2].setSelectedActionName("holdingCell");
+			assert.strictEqual(model.items[2].isValid, false, "action with menu (no item selected");
+			model.items[2].setOptionValue("holdcellSection", "review");
+			assert.strictEqual(model.items[2].isValid, true, "action with menu (item selected)");
+		});
+		it("validates when action has menuTagMultiselect option", function() {
+			assert.strictEqual(model.items[1].isValid, true, "action with menuTagMultiselect (no items selected)");
+			model.items[1].setOptionValue("rcats", ["foo"]);
+			assert.strictEqual(model.items[1].isValid, true, "action with menuTagMultiselect (one item selected)");
+			model.items[1].setOptionValue("rcats", ["foo", "bar"]);
+			assert.strictEqual(model.items[1].isValid, true, "action with menuTagMultiselect (multiple items selected)");
+		});	
+		it("(List) validates all result options items", function() {
 			assert.strictEqual(model.isValid, true, "Valid if invalid option is not for the selected action");
 
-			model.setActionIndex("delete", 1);
+			model.items[2].setSelectedActionName("holdingCell");
 			assert.strictEqual(model.isValid, false, "Invalid if invalid option is for the selected action");
 
-			model.setOptions("delete",  [
-				{
-					name: "holdcellSection",
-					prop: "selectedItemIndex",
-					val: 2
-				}
-			]);
+			model.items[2].setOptionValue("holdcellSection", "review");
 			assert.strictEqual(model.isValid, true, "Valid if all options are valid");
 		});
 	});

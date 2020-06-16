@@ -5,7 +5,7 @@ import MainWindowModel from "../xfdcloser-src/Models/MainWindowModel";
 import Discussion from "../xfdcloser-src/Models/Discussion";
 import Venue from "../xfdcloser-src/Venue";
 
-describe.skip("MainWindowModel", function() {
+describe("MainWindowModel", function() {
 	let model;
 	const resetModel = function() {
 		const discussion = new Discussion({
