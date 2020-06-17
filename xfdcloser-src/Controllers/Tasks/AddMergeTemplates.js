@@ -62,8 +62,9 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 					.replace(/__DEBATE__/, this.model.discussion.discussionSubpageName)
 					.replace(/__DATE__/, curdate)
 				);
-			const isNominatedPage = this.model.discussion.getPageTitles().includes(this.model.discussion.getUnresolvedPageName(target));
+			const isNominatedPage = this.model.discussion.pagesNames.includes(this.model.discussion.getUnresolvedPageName(target));
 			return new Merger({
+				from: mergeFromPages,
 				target,
 				mergeToTemplate,
 				mergeFromTemplates,
@@ -94,7 +95,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		if ( !merger ) {
 			return rejection("unexpectedTitle");
 		}
-		return RemoveNomTemplates.transfrom(this, page, merger.mergeToTemplate);
+		return RemoveNomTemplates.transform(this, page, merger.mergeToTemplate);
 	}
 
 	doTask() {

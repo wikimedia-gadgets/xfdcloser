@@ -1730,6 +1730,12 @@ const siteInfo = {
 	]
 };
 
+/**
+ * Constructor. Either specify title, or title and namespace, or _title
+ * @param {String} [title] 
+ * @param {Number} [namespace] 
+ * @param {_Title} [_title]
+ */
 function Title(title, namespace, _title) {
 	if (_title) {
 		this._title = _title;
@@ -1737,6 +1743,11 @@ function Title(title, namespace, _title) {
 		this._title = _Title.newFromText(title, siteInfo, namespace);
 	}
 }
+/**
+ * 
+ * @param {string} title 
+ * @param {number} [namespace]
+ */
 Title.newFromText = function(title, namespace) {
 	try {
 		const _t = _Title.newFromText(title, siteInfo, namespace);
@@ -1745,8 +1756,15 @@ Title.newFromText = function(title, namespace) {
 		return null;
 	}
 };
+/**
+ * 
+ * @param {number} namespace 
+ * @param {string} title 
+ */
 Title.makeTitle = function(namespace, title) {
-	const namespacePrefix = _Namespace.newFromText(namespace, siteInfo).getNormalizedText();
+	const namespacePrefix = namespace === 0
+		? ""
+		: new _Namespace(namespace, siteInfo).getNormalizedText() + ":";
 	return Title.newFromText(namespacePrefix + title);
 };
 Title.newFromUserInput = function() {
@@ -1758,12 +1776,20 @@ Title.newFromFileName = function() {
 Title.newFromImg = function() {
 	throw notReplicatedError("newFromImg");
 };
+/**
+ * 
+ * @param {number} namespaceId 
+ */
 Title.isTalkNamespace = function(namespaceId) {
 	return !!(namespaceId > NS_MAIN && namespaceId % 2);
 };
 Title.wantSignaturesNamespace = function() {
 	throw notReplicatedError("wantSignaturesNamespace");
 };
+/**
+ * 
+ * @param {string|Title} title 
+ */
 Title.exists = function(title) {
 	var match, obj = Title.exist.pages;
 	if (typeof title === "string") {
@@ -1804,7 +1830,9 @@ Title.prototype = {
 		return this._title.getNamespace().getId();
 	},
 	getNamespacePrefix: function() {
-		return this._title.getNamespace().getNormalizedText();
+		return this.getNamespaceId() === 0
+			? ""
+			: this._title.getNamespace().getNormalizedText();
 	},
 	getName: function() {
 		var ext = this.getExtension();

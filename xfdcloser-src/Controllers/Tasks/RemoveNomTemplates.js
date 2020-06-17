@@ -11,7 +11,9 @@ export default class RemoveNomTemplates extends TaskItemController {
 
 	/**
 	 * Transform a page object into edit parameters for removing a nomination
-	 * template, and optionally prepending addtional content.
+	 * template, and optionally prepending addtional content. This is a static
+	 * method so that it can be exported and used with a different context.
+	 * 
 	 * @param {TaskItemController} context Context to use for the `this` value
 	 * @param {Object} page Api page object
 	 * @param {String} [prependContent] Additional content to prepend to transformed text

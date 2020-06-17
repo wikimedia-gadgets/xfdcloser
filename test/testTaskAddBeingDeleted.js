@@ -62,9 +62,6 @@ describe("AddBeingDeleted", function() {
 		});
 		task = new AddBeingDeleted(model, widgets);
 	});
-	it("can be instantiated", function() {
-		assert.ok(task);
-	});
 	it("transforms a page without a nomination template", function() {
 		const page = {
 			title: "Template:Foo",
