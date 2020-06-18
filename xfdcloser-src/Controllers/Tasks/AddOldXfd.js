@@ -1,6 +1,6 @@
 import { $, mw, OO } from "../../../globals";
 import TaskItemController from "../TaskItemController";
-import { rejection, dmyDateString, uppercaseFirst } from "../../util";
+import { rejection, dmyDateString, dateFromUserInput, uppercaseFirst, ymdDateString } from "../../util";
 import Template from "../../Template";
 // <nowiki>
 
@@ -47,15 +47,17 @@ export default class AddOldXfdTask extends TaskItemController {
 		templates.forEach(template => {
 			const isXfdTemplate = /(a|t|d|f|i|m|r)fd/i.test(template.name);
 			if ( !isXfdTemplate ) return;
-
-			const date = template.getParamValue("date") || "";
+			const dateParamValue = template.getParamValue("date") || "";
+			const date = dateFromUserInput(dateParamValue);
+			const ymdFormatDate = date && ymdDateString(date) || dateParamValue;
+			const dmyFormatDate = date && dmyDateString(date) || dateParamValue;
 			const result = template.getParamValue("result") || "keep";
 
 			// Old AFDs
 			if (/(?:old|afd) ?(?:old|afd) ?(?:multi|full)?/i.test(template.name)){
 				oldAfdTemplate = template;
 				template.parameters.forEach(param => {
-					oldafdmulti += ` | ${param.name}=${param.value}`;
+					oldafdmulti += ` |${param.name}=${param.value}`;
 					const numCheck = /[A-z]+([0-9]+)/i.exec(param.name);
 					const paramNum = numCheck && parseInt(numCheck[1]) || 1;
 					if (paramNum > count) {
@@ -66,26 +68,25 @@ export default class AddOldXfdTask extends TaskItemController {
 			// Old TFDs
 			else if (/(?:old|tfd|Previous) ?(?:tfd|tfd|end)(?:full)?/i.test(template.name)) {
 				count++;
-				const logSubpage = template.getParamValue("link") || `{{subst:Date|${date}|ymd}}`;
+				const logSubpage = template.getParamValue("link") || ymdFormatDate;
 				const fragment = template.getParamValue(1) || template.getParamValue("disc") || "Template:"+PAGENAME;
 				const page = `{{subst:#ifexist:Wikipedia:Templates for deletion/Log/${logSubpage}`+
 					`|Wikipedia:Templates for deletion/Log/${logSubpage}#${fragment}`+
 					`|Wikipedia:Templates for discussion/Log/${logSubpage}#${fragment}}}`;
-				oldafdmulti += ` |date${count}=${date} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
-				wikitext = wikitext.replace(template.wikitext, "");
+				oldafdmulti += ` |date${count}=${dmyFormatDate} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
+				wikitext = wikitext.replace(template.wikitext+"\n", "").replace(template.wikitext, "");
 			}
 			// Old FFDs
 			else if (/old ?(?:f|i)fd(?:full)?/i.test(template.name)) {
 				count++;
-				const formattedDate = `{{subst:#iferror:{{subst:#time:|${date}}}|${date}|{{subst:#time:Y F j|${date}}}}}`;
 				const fragment = "File:" + template.getParamValue("page") || PAGENAME;
-				const page = `{{subst:#ifexist:Wikipedia:Images and media for deletion/${formattedDate}`+
-					`|Wikipedia:Images and media for deletion/${formattedDate}#${fragment}`+
-					`|{{subst:#ifexist:Wikipedia:Files for deletion/${formattedDate}`+
-					`|Wikipedia:Files for deletion/${formattedDate}#${fragment}`+
-					`|Wikipedia:Files for discussion/${formattedDate}#${fragment}}}}}`;
-				oldafdmulti += ` |date${count}=${date} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
-				wikitext = wikitext.replace(template.wikitext, "");
+				const page = `{{subst:#ifexist:Wikipedia:Images and media for deletion/${ymdFormatDate}`+
+					`|Wikipedia:Images and media for deletion/${ymdFormatDate}#${fragment}`+
+					`|{{subst:#ifexist:Wikipedia:Files for deletion/${ymdFormatDate}`+
+					`|Wikipedia:Files for deletion/${ymdFormatDate}#${fragment}`+
+					`|Wikipedia:Files for discussion/${ymdFormatDate}#${fragment}}}}}`;
+				oldafdmulti += ` |date${count}=${dmyFormatDate} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
+				wikitext = wikitext.replace(template.wikitext+"\n", "").replace(template.wikitext, "");
 			}
 			// Old MFDs
 			else if (/(?:old ?mfd|mfdend|mfdold)(?:full)?/i.test(template.name)) {
@@ -95,19 +96,19 @@ export default class AddOldXfdTask extends TaskItemController {
 					template.getParamValue("page") ||
 					SUBJECTPAGENAME;
 				const page = `Wikipedia:Miscellany for deletion/${subpage}`;
-				oldafdmulti += ` |date${count}=${date} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
-				wikitext = wikitext.replace(template.wikitext, "");	
+				oldafdmulti += ` |date${count}=${dmyFormatDate} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
+				wikitext = wikitext.replace(template.wikitext+"\n", "").replace(template.wikitext, "");
 			}
 			// Old RFDs
 			else if (/old?(?: |-)?rfd(?:full)?/i.test(template.name)) {
 				count++;
 				const rawlink = template.getParamValue("rawlink");
-				const subpage = template.getParamValue("page") || date + "#" + SUBJECTPAGENAME;
+				const subpage = template.getParamValue("page") || ymdFormatDate + "#" + SUBJECTPAGENAME;
 				const page = rawlink
 					? rawlink.slice(2, rawlink.indexOf("|"))
 					: "Wikipedia:Redirects for discussion/Log/" + subpage;
-				oldafdmulti += ` |date${count}=${date} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
-				wikitext = wikitext.replace(template.wikitext, "");
+				oldafdmulti += ` |date${count}=${dmyFormatDate} |result${count}='''${uppercaseFirst(result.replace(/'''/g, ""))}''' |page${count}=${page}`;
+				wikitext = wikitext.replace(template.wikitext+"\n", "").replace(template.wikitext, "");
 			}
 		});
 
@@ -134,7 +135,7 @@ export default class AddOldXfdTask extends TaskItemController {
 			return wikitext.replace(oldAfdTemplate.wikitext, oldafdmulti);
 		} else {
 			// Prepend to content ([[WP:Talk page layout]] is too complicated to automate)
-			return oldafdmulti + "\n" + wikitext;
+			return oldafdmulti + "\n" + wikitext.trim();
 		}
 	}
 

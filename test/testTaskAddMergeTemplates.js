@@ -26,7 +26,7 @@ const widgets = {
 	emit: ()=>{}
 };
 
-describe.only("AddBeingDeleted", function() {
+describe("AddMergeTemplates", function() {
 	let discussion, result, options, model, task;
 	const dateNow = new Date();
 	beforeEach(function() {

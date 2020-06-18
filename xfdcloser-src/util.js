@@ -129,6 +129,29 @@ const dateFromSubpageName = function(subpageName) {
 	return dateFromParts(year, monthName, day);
 };
 
+const dateFromUserInput = function(text) {
+	let day, monthName, year;
+	// Probably formatted like "18 March 2020" or "2020 March 18"
+	const mdyParts =  /(\w+) (\d{1,2}), (\d\d\d\d)/.exec(text);
+	const dmyParts =  /(\d{1,2}) (\w+) (\d{4})/.exec(text);
+	const ymdParts =  /(\d{4}) (\w+) (\d{1,2})/.exec(text);
+	switch(true) {
+	case !!mdyParts:
+		[monthName, day, year] = mdyParts.slice(1); break;
+	case !!dmyParts:
+		[day, monthName, year] = dmyParts.slice(1); break;
+	case !!ymdParts:
+		[year, monthName, day] = ymdParts.slice(1); break;
+	default:
+		return NaN;
+	}
+	const month = Month.newFromMonthShortName(monthName.slice(0,3));
+	if ( !month.isValid() ) {
+		return NaN;
+	}
+	return dateFromParts(year, month.name, day);
+};
+
 // Additional functions for working with mw.Title objects
 // var hasCorrectNamespace = function(mwTitleObject) {
 // 	return (
@@ -376,6 +399,7 @@ export {
 	ymdDateString,
 	dateFromSigTimestamp,
 	dateFromSubpageName,
+	dateFromUserInput,
 	multiButtonConfirm,
 	multiCheckboxMessageDialog,
 	recursiveMerge,

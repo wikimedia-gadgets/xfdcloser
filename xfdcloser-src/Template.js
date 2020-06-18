@@ -84,8 +84,8 @@ export default class Template {
 		this.equalsStyle = "=";
 		this.endBracesStyle = "}}";
 	}
-	addParam(name, val, wikitext) {
-		this.parameters.push(new Parameter(name, val, "|" + wikitext));
+	addParam(parameter) {
+		this.parameters.push(parameter);
 	}
 	/**
      * Get a parameter data by parameter name
