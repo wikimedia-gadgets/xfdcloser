@@ -1,5 +1,6 @@
 import { $, OO } from "../../globals";
 import { rejection, makeLink } from "../util";
+import * as prefs from "../prefs";
 // <nowiki>
 
 //const getElementHeight = element => element && $(element).outerHeight(true);
@@ -96,9 +97,15 @@ class MainWindowController {
 		} else if ( action === "showPrefs" ) {
 			this.model.showPrefs();	
 		} else if ( action === "savePrefs" ) {
-			// TODO: Actually save the prefs
-			$.when("API SAVE PREFS")
-				.then(() => this.model.closePrefs());
+			this.window.pushPending();
+			const changedPrefValues = this.model.preferences.getValues({changedOnly: true});
+			return new OO.ui.Process()
+				.next(() => prefs.set(changedPrefValues))
+				.next(() => {
+					this.model.preferences.resetValues(changedPrefValues);
+					this.model.closePrefs();
+					this.window.popPending();
+				});
 		} else if ( action === "closePrefs" ) {
 			this.model.closePrefs();
 		} else if ( action === "multimode" ) {

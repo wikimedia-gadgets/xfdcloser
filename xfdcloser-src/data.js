@@ -562,6 +562,67 @@ const options = [
 	}
 ];
 
+const prefs = [{
+	name: "beta",
+	label: "Enable beta version",
+	type: "toggle",
+	help: "Requires page refresh to take effect.",
+	helpInline: true,
+	default: false
+}, {
+	name: "watchlist",
+	label: "Add edited pages to your watchlist",
+	type: "dropdown",
+	options: [{
+		data: "preferences",
+		label: "Default"
+	}, {
+		data: "watch",
+		label: "Always"
+	}, {
+		data: "preferences",
+		label: "Never"
+	}],
+	help: "Default behaviour depends on your \"Add pages and files I edit to my watchlist\" setting in Special:Preferences",
+	default: "preferences"
+}, {
+	name: "tfdDeleteAction",
+	label: "Default action for TfD delete results",
+	sysopOnly: true,
+	type: "dropdown",
+	options: [{
+		data: "deletePages",
+		label: "Delete pages"
+	}, {
+		data: "holdingCell",
+		label: "List pages at holding cell"
+	}],
+	default: "holdingCell"
+}, {
+	name: "unlinkBacklinks",
+	label: "Enable unlink backlinks option by default",
+	sysopOnly: true,
+	type: "toggle",
+	default: true
+}, {
+	name: "collapseWarnings",
+	label: "Collapse task warnings if at least:",
+	type: "number",
+	min: 2,
+	default: 5
+}, {
+	name: "collapseErrors",
+	label: "Collapse task errors if at least:",
+	type: "number",
+	min: 2,
+	default: 5
+}];
+
+const defaultPrefValues = prefs.reduce((accumulated, currentPref) => {
+	accumulated[currentPref.name] = currentPref.default;
+	return accumulated;
+}, {});
+
 /**
  * @param {String} venueType type of venue, e.g. "afd"
  * @param {Boolean} userIsSysop
@@ -612,7 +673,16 @@ const getRelevantOptions = function(venueType, userIsSysop, actions) {
 	)).map(option => ({...option})); // Make copies of objects, so the originals here are not touched
 };
 
-export { getRelevantResults, getRelevantActions, getRelevantOptions };
+/**
+ * 
+ * @param {Boolean} userIsSysop
+ * @returns {Object[]} relevant prefs
+ */
+const getRelevantPrefs = function(userIsSysop) {
+	return prefs.filter(isRelevant(null, userIsSysop));
+};
 
-export {resultsData, actions, options};
+export { getRelevantResults, getRelevantActions, getRelevantOptions, getRelevantPrefs };
+
+export { resultsData, actions, options, prefs, defaultPrefValues };
 // </nowiki>

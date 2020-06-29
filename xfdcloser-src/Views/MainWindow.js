@@ -5,6 +5,7 @@ import MainWindowController from "../Controllers/MainWindowController";
 import ResultPanel from "./ResultPanel";
 import OptionsPanel from "./OptionsPanel";
 import TaskListPanel from "./TaskListPanel";
+import PrefsPanel from "./PrefsPanel";
 // <nowiki>
 
 function MainWindow( config ) {
@@ -180,12 +181,17 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 				data: {name: "taskListPanel"},
 				padded: true,
 			}, this.model.taskList);
+			this.prefsPanel = new PrefsPanel({
+				data: {name: "prefsPanel"},
+				padded: true
+			}, this.model.preferences);
 
 			this.stackLayout.clearItems();
 			this.stackLayout.addItems([
 				this.resultPanel,
 				this.optionsPanel,
-				this.taskListPanel
+				this.taskListPanel,
+				this.prefsPanel
 			]);
 
 			this.controller = new MainWindowController(this.model, this);

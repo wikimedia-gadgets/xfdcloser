@@ -1,49 +1,61 @@
-import { $, mw } from "../globals";
-import API from "./api";
+import { mw } from "../globals";
 import config from "./config";
+import { defaultPrefValues } from "./data";
 // <nowiki>
 
-const prefsPage = `User:${mw.config.get("wgUserName")}/xfdcPrefs.json`;
-
-const defaultPrefs = {
-	watchlist: "preferences"
-};
-
-const getPrefs = () => API.get({
-	"action": "query",
-	"format": "json",
-	"formatversion": "2",
-	"prop": "revisions",
-	"titles": prefsPage,
-	"rvprop": "content",
-	"rvslots": "main"
-}).then(response => {
-	const page = response.query.pages[0];
-	if (page.missing || !page.pageid) {
-		return defaultPrefs;
+// Use a new mw.API instance so that preferences can be imported to our API class
+const API = new mw.Api({
+	ajax: {
+		headers: { 
+			"Api-User-Agent": `XFDcloser/${config.script.version} ( https://en.wikipedia.org/wiki/WP:XFDC )`
+		}
 	}
-	let prefs;
-	try {
-		prefs = JSON.parse( page.revisions[0].slots.main.content );
-	} catch(e) {
-		return $.Deferred().reject("JSON-parsing-error", e);
-	}
-	return prefs;
-}).catch((code, error) => {
-	console.warn("XFDcloser preferences not loaded", {code, error});
-	mw.notify("Your XFDcloser preferences could not be loaded.");
-	return defaultPrefs;
 });
 
 /**
- * 
- * @param {Object} updatedPrefs object with key:value pairs for preferences json.
+ * @returns {Object<string,string|number|boolean>} Object of option values keyed by name
  */
-const setPrefs = updatedPrefs => API.editWithRetry(prefsPage, null, () => ({
-	"text": JSON.stringify(updatedPrefs),
-	"summary": "Saving XFDcloser preferences " + config.script.advert
-})
-);
+const parseOptions = () => {
+	try {
+		return JSON.parse(mw.user.options.get("userjs-xfdc")) || {};
+	} catch(e) {
+		return {};
+	}
+};
 
-export { getPrefs, setPrefs, defaultPrefs };
+/**
+ * 
+ * @param {string} [prefName] name of preference to get, omit to get all preferences
+ * @return {string|number|boolean} user or default preference value
+ */
+const get = prefName => {
+	const options = parseOptions();
+	if ( prefName ) {
+		const val = options[prefName];
+		return val !== undefined ? val : defaultPrefValues[prefName];
+	}
+	return { ...defaultPrefValues, ...options };
+};
+
+/**
+ * 
+ * @param {Object<string,*>} prefs new preference values, keyed by preference name
+ * @returns {Promise} resolved if saved successfully
+ */
+const set = prefs => {
+	const previousOptions = parseOptions();
+	const options = JSON.stringify({ ...previousOptions, ...prefs });
+	return API.postWithToken("csrf", {
+		"action": "options",
+		"format": "json",
+		"formatversion": "2",
+		"optionname": "userjs-xfdc",
+		"optionvalue": options
+	}).then(() => {
+		mw.user.options.set("userjs-xfdc", options);
+		mw.notify("XFDcloser preferences updated successfully");
+	});
+};
+
+export { get, set };
 // </nowiki>

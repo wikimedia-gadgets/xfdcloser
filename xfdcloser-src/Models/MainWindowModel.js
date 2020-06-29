@@ -3,6 +3,7 @@ import Result from "./Result";
 import Options from "./Options";
 import TaskList from "./TaskList";
 import SanityChecks from "./SanityChecks";
+import PrefsGroup from "./PrefsGroup";
 // <nowiki>
 
 /**
@@ -40,14 +41,16 @@ class MainWindowModel {
 			result: this.result,
 			options: this.options
 		});
-		this.taskList = new TaskList({/* todo */
+		this.taskList = new TaskList({
 			discussion: this.discussion,
 			result: this.result,
 			options: this.options,
 			type,
 			userIsSysop
 		});
-		this.preferences = {}; // TODO. 
+		this.preferences = new PrefsGroup({
+			userIsSysop
+		}); // TODO. 
 		this.heights = {};
 
 		// Other props
@@ -75,13 +78,17 @@ class MainWindowModel {
 			"itemUpdate": ["emit", "update"]
 		});
 		this.taskList.connect(this, {"update": ["emit", "update"]});
+		this.preferences.connect(this, {
+			"update": ["emit", "update"],
+			"itemUpdate": ["emit", "update"]
+		});
 	}
 
 	get actionAbilities() {
 		// Action abilities determine whether an action can be clicked, or is disabled.
 		// Visibility is controlled seperately, via the mode property
 		return {
-			savePrefs: true, // TODO: Only if prefs form changed
+			savePrefs: this.preferences.changed,
 			next: this.result.isValid, 
 			save: this.mode === "options" ? this.options.isValid : this.result.isValid,
 			finish: this.taskList.finished || this.taskList.aborted,

@@ -1,15 +1,22 @@
 import { $, mw } from "../globals";
 import config from "./config";
-import { recursiveMerge } from "./util";
+import { recursiveMerge, rejection } from "./util";
+import * as prefs from "./prefs";
 
 // <nowiki>
 
 /**
- * Extends an mw.Api object with additional methods
- * @param {mw.Api} api API object to be extended 
- * @returns {mw.Api} extended API object 
+ * Extends the mw.Api class with additional methods, and simplifies the
+ * constcructor
  */
-function extendMwApi(api) {
+class API extends mw.Api {
+	/**
+	 * @param {String} apiUserAgent 
+	 */
+	constructor(apiUserAgent) {
+		super({ ajax: { headers: { "Api-User-Agent": apiUserAgent } } });
+	}
+
 	/**
 	 * @param {String|String[]} titles
 	 * @param {Object|null} [getParams] additional parameters for the api query
@@ -19,30 +26,32 @@ function extendMwApi(api) {
 	 * @param {Function} onEachFail callback for each failed deletion
 	 * @returns {Promise} resolved if all edits were successful, rejected if there were failures
 	 */
-	api.editWithRetry = function(titles, getParams, transform, onEachSuccess, onEachFail) {
+	editWithRetry(titles, getParams, transform, onEachSuccess, onEachFail) {
 		getParams = getParams || {};
-		const processPage = function(page, starttime) {
+		const watchlist = prefs.get("watchlist");
+		const processPage = (page, starttime) => {
 			const basetimestamp = page.revisions && page.revisions[0].timestamp;
 			return $.when( transform(page) ).then(
-				function(editParams) {
+				editParams => {
 					const baseQuery = {
 						action: "edit",
 						title: page.title,
+						watchlist,
 						// Protect against errors and conflicts
 						assert: "user",
 						basetimestamp: editParams.redirect ? null : basetimestamp, // basetimestamp of a redirect should not be used if editing the redirect's target
 						starttimestamp: starttime
 					};
 					const query = { ...baseQuery, ...editParams };
-					const doEdit = function(isRetry) {
-						return api.postWithToken("csrf", query).then(
-							function(data) {
+					const doEdit = isRetry => {
+						return this.postWithToken("csrf", query).then(
+							data => {
 								if (onEachSuccess) {
 									onEachSuccess(data);
 								}
 								return data.edit;
 							},
-							function(code, error) {
+							(code, error) => {
 								if (code === "http" && !isRetry) {
 									return doEdit(true);
 								} else if ( code === "editconflict" ) {
@@ -51,21 +60,21 @@ function extendMwApi(api) {
 								if (onEachFail) {
 									onEachFail(code, error, page.title);
 								}
-								return $.Deferred().reject(code, error, page.title);
+								return rejection(code, error, page.title);
 							}
 						);
 					};
 					return doEdit();
 				},
-				function(code, error) {
+				(code, error) => {
 					if (onEachFail) {
 						onEachFail(code, error, page.title);
 					}
-					return $.Deferred().reject(code, error, page.title);			
+					return rejection(code, error, page.title);			
 				});
 		};
 		
-		const doGetQuery = function(titles, isRetry) {
+		const doGetQuery = (titles, isRetry) => {
 			const baseQuery = {
 				action: "query",
 				format: "json",
@@ -76,10 +85,10 @@ function extendMwApi(api) {
 				rvprop: "content|timestamp",
 				rvslots: "main"
 			};
-			return api.get({
+			return this.get({
 				...baseQuery,
 				...getParams
-			}).then(function(response) {
+			}).then(response => {
 				const starttime = response.curtimestamp;
 				const normalizeds = response.query.normalized || [];
 				const redirects = response.query.redirects || [];
@@ -124,18 +133,18 @@ function extendMwApi(api) {
 							return !arg.success;
 						});
 						if (errors.length > 0) {
-							return $.Deferred().reject("write", errors.length, errors);
+							return rejection("write", errors.length, errors);
 						}
 					});
 			}, function(code, error) {
 				if (!isRetry) {
 					return doGetQuery(titles, true);
 				}
-				return $.Deferred().reject("read", code, error);
+				return rejection("read", code, error);
 			});
 		};
 		return doGetQuery(titles);
-	};
+	}
 
 	/**
 	 * @param {String|String[]|Number|Number[]} pages pages to be deleted, either:
@@ -145,8 +154,9 @@ function extendMwApi(api) {
 	 *  @param {String} options.reason deletion reason for logs
 	 * @param {Function} onEachSuccess callback for each successful deletion
 	 * @param {Function} onEachFail callback for each failed deletion
+	 * @returns {Promise} resolved if all deleted successfully, rejected if there were failures
 	 */
-	api.deleteWithRetry = function(pages, options, onEachSuccess, onEachFail) {
+	deleteWithRetry(pages, options, onEachSuccess, onEachFail) {
 		const deletePage = (titleOrId, isRetry) => {
 			const baseQuery = {action: "delete"};
 			if (typeof titleOrId === "number") {
@@ -154,7 +164,7 @@ function extendMwApi(api) {
 			} else {
 				baseQuery.title = titleOrId;
 			}
-			return api.postWithEditToken({...baseQuery, ...options}).then(
+			return this.postWithEditToken({...baseQuery, ...options}).then(
 				(response) => {
 					if (onEachSuccess) {
 						onEachSuccess(response);
@@ -184,24 +194,24 @@ function extendMwApi(api) {
 					return !arg.success;
 				});
 				if (errors.length > 0) {
-					return $.Deferred().reject("delete", errors.length, errors);
+					return rejection("delete", errors.length, errors);
 				}
 			});
-	};
+	}
 
 	/**
 	 * @param {Object} params query parameters
 	 * @param {String} [method] method for sending query, default if not specified is "get"
 	 * @returns {Promise} recursively merged query responses 
 	 */
-	api.queryWithContinue = function(params, method) {
+	queryWithContinue(params, method) {
 		const baseQuery = {
 			action: "query",
 			format: "json",
 			formatversion: "2",
 			...params
 		};
-		const doQuery = (query, previousResult) => api[method||"get"](query).then(response => {
+		const doQuery = (query, previousResult) => this[method||"get"](query).then(response => {
 			const result = previousResult
 				? recursiveMerge(previousResult, response.query)
 				: response.query;
@@ -212,23 +222,10 @@ function extendMwApi(api) {
 		});
 
 		return doQuery(baseQuery);
-	};
-
-	return api;
+	}
 }
 
-var API = extendMwApi(
-	new mw.Api( {
-		ajax: {
-			headers: { 
-				"Api-User-Agent": "XFDcloser/" + config.script.version + 
-					" ( https://en.wikipedia.org/wiki/WP:XFDC )"
-			}
-		}
-	} )
-);
+const api = new API(`XFDcloser/${config.script.version} ( https://en.wikipedia.org/wiki/WP:XFDC )`);
 
-
-export default API;
-export {extendMwApi};
+export default api;
 // </nowiki>

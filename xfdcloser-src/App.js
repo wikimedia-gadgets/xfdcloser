@@ -17,7 +17,7 @@ import DiscussionView from "./Views/DiscussionView";
 
 	// Warn if unloading before closes/relists are completed
 	$(window).on("beforeunload", function(e) {
-		if ( config.track.started > config.track.finished ) {
+		if ( windowManager.hasOpenWindow() ) {
 			e.returnValue = "";
 			return "";		
 		}
@@ -30,8 +30,8 @@ import DiscussionView from "./Views/DiscussionView";
 		windowManager.openWindow("prefs");
 	});
 
-	// Unlink portal link: non-existant pages only
-	if (config.mw.wgArticleId === 0) {
+	// Unlink portlet link: non-existant pages only
+	if ( config.mw.wgArticleId === 0 ) {
 		mw.util.addPortletLink("p-cactions", "#", "XFDC Unlink", "p-xfdc-unlink", "Unlink backlinks using XFDcloser");
 		$("#p-xfdc-unlink").click(e => {
 			e.preventDefault();

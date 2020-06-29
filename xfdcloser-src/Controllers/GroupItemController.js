@@ -26,11 +26,13 @@ export default class GroupedItemController {
 		if ( !model ) {
 			throw new Error("GroupedItemController: model must be defined.");
 		} else if ( !Array.isArray(model.items) ) {
-			throw new Error("GroupedItemController: Expected model.items to be an array, instead found", model.items);
+			console.warn("GroupedItemController: model.items = ", model.items);
+			throw new Error("GroupedItemController: Expected model.items to be an array");
 		} else if ( !group ) {
 			throw new Error("GroupedItemController: group must be defined.");
 		} else if ( !Array.isArray(group.items) ) {
-			throw new Error("GroupedItemController: Expected group.items to be an array, instead found", group.items);
+			console.warn("GroupedItemController: group.items = ", group.items);
+			throw new Error("GroupedItemController: Expected group.items to be an array");
 		}
 
 		this.model = model;
