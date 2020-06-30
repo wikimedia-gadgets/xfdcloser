@@ -1,5 +1,5 @@
 import { mw } from "../../../globals";
-import { rejection, makeLink, dmyDateString } from "../../util";
+import { rejection, makeLink, ymdDateString } from "../../util";
 import TaskItemController from "../TaskItemController";
 // <nowiki>
 
@@ -30,7 +30,7 @@ export default class AddToHoldingCell extends TaskItemController {
 			return "module";
 		case total === moduleCount:
 			return "modules";
-		case total === 0:
+		case moduleCount === 0:
 			return "templates";
 		case total === 2 && moduleCount === 1:
 			return "template and module";
@@ -58,7 +58,7 @@ export default class AddToHoldingCell extends TaskItemController {
 		this.model.getPageResults().forEach(pageResult => {
 			const pageName = this.model.discussion.getResolvedPageName(pageResult.pageName);
 			const pageTitle = mw.Title.newFromText(pageName);
-			const options = this.model.options.getOptionValues(pageResult.name);
+			const options = this.model.options.getOptionValues(pageResult.selectedResultName);
 			const hasCorrectNamespace = this.model.venue.ns_number.includes(pageTitle.getNamespaceId());
 			// Check namespace and existance
 			if ( !hasCorrectNamespace ) {
@@ -73,11 +73,11 @@ export default class AddToHoldingCell extends TaskItemController {
 				return;
 			}
 			const main = pageTitle.getMain(),
-				dateString = dmyDateString(this.model.discussion.nominationDate),
+				dateString = ymdDateString(this.model.discussion.nominationDate),
 				section = this.model.discussion.sectionHeader,
 				deleteParam = options.holdcellSection === "ready" ? "|delete=1" : "",
 				nsParam = pageTitle.getNamespaceId() === 828 ? "|ns=Module" : "",
-				sectionNum = this.model.venue.holdingCellSectionNumber[options.holdcellSection];
+				sectionNum = this.model.venue.holdingCellSectionNumber[options.holdcellSection || options.holdcellMergeSection];
 			// Make new section wikitext
 			sectionsArray[sectionNum] = AddToHoldingCell.cleanupSection(sectionsArray[sectionNum]) +
 				`\n*{{tfdl|${main}|${dateString}|section=${section}${deleteParam}${nsParam}}}\n`;
