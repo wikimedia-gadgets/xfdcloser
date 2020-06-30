@@ -108,6 +108,8 @@ class MainWindowController {
 				});
 		} else if ( action === "closePrefs" ) {
 			this.model.closePrefs();
+		} else if ( action === "defaultPrefs" ) {
+			this.model.preferences.restoreDefaults();
 		} else if ( action === "multimode" ) {
 			this.model.setMultimode(true);
 		} else if ( action === "singlemode" ) {

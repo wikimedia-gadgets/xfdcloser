@@ -91,6 +91,13 @@ MainWindow.static.actions = [
 		modes: ["normal", "relist", "basic", "multimodeAvailable", "multimodeActive"]
 	},
 	{
+		action: "defaultPrefs",
+		label: "Restore defaults",
+		title: "Restore default preferences",
+		flags: "safe",
+		modes: "prefs"
+	},
+	{
 		action: "multimode",
 		label: "Multiple results...",
 		modes: ["multimodeAvailable"]
