@@ -57,6 +57,10 @@ class PrefsGroup {
 		});
 	}
 
+	restoreDefaults() {
+		this.items.forEach(item => item.restoreDefault());
+	}
+
 	onItemUpdate() {
 		this.emit("itemUpdate");
 	}

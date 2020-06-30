@@ -1,4 +1,5 @@
 import { OO } from "../../globals";
+import { defaultPrefValues } from "../data";
 // <nowiki>
 
 class PrefsItem {
@@ -64,6 +65,10 @@ class PrefsItem {
 		this.value = value;
 		this.initialValue = value;
 		this.emit("update");
+	}
+
+	restoreDefault() {
+		this.setValue(defaultPrefValues[this.name]);
 	}
 }
 OO.initClass( PrefsItem );

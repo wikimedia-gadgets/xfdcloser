@@ -1,5 +1,5 @@
 import { OO } from "../../globals";
-//import * as prefs from "../prefs";
+import PrefsGroup from "./PrefsGroup";
 // <nowiki>
 
 /**
@@ -9,14 +9,20 @@ class PrefsWindowModel {
 	/**
 	 * 
 	 * @param {Object} config
-	 *  @param {Object<string,string|number|boolean>} config.prefs preference values keyed by pairs
+	 *  @param {boolean} config.userIsSysop
 	 */
 	constructor(config) {
 		// call mixin constructor
 		OO.EventEmitter.call(this);
 
-		this.prefs = config.prefs;
-		this.changed = false;
+		this.preferences = new PrefsGroup({
+			userIsSysop: config.userIsSysop
+		});
+		this.preferences.connect(this, {
+			"update": ["emit", "update"],
+			"itemUpdate": ["emit", "update"],
+			"resize": ["emit", "update"]
+		});
 	}
 
 	get actionAbilities() {
@@ -24,16 +30,6 @@ class PrefsWindowModel {
 			savePrefs: this.changed,
 			defaultPrefs: true,
 		};
-	}
-
-	setPref(name, val) {
-		this.prefs[name] = val;
-		this.emit("update");
-	}
-
-	onSave() {
-		this.changed = false;
-		this.emit("update");
 	}
 }
 

@@ -27,12 +27,11 @@ function PrefsItemWidget( model, config ) {
 	default:
 		throw new Error("PrefsItemWidget: unrecognised type: "+model.type);
 	}
-	this.field = new OO.ui.FieldLayout(this.selector, {
+	this.fieldLayout = new OO.ui.FieldLayout(this.selector, {
 		help: model.help,
 		helpInline: model.helpInline,
 		$element: this.$element
 	});
-	//this.$element.append(this.field.$element);
 
 	this.controller = new PrefsItemController(this.model, this);
 	this.controller.updateFromModel();

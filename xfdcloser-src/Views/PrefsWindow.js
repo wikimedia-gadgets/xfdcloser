@@ -1,8 +1,9 @@
 import { $, mw, OO } from "../../globals";
 import appConfig from "../config";
-import PrefsFormWidget from "../Layouts/PrefsFormWidget";
-import { setPrefs as ApiSetPrefs, defaultPrefs, getPrefs } from "../prefs";
+import PrefsPanel from "./PrefsPanel";
 import DraggableMixin from "../Mixins/DraggableMixin";
+import PrefsWindowModel from "../Models/PrefsWindowModel";
+import PrefsWindowController from "../Controllers/PrefsWindowController";
 // <nowiki>
 
 function PrefsWindow( config ) {
@@ -30,7 +31,7 @@ PrefsWindow.static.actions = [
 	},
 	// Safe action (top left)
 	{
-		label: "Cancel",
+		label: "Close",
 		flags: "safe"
 	},
 	// Other actions (bottom left)
@@ -48,30 +49,12 @@ PrefsWindow.prototype.initialize = function () {
 	// Call the parent method.
 	PrefsWindow.super.prototype.initialize.call( this );
 
-	/* --- PREFS --- */
-	this.preferences = appConfig.defaultPrefs;
-
-	/* --- CONTENT AREA --- */
-
-	// Preferences, filled in with current prefs upon loading.
-	this.prefsForm = new PrefsFormWidget();
-	this.prefsLayout = new OO.ui.PanelLayout( {
-		padded: true,
-		expanded: false,
-		$content: this.prefsForm.$element
-	} );
-
-	this.contentArea = new OO.ui.StackLayout( {
-		items: [
-			this.prefsLayout,
-		],
+	this.stackLayout = new OO.ui.StackLayout( {
 		padded: false,
 		expanded: false
 	} );
 
-	this.$body.append(this.contentArea.$element);
-
-	/* --- EVENT HANDLING --- */
+	this.$body.append( this.stackLayout.$element );
 
 	// Handle certain keyboard events. Requires something in the window to be focused,
 	// so add a tabindex to the body and it's parent container.
@@ -91,79 +74,49 @@ PrefsWindow.prototype.initialize = function () {
 			this.$body.scrollTop(scrollAmount);
 			event.preventDefault();
 		}.bind(this));
-	
-};
-
-// Override the getBodyHeight() method to specify a custom height
-PrefsWindow.prototype.getBodyHeight = function () {
-	var currentlayout = this.contentArea.getCurrentItem();
-	var layoutHeight = currentlayout && currentlayout.$element.outerHeight(true);
-	var contentHeight = currentlayout && currentlayout.$element.children(":first-child").outerHeight(true);
-	return Math.max(200, layoutHeight, contentHeight);
 };
 
 PrefsWindow.prototype.getSetupProcess = function ( data ) {
 	data = data || {};
 	return PrefsWindow.super.prototype.getSetupProcess.call( this, data )
-		.next(
-			getPrefs().then(prefs => {
-				this.setPreferences(prefs || {});
-				this.prefsForm.changed = false;
-				return true;
-			}),
-			this)
-		.next(
-			() => {
-				this.makeDraggable();
-				this.updateSize();
-			},
-			this);
+		.next(() => {
+			this.makeDraggable();
+			this.model = new PrefsWindowModel({
+				userIsSysop: data.userIsSysop
+			});
+			this.prefsPanel = new PrefsPanel({
+				data: {name: "prefsPanel"},
+				padded: true
+			}, this.model.preferences);
+			this.stackLayout.clearItems();
+			this.stackLayout.addItems([
+				this.prefsPanel
+			]);
+
+			this.controller = new PrefsWindowController(this.model, this);
+			this.controller.updateFromModel();
+		});
 };
 
-// Use the getActionProcess() method to do things when actions are clicked
-PrefsWindow.prototype.getActionProcess = function ( action ) {
-	const updatedPrefs = this.prefsForm.getPrefs();
-	if ( action === "savePrefs" ) {
-		return new OO.ui.Process().next(
-			ApiSetPrefs(updatedPrefs).then(
-				// Success
-				() => {
-					mw.notify("XFDcloser preferences updated.");
-					this.close();
-				},
-				// Failure
-				(code, err) => $.Deferred().reject(
-					new OO.ui.Error(
-						$("<div>").append(
-							$("<strong style='display:block;'>").text("Could not save preferences."),
-							$("<span style='color:#777'>").text( extraJs.makeErrorMsg(code, err) )
-						)
-					)
-				)
-			)
-		);
+PrefsWindow.prototype.getReadyProcess = function ( data ) {
+	data = data || {};
+	return PrefsWindow.super.prototype.getReadyProcess.call( this, data )
+		.next( () => {
+			// Set focus to first input
+			this.prefsPanel.fieldset.items[0].fieldLayout.getField().focus();
+		});
+};
 
-	} else if ( action === "defaultPrefs" ) {
-		return new OO.ui.Process().next(
-			() => {
-				const updatedPrefsChangedFromDefault = JSON.stringify(updatedPrefs) !== JSON.stringify(defaultPrefs);
-				if (updatedPrefsChangedFromDefault) {
-					this.setPreferences();
-				}
-				const savedPrefsDifferentFromDefault = JSON.stringify(this.preferences) !== JSON.stringify(defaultPrefs);
-				this.prefsForm.changed = savedPrefsDifferentFromDefault;
-			}
-		);
+PrefsWindow.prototype.getActionProcess = function(action) {
+	// This is handled by the controller
+	return this.controller.getActionProcess(action);
+};
 
-	} else if (!action && this.prefsForm.changed) {
-		// Confirm closing of dialog if there have been changes 
-		return new OO.ui.Process().next(
-			OO.ui.confirm("Changes made will be discarded.", {title:"Close XFDcloser?"})
-				.then(confirmed => { confirmed ? this.close() : null; })
-		);
-	}
-
-	return PrefsWindow.super.prototype.getActionProcess.call( this, action );
+PrefsWindow.prototype.getBodyHeight = function () {
+	// This is handled by the controller (once it is defined)
+	return this.controller
+		? this.controller.getBodyHeight()
+		: PrefsWindow.super.prototype.getBodyHeight.call(this);
 };
 
 // Use the getTeardownProcess() method to perform actions whenever the dialog is closed.
@@ -173,15 +126,6 @@ PrefsWindow.prototype.getTeardownProcess = function ( data ) {
 		.first( () => {
 			this.removeDraggability();
 		} );
-};
-
-PrefsWindow.prototype.setPreferences = function(prefs) {
-	if (!prefs) {
-		this.preferences = { ...defaultPrefs };
-	} else {
-		this.preferences = { ...defaultPrefs, ...prefs };
-	}
-	this.prefsForm.setPrefValues(this.preferences);
 };
 
 export default PrefsWindow;

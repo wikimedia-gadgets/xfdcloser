@@ -19,8 +19,8 @@ export default class PrefsItemController {
 	}
 
 	updateFromModel() {
-		this.widget.field.setLabel(this.model.label);
-		this.widget.field.setErrors(this.model.errors);
+		this.widget.fieldLayout.setLabel(this.model.label);
+		this.widget.fieldLayout.setErrors(this.model.errors);
 		this.widget.$element.find(".oo-ui-fieldLayout-messages").css("clear","both");
 		if ( this.model.type === "dropdown" ) {
 			this.widget.selector.getMenu().selectItemByData(this.model.value);

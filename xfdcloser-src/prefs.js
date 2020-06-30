@@ -40,11 +40,16 @@ const get = prefName => {
 /**
  * 
  * @param {Object<string,*>} prefs new preference values, keyed by preference name
+ * @param {Object} [mode]
+ *  @param {boolean} mode.reset unset all current preferences
  * @returns {Promise} resolved if saved successfully
  */
-const set = prefs => {
+const set = (prefs, mode) => {
 	const previousOptions = parseOptions();
-	const options = JSON.stringify({ ...previousOptions, ...prefs });
+	const options = JSON.stringify( mode && mode.reset
+		? prefs
+		: { ...previousOptions, ...prefs }
+	);
 	return API.postWithToken("csrf", {
 		"action": "options",
 		"format": "json",

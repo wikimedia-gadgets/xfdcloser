@@ -1,6 +1,7 @@
 import { $, OO } from "../globals";
 import MainWindow from "./Views/MainWindow";
 import UnlinkWindow from "./Views/UnlinkWindow";
+import PrefsWindow from "./Views/PrefsWindow";
 
 var factory = new OO.Factory();
 
@@ -8,6 +9,7 @@ var factory = new OO.Factory();
 //factory.register(PrefsWindow);
 factory.register(MainWindow);
 factory.register(UnlinkWindow);
+factory.register(PrefsWindow);
 
 var manager = new OO.ui.WindowManager( {
 	"factory": factory

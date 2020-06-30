@@ -27,7 +27,9 @@ import DiscussionView from "./Views/DiscussionView";
 	mw.util.addPortletLink("p-cactions", "#", "XFDC prefs", "p-xfdc-prefs", "XFDcloser preferences");
 	$("#p-xfdc-prefs").click(e => {
 		e.preventDefault();
-		windowManager.openWindow("prefs");
+		windowManager.openWindow("prefs", {
+			userIsSysop: config.user.isSysop
+		});
 	});
 
 	// Unlink portlet link: non-existant pages only
