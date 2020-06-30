@@ -29,9 +29,10 @@ function PrefsItemWidget( model, config ) {
 	}
 	this.field = new OO.ui.FieldLayout(this.selector, {
 		help: model.help,
-		helpInline: model.helpInline
+		helpInline: model.helpInline,
+		$element: this.$element
 	});
-	this.$element.append(this.field.$element);
+	//this.$element.append(this.field.$element);
 
 	this.controller = new PrefsItemController(this.model, this);
 	this.controller.updateFromModel();

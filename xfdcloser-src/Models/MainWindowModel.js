@@ -80,7 +80,8 @@ class MainWindowModel {
 		this.taskList.connect(this, {"update": ["emit", "update"]});
 		this.preferences.connect(this, {
 			"update": ["emit", "update"],
-			"itemUpdate": ["emit", "update"]
+			"itemUpdate": ["emit", "update"],
+			"resize": ["emit", "update"]
 		});
 	}
 
@@ -150,6 +151,11 @@ class MainWindowModel {
 		this._setMode("prefs");
 		this.currentPanel = "prefsPanel";
 		this.emit("update");
+		// Hack to fix initial sizing bug
+		setTimeout(() => {
+			this.heights[this._heightKey] += 15;
+			this.emit("update");
+		}, 100);
 	}
 	closePrefs() {
 		this._setMode("_previous");
