@@ -1,5 +1,6 @@
 import { OO } from "../../globals";
 import { getRelevantActions, getRelevantOptions } from "../data";
+import * as prefs from "../prefs";
 // <nowiki>
 
 class OptionsItem {
@@ -18,6 +19,15 @@ class OptionsItem {
 		this.actions = getRelevantActions(config.venueType, config.userIsSysop, config.result);
 		this._options = getRelevantOptions(config.venueType, config.userIsSysop, this.actions);
 		this.selectedActionName = this.actions[0].name; // make first action the default selection
+		// Adjust defaults per preferences
+		if ( config.venueType === "tfd" && config.result === "delete" ) {
+			this.selectedActionName = prefs.get("tfdDeleteAction");
+		}
+		const unlinkOptionIndex = this._options.findIndex(option => option.name === "unlink");
+		if ( unlinkOptionIndex !== -1 ) {
+			this._options[unlinkOptionIndex].value = prefs.get("unlinkBacklinks");
+		}
+
 	}
 	get name() {
 		return this.result;

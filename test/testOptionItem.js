@@ -2,6 +2,7 @@
 import assert from "assert";
 //import { mw } from "../globals";
 import OptionsItem from "../xfdcloser-src/Models/OptionsItem";
+import { defaultPrefValues } from "../xfdcloser-src/data";
 
 describe("OptionsItem", function() {
 	let model;
@@ -53,9 +54,9 @@ describe("OptionsItem", function() {
 		it("has three actions", function() {
 			assert.strictEqual(model.actions.length, 3);
 		});
-		it("has the first action initially selected", function() {
+		it("has the preferences-specified action initially selected", function() {
 			assert.ok(model.selectedAction);
-			assert.strictEqual(model.actions[0].name, model.selectedAction.name);
+			assert.strictEqual(defaultPrefValues.tfdDeleteAction, model.selectedAction.name);
 		});
 	});
 	describe("for TfD delete result (deletePages action)", function() {

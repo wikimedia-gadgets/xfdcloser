@@ -5,6 +5,7 @@ import Options from "../xfdcloser-src/Models/Options";
 import Result from "../xfdcloser-src/Models/Result";
 import Discussion from "../xfdcloser-src/Models/Discussion";
 import Venue from "../xfdcloser-src/Venue";
+import { defaultPrefValues } from "../xfdcloser-src/data";
 
 describe("Options", function() {
 	let model, discussion, result, venue, userIsSysop;
@@ -122,7 +123,7 @@ describe("Options", function() {
 		it("has action set initially", function() {
 			assert.strictEqual(model.items[0].selectedActionName, "updatePages");
 			assert.strictEqual(model.items[1].selectedActionName, "redirectAndUpdate");
-			assert.strictEqual(model.items[2].selectedActionName, "deletePages");
+			assert.strictEqual(model.items[2].selectedActionName, defaultPrefValues.tfdDeleteAction);
 		});
 		it("can set action", function() {
 			model.items[0].setSelectedActionName("noActions");
@@ -136,6 +137,7 @@ describe("Options", function() {
 			assert.strictEqual(model.items[2].setSelectedActionName("holdingCell"), false, "returns false if setting to current value");
 		});
 		it("has initial option values", function() {
+			model.items[2].setSelectedActionName("deletePages");
 			assert.deepStrictEqual(model.items[0].values, {
 				action: "updatePages"
 			});
@@ -150,6 +152,7 @@ describe("Options", function() {
 			});
 		});
 		it("can set boolean option values", function() {
+			model.items[2].setSelectedActionName("deletePages");
 			model.items[2].setOptionValue("deleteTalk", false);
 			assert.deepStrictEqual(model.items[2].values, {
 				action: "deletePages",
@@ -214,6 +217,7 @@ describe("Options", function() {
 			assert.strictEqual(model.items[0].isValid, true, "action without options");
 		});
 		it("validates when action with toggle options", function() {
+			model.items[2].setSelectedActionName("deletePages");
 			assert.strictEqual(model.items[2].isValid, true, "action with toggle options (both on)");
 			model.items[2].setOptionValue("deleteTalk", false);
 			assert.strictEqual(model.items[2].isValid, true, "action with toggle options (one on, one off)");
@@ -234,6 +238,7 @@ describe("Options", function() {
 			assert.strictEqual(model.items[1].isValid, true, "action with menuTagMultiselect (multiple items selected)");
 		});	
 		it("(List) validates all result options items", function() {
+			model.items[2].setSelectedActionName("deletePages");
 			assert.strictEqual(model.isValid, true, "Valid if invalid option is not for the selected action");
 
 			model.items[2].setSelectedActionName("holdingCell");
