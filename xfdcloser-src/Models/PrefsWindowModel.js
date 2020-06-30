@@ -27,8 +27,8 @@ class PrefsWindowModel {
 
 	get actionAbilities() {
 		return {
-			savePrefs: this.changed,
-			defaultPrefs: true,
+			savePrefs: this.preferences.changed,
+			defaultPrefs: !this.preferences.allHaveDefaultValues()
 		};
 	}
 }

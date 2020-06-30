@@ -70,6 +70,10 @@ class PrefsItem {
 	restoreDefault() {
 		this.setValue(defaultPrefValues[this.name]);
 	}
+
+	hasDefaultValue() {
+		return this.value === defaultPrefValues[this.name];
+	}
 }
 OO.initClass( PrefsItem );
 OO.mixinClass( PrefsItem, OO.EventEmitter );
