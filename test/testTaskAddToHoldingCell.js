@@ -168,7 +168,7 @@ If empty, add * ''None currently'' below this comment. -->
 * ''None currently''
 `;
 
-describe.only("AddToHoldingCell", function() {
+describe("AddToHoldingCell", function() {
 	describe("single template", function() {
 		let discussion, result, options, model, task;
 		beforeEach(function() {
