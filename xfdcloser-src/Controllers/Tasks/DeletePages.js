@@ -15,7 +15,7 @@ export default class DeletePages extends TaskItemController {
 	 * @returns {Boolean} page exists
 	 */
 	verifyPage(pageName) {
-		if ( !mw.title.newFromText(pageName).exists() ) {
+		if ( !mw.Title.newFromText(pageName).exists() ) {
 			this.model.addWarning(
 				`${makeLink(pageName)} skipped: does not exist (may have already been deleted by others)`
 			);
@@ -28,7 +28,7 @@ export default class DeletePages extends TaskItemController {
 	doTask() {
 		this.model.setTotalSteps(this.model.discussion.pages.length);
 		this.model.setDoing();
-		const pagesToDelete = this.model.getResolvedPagesNames()
+		const pagesToDelete = this.model.discussion.getResolvedPagesNames()
 			.filter(pageName => this.verifyPage(pageName));
 
 		if ( pagesToDelete.length === 0 ) {

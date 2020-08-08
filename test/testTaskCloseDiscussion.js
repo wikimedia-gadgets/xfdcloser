@@ -154,14 +154,14 @@ Fails [[WP:GNG]] and [[WP:NMUSIC]] [[User:Example|Example]] ([[User talk:Example
 				timestamp: Date.now()
 			}],
 			content: "content"
-		}
+		};
 		const transformed = task.transform(page);
 		if ( !transformed.then ) {
 			throw new Error("transform did not return a promise");
-		};
+		}
 		return transformed.then(
 			() => {
-				throw new Error("transform promise was resolved")
+				throw new Error("transform promise was resolved");
 			},
 			(code) => {
 				assert.strictEqual(code, "abort"); // expected to be aborted
@@ -174,14 +174,14 @@ Fails [[WP:GNG]] and [[WP:NMUSIC]] [[User:Example|Example]] ([[User talk:Example
 				timestamp: "2020-02-20T03:24:00"
 			}],
 			content: "==heading==\ncontent"
-		}
+		};
 		const transformed = task.transform(page);
 		if ( !transformed.then ) {
 			throw new Error("transform did not return a promise");
-		};
+		}
 		return transformed.then(
 			() => {
-				throw new Error("transform promise was resolved")
+				throw new Error("transform promise was resolved");
 			},
 			(code) => {
 				assert.strictEqual(code, "abort"); // expected to be aborted
@@ -194,14 +194,14 @@ Fails [[WP:GNG]] and [[WP:NMUSIC]] [[User:Example|Example]] ([[User talk:Example
 				timestamp: "2020-02-20T03:24:00"
 			}],
 			content: "==[[:Foobar]]==\ncontent\n<!--Template:Afd bottom-->"
-		}
+		};
 		const transformed = task.transform(page);
 		if ( !transformed.then ) {
 			throw new Error("transform did not return a promise");
-		};
+		}
 		return transformed.then(
 			() => {
-				throw new Error("transform promise was resolved")
+				throw new Error("transform promise was resolved");
 			},
 			(code) => {
 				assert.strictEqual(code, "abort"); // expected to be aborted
