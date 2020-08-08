@@ -63,7 +63,7 @@ export default class DeleteRedirects extends TaskItemController {
 
 	doTask() {
 		return this.api.queryWithContinue({
-			titles: this.model.getResolvedPagesNames(),
+			titles: this.model.discussion.getResolvedPagesNames(),
 			generator: "redirects",
 			grdlimit: "max",
 			prop: "info",

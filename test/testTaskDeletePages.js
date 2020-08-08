@@ -24,7 +24,7 @@ const widgets = {
 	emit: ()=>{}
 };
 
-describe.only("DeletePages", function() {
+describe("DeletePages", function() {
 	let discussion, result, options, model, task;
 	beforeEach(function() {
 		discussion = new Discussion({
