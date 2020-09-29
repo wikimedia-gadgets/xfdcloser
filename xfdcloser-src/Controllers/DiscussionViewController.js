@@ -13,13 +13,14 @@ class DiscussionViewController {
 		this.buttonGroup = widget.buttonGroup;
 		this.closeButton = widget.closeButton;
 		this.relistButton = widget.relistButton;
-		this.quickCloseButtonMenu = widget.quickCloseButtonMenu;
+		this.quickCloseButton = widget.quickCloseButtonMenu;
+		this.quickCloseMenu = widget.quickCloseButtonMenu.getMenu();
 
 		this.model.connect(this, {update: "updateFromModel"});
 
 		this.closeButton.connect(this, {click: ["onButtonClick", "close"]});
 		this.relistButton.connect(this, {click: ["onButtonClick", "relist"]});
-		this.quickCloseButtonMenu.connect(this, {choose: "onQuickCloseChoose"});
+		this.quickCloseMenu.connect(this, {choose: "onQuickCloseChoose"});
 
 		if ( this.model.pages.length ) {
 			this.fetchInfoFromApi();
@@ -68,7 +69,7 @@ class DiscussionViewController {
 	updateFromModel() {
 		this.statusLabel.setLabel(this.model.status).toggle(this.model.showStatus);
 		this.buttonGroup.toggle(this.model.showButtons);
-		this.quickCloseButtonMenu.toggle(this.model.showQuickClose);
+		this.quickCloseButton.toggle(this.model.showQuickClose);
 	}
 	
 	/**
