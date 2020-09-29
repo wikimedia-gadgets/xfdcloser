@@ -97,18 +97,23 @@ class DiscussionViewController {
 		if ( windowManager.hasOpenWindow() ) {
 			return false;
 		}
+		const windowModel = new MainWindowModel({
+			type: "close",
+			quick: true,
+			result: quickCloseResult,
+			discussion: this.model,
+		});
 		const windowInstance = windowManager.openWindow("main", {
-			model: new MainWindowModel({
-				type: "close",
-				quick: true,
-				result: quickCloseResult,
-				discussion: this.model,
-			})
+			model: windowModel
 		});
 		windowInstance.closed.then(winData => {
 			this.model.setClosedWindowData(winData);
 		});
 		this.model.setWindowOpened("close");
+		windowModel.result.singleModeResult.setSelectedResultName(quickCloseResult.replace("quick", "").toLowerCase());
+		windowModel.taskList.resetItems();
+		windowModel.taskList.startTasks();
+		console.log("windowModel", windowModel);
 	}
 }
 

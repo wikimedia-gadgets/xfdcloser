@@ -56,6 +56,7 @@ class MainWindowModel {
 		// Other props
 		this.type = config.type;
 		if ( config.quick ) {
+			this.isQuick = true;
 			this.mode = "tasks";
 		} else if ( this.type === "relist" ) {
 			this.mode = "relist";
