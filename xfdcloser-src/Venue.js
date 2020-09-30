@@ -176,17 +176,15 @@ Venue.Tfd = () => {
 		},
 		holdingCellSectionNumber: {
 			"review":			3,
-			"merge-arts":		5,
-			"merge-geopolgov":	6,	// (geography, politics and governance)
-			"merge-religion":	7,
-			"merge-sports":		8,
-			"merge-transport":	9,
-			"merge-other":		10,
-			"merge-meta":		11,
-			"convert":			12,
-			"substitute":		13,
-			"orphan":			14,
-			"ready":			15	// (ready for deletion)
+			"merge-infobox":	5,
+			"merge-navigation":	6,	// (geography, politics and governance)
+			"merge-link":		7,
+			"merge-other":		8,
+			"merge-meta":		9,
+			"convert":			10,
+			"substitute":		11,
+			"orphan":			12,
+			"ready":			13	// (ready for deletion)
 		},
 		relistTasks:		["UpdateOldLogPage", "UpdateNewLogPage", "UpdateNomTemplates"]
 	});

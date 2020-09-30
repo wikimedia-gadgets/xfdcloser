@@ -535,11 +535,10 @@ const options = [
 		type: "dropdown",
 		venues: ["tfd"],
 		items: [
-			{label: "Merge (Arts)", data:"merge-arts"},
-			{label: "Merge (Geography, politics and governance)", data:"merge-geopolgov"},
-			{label: "Merge (Religion)", data:"merge-religion"},
+			{label: "Merge (Infoboxes)", data:"merge-infobox"},
+			{label: "Merge (Navigation templates)", data:"merge-navigation"},
+			{label: "Merge (Link templates)", data:"merge-link"},
 			{label: "Merge (Sports)", data:"merge-sports"},
-			{label: "Merge (Transport)", data:"merge-transport"},
 			{label: "Merge (Other)", data:"merge-other"},
 			{label: "Merge (Meta)", data:"merge-meta"}
 		]
