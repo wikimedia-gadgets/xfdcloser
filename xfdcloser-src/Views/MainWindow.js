@@ -200,9 +200,11 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 				this.taskListPanel,
 				this.prefsPanel
 			]);
-			// Hack to make sure there are items in the task list panel's group 
+			
 			if (this.model.isQuick) {
+				// Hack to make sure there are items in the panels' groups 
 				this.taskListPanel.controller.updateGroupFromModel();
+				this.optionsPanel.controller.updateGroupFromModel();
 			}
 
 			this.controller = new MainWindowController(this.model, this);

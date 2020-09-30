@@ -111,9 +111,14 @@ class DiscussionViewController {
 		});
 		this.model.setWindowOpened("close");
 		windowModel.result.singleModeResult.setSelectedResultName(quickCloseResult.replace("quick", "").toLowerCase());
-		windowModel.taskList.resetItems();
-		windowModel.taskList.startTasks();
-		console.log("windowModel", windowModel);
+		// If an option needs to be selected, show the options panel (e.g. holding cell section)
+		if (!windowModel.options.isValid) {
+			windowModel.showOptions();
+		} else {
+			// Just start doing the tasks
+			windowModel.taskList.resetItems();
+			windowModel.taskList.startTasks();
+		}
 	}
 }
 
