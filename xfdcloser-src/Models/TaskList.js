@@ -26,6 +26,7 @@ class TaskList {
 		this.started = false;
 		this.done = false;
 		this.aborted = false;
+		this.allFailed = false;
 	
 		this.result.connect(this, {"update": "resetItems"});
 		this.options.connect(this, {
@@ -34,6 +35,10 @@ class TaskList {
 		});
 		// this.aggregate({update: "itemUpdate"});
 		// this.connect(this, {itemUpdate: ["emit", "update"]});
+	}
+
+	get success() {
+		return this.done && !this.allFailed;
 	}
 
 	makeItemsForClose() {
@@ -326,9 +331,17 @@ class TaskList {
 		this.emit("update");
 	}
 
+	setAllFailed() {
+		this.done = true;
+		this.allFailed = true;
+		this.emit("update");
+	}
+
 	onItemUpdate() {
 		if ( this.getItems().some(task => task.aborted) ) {
 			this.abort();
+		} else if ( this.getItems().every(task => task.failed) ) {
+			this.setAllFailed();
 		} else if ( this.getItems().every(task => task.done || task.failed) ) {
 			this.setDone();
 		}

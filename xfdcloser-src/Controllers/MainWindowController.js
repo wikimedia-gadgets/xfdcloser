@@ -120,9 +120,9 @@ class MainWindowController {
 			this.model.showResult();	
 		} else if ( action === "finish" ) {
 			this.window.close( {
-				success: this.model.success,
-				aborted: this.model.aborted,
-				result: this.model.type !== "relist" && this.model.resultViewModel.getFormattedResult()
+				success: this.model.taskList.success,
+				aborted: this.model.taskList.aborted,
+				result: this.model.type !== "relist" && this.model.result.getFormattedResult()
 			} );	
 		} else if ( action === "abort" ) {
 			this.model.abortTasks();

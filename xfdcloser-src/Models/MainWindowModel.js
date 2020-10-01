@@ -93,7 +93,7 @@ class MainWindowModel {
 			savePrefs: this.preferences.changed,
 			next: this.result.isValid, 
 			save: this.mode === "options" ? this.options.isValid : this.result.isValid,
-			finish: this.taskList.finished || this.taskList.aborted,
+			finish: this.taskList.done || this.taskList.aborted,
 			closePrefs: true,
 			defaultPrefs: !this.preferences.allHaveDefaultValues(),
 			back: true,

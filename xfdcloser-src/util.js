@@ -389,6 +389,25 @@ const normalisePageName = function(pageName) {
 	return title && title.getPrefixedText();
 };
 
+/**
+ * Scrolls to a particular element over a short period of a time,
+ * simulating a smooth transition.
+ * Attribution: Based on Stack Overflow answer by Michael Whinfrey at
+ * https://stackoverflow.com/questions/3163615/how-to-scroll-html-page-to-given-anchor#answer-36929383
+ * @param {Element} elem Element to scroll to 
+ */
+const scrollToElem = function (elem) {
+	var jump = parseInt(elem.getBoundingClientRect().top * .2);
+	document.body.scrollTop += jump;
+	document.documentElement.scrollTop += jump;
+	if (!elem.lastjump || elem.lastjump > Math.abs(jump)) {
+		elem.lastjump = Math.abs(jump);
+		setTimeout(function() { scrollToElem(elem);}, "50");
+	} else {
+		elem.lastjump = null;
+	}
+};
+
 export {
 	encodeForUrl,
 	encodeForWikilinkFragment,
@@ -412,6 +431,7 @@ export {
 	decodeHtml,
 	uppercaseFirst,
 	mostFrequent,
-	normalisePageName
+	normalisePageName,
+	scrollToElem
 };
 // </nowiki>

@@ -1,6 +1,6 @@
-import { $, mw } from "../../globals";
+import { $, mw, OO } from "../../globals";
 import API from "../api";
-import { dateFromSubpageName } from "../util"; 
+import { dateFromSubpageName, scrollToElem } from "../util"; 
 import MainWindowModel from "../Models/MainWindowModel";
 import windowManager from "../windowManager";
 
@@ -67,7 +67,7 @@ class DiscussionViewController {
 	}
 
 	updateFromModel() {
-		this.statusLabel.setLabel(this.model.status).toggle(this.model.showStatus);
+		this.statusLabel.setLabel(new OO.ui.HtmlSnippet(this.model.status)).toggle(this.model.showStatus);
 		this.buttonGroup.toggle(this.model.showButtons);
 		this.quickCloseButton.toggle(this.model.showQuickClose);
 	}
@@ -88,6 +88,8 @@ class DiscussionViewController {
 		});
 		windowInstance.closed.then(winData => {
 			this.model.setClosedWindowData(winData);
+			// Scroll discussion into view
+			scrollToElem(document.getElementById(this.model.id).parentNode);
 		});
 		this.model.setWindowOpened(type);
 	}
@@ -108,6 +110,8 @@ class DiscussionViewController {
 		});
 		windowInstance.closed.then(winData => {
 			this.model.setClosedWindowData(winData);
+			// Scroll discussion into view
+			scrollToElem(document.getElementById(this.model.id).parentNode);
 		});
 		this.model.setWindowOpened("close");
 		windowModel.result.singleModeResult.setSelectedResultName(quickCloseResult.replace("quick", "").toLowerCase());
