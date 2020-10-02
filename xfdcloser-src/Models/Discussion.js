@@ -1,6 +1,6 @@
 
 import { mw, OO } from "../../globals";
-import { encodeForWikilinkFragment } from "../util";
+import { makeLink, encodeForWikilinkFragment } from "../util";
 // <nowiki>
 class Discussion {
 	/**
@@ -159,12 +159,12 @@ class Discussion {
 	setClosedWindowData(windowData) {
 		switch (true) {
 		case windowData && windowData.aborted:
-			this.status = this.type + " aborted";
+			this.status = `<strong>Aborted</strong> during ${this.type}; check ${makeLink("Special:MyContributions", "your contributions")} to see which actions were already completed.`;
 			break;
 		case windowData && windowData.success: {
 			const actioned = this.type.slice(0,1).toUpperCase() + this.type.slice(1).replace(/e$/, "") + "ed";
 			const as = windowData.result ? ` as "${windowData.result}"` : "";
-			this.status = `<strong>${actioned}</strong>${as}! (reload page to see the actual ${this.type})`;
+			this.status = `<strong>${actioned}</strong>${as} (reload page to see the actual ${this.type})`;
 			break;
 		}
 		default: // cancelled

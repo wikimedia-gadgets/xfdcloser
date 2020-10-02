@@ -125,7 +125,7 @@ class MainWindowController {
 				result: this.model.type !== "relist" && this.model.result.getFormattedResult()
 			} );	
 		} else if ( action === "abort" ) {
-			this.model.abortTasks();
+			this.model.taskList.abort();
 		} else if ( !action && this.model.canClose ) {
 			this.window.close();
 		}

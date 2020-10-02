@@ -98,7 +98,7 @@ describe("Discussion", function() {
 			discussion.setWindowOpened("close");
 			discussion.setClosedWindowData({aborted: true});
 			assert.strictEqual(discussion.showStatus, true);
-			assert.strictEqual(discussion.status, "close aborted");
+			assert.strictEqual(discussion.status.toLowerCase().includes("aborted") && discussion.status.includes("close"), true);
 		});
 
 		it("shows aborted status messsage after aborting relist", function() {
@@ -106,7 +106,7 @@ describe("Discussion", function() {
 			discussion.setWindowOpened("relist");
 			discussion.setClosedWindowData({aborted: true});
 			assert.strictEqual(discussion.showStatus, true);
-			assert.strictEqual(discussion.status, "relist aborted");
+			assert.strictEqual(discussion.status.toLowerCase().includes("aborted") && discussion.status.includes("relist"), true);
 		});
 	});
 	describe("with over 50 pages for non-admin:", function() {
