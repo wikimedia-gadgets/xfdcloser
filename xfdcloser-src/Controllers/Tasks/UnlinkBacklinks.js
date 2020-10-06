@@ -256,6 +256,8 @@ export default class  UnlinkBacklinks extends TaskItemController {
 			}
 			if ( result.backlinks.length + result.imageusage.length === 0 ) {
 				this.model.addWarning("none found");
+				this.model.setTotalSteps(1);
+				this.model.trackStep("skipped");
 				return "Skipped";
 			}
 			const { unlinkPageNames, redirectPageNames, hasImageUsage } = this.getUnlinkPages(result.backlinks, result.imageusage);
