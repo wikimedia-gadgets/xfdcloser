@@ -50,7 +50,8 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		return targets.map(target => {
 			const mergeFromPages = this.model.getPageResults()
 				.filter(pageResult => pageResult.getFormattedTarget({raw: true}) === target )
-				.map(pageResult => this.model.discussion.getResolvedPageName(pageResult.pageName))			;
+				.map(pageResult => this.model.discussion.redirects.resolveOne(pageResult.pageName)
+				);
 			const mergeToTemplate = this.model.venue.wikitext.mergeTo
 				.replace(/__TARGET__/, target)
 				.replace(/__DEBATE__/, this.model.discussion.discussionSubpageName)
@@ -62,7 +63,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 					.replace(/__DEBATE__/, this.model.discussion.discussionSubpageName)
 					.replace(/__DATE__/, curdate)
 				);
-			const isNominatedPage = this.model.discussion.pagesNames.includes(this.model.discussion.getUnresolvedPageName(target));
+			const isNominatedPage = this.model.discussion.pagesNames.includes(this.model.discussion.redirects.unresolveOne(target));
 			return new Merger({
 				from: mergeFromPages,
 				target,

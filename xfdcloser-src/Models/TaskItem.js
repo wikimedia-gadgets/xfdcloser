@@ -117,11 +117,14 @@ class TaskItem {
 	 * @returns {String[]} relevant page names with redirects resolved
 	 */
 	getResolvedPageNames() {
-		return this.discussion.getResolvedPagesNames(this.pageNames);
+		return this.discussion.redirects.resolve(this.pageNames);
 	}
 
+	/**
+	 * @returns {String[]} relevant talk page names with redirects resolved
+	 */
 	getResolvedTalkpagesNames() {
-		return this.discussion.getResolvedTalkpagesNames(this.pageNames);
+		return this.discussion.redirects.resolveTalks(this.pageNames);
 	}
 
 	getPageResults(resultType) {

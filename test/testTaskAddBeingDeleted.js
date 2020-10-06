@@ -72,7 +72,7 @@ describe("AddBeingDeleted", function() {
 		};
 		const transformed = task.transform(page);
 		if ( transformed.then ) {
-			transformed.catch((e,m) => console.warn("Error "+e, m));
+			transformed.then(r => console.log("Promise resolved with:", r)).catch((e,m) => console.warn("Error "+e, m));
 			throw new Error("transformed is a promise");
 		}
 		assert.deepStrictEqual(

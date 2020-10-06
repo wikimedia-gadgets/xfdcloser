@@ -25,7 +25,7 @@ export default class AddBeingDeleted extends TaskItemController {
 		}
 
 		const result = this.model.result.getResultsByPage().find(
-			result => result.pageName === this.model.discussion.getUnresolvedPageName(docToModule(page.title))
+			result => result.pageName === this.model.discussion.redirects.unresolveOne(docToModule(page.title))
 		);
 		if ( !result ) {
 			return rejection("unexpectedTitle");
@@ -76,14 +76,14 @@ export default class AddBeingDeleted extends TaskItemController {
 		// Merge targets and pages to be merged (if any)
 		const mergePageResults = this.model.getPageResults("merge");
 		this.mergeTargets = uniqueArray(mergePageResults.map(pageResult => pageResult.targetPageName));
-		this.mergeTitles = this.model.discussion.getResolvedPagesNames(mergePageResults.map(pageResult => pageResult.pageName));
+		this.mergeTitles = this.model.discussion.redirects.resolve(mergePageResults.map(pageResult => pageResult.pageName));
 	}
 
 	doTask() {
 		this.initialise();
 		this.model.setDoing();
 		return this.api.editWithRetry(
-			this.model.getResolvedPagesNames().map(moduleToDoc),
+			this.model.getResolvedPageNames().map(moduleToDoc),
 			null,
 			page => this.transform(page),
 			() => this.model.trackStep(),

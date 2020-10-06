@@ -148,7 +148,7 @@ export default class AddOldXfdTask extends TaskItemController {
 		if ( this.model.aborted ) return rejection("aborted");
 
 		// Check there's a corresponding nominated page, and that page exists
-		const pageName = this.model.discussion.getResolvedTalkpagesNames().find(talkpageName => talkpageName === page.title);
+		const pageName = this.model.getResolvedTalkpagesNames().find(talkpageName => talkpageName === page.title);
 		const pageTitle = pageName && mw.Title.newFromText(pageName);
 		if ( !pageTitle ) {
 			return rejection("unexpectedTitle");

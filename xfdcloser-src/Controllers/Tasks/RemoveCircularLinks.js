@@ -21,7 +21,7 @@ export default class RemoveCircularLinks extends TaskItemController {
 		const targets = this.targets;
 		return this.model.getPageResults()
 			.filter(pageResult => {
-				const resolvedPageName = this.model.discussion.getResolvedPageName(pageResult.pageName);
+				const resolvedPageName = this.model.discussion.redirects.resolveOne(pageResult.pageName);
 				return !targets.includes(resolvedPageName);
 			})
 			.map(pageResult => pageResult.pageName);

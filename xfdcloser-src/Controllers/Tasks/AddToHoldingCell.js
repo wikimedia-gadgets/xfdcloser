@@ -56,7 +56,7 @@ export default class AddToHoldingCell extends TaskItemController {
 		let moduleCount = 0;
 
 		this.model.getPageResults().forEach(pageResult => {
-			const pageName = this.model.discussion.getResolvedPageName(pageResult.pageName);
+			const pageName = this.model.discussion.redirects.resolveOne(pageResult.pageName);
 			const pageTitle = mw.Title.newFromText(pageName);
 			const options = this.model.options.getOptionValues(pageResult.selectedResultName);
 			const hasCorrectNamespace = this.model.venue.ns_number.includes(pageTitle.getNamespaceId());

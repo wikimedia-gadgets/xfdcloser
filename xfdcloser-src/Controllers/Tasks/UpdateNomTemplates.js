@@ -44,7 +44,7 @@ export default class UpdateNewLogPage extends TaskItemController {
 	doTask() {
 		if ( this.aborted ) return rejection("Aborted");
 
-		const pageNames = this.discussion.getResolvedPagesNames().map(moduleToDoc);
+		const pageNames = this.model.getResolvedPageNames().map(moduleToDoc);
 		this.model.setTotalSteps(pageNames.length);
 		this.model.setDoing();
 		return this.api.editWithRetry(

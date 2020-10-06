@@ -49,11 +49,11 @@ export default class Redirect extends TaskItemController {
 		);
 		return this.model.getPageResults()
 			.filter(pageResult => {
-				const resolvedPageName = this.model.discussion.getResolvedPageName(pageResult.pageName);
+				const resolvedPageName = this.model.discussion.redirects.resolveOne(pageResult.pageName);
 				return !targets.includes(resolvedPageName);
 			})
 			.map(pageResult => new Redirection({
-				from: this.model.discussion.getResolvedPageName(pageResult.pageName),
+				from: this.model.discussion.redirects.resolveOne(pageResult.pageName),
 				to: normalisePageName(pageResult.targetPageName),
 				deleteFirst: pageResult.isDeleteFirst(),
 				isSoft: pageResult.isSoft(),

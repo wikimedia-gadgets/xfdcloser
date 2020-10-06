@@ -89,7 +89,8 @@ class MainWindowController {
 					if ( this.model.discussion.venue.expectRedirects ) {
 						return 0;
 					}
-					return this.model.sanityChecks.getRedirections({setExistences: true});
+					const redirections = this.model.sanityChecks.getRedirections({setExistences: true});
+					this.model.discussion.setRedirects(redirections);
 				})
 				.next(() => {
 					this.model.startTasks();

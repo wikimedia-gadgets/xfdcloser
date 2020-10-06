@@ -24,7 +24,7 @@ export default class RemoveNomTemplates extends TaskItemController {
 		if ( context.aborted ) return rejection("aborted");
 
 		// Check there's a corresponding nominated page
-		const unresolvedPageName = context.model.discussion.getUnresolvedPageName(docToModule(page.title));
+		const unresolvedPageName = context.model.discussion.redirects.unresolveOne(docToModule(page.title));
 		const title = context.model.discussion.pages.find(
 			page => page.getPrefixedText() === unresolvedPageName
 		);

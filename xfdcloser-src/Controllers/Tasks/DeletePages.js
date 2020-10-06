@@ -28,7 +28,7 @@ export default class DeletePages extends TaskItemController {
 	doTask() {
 		this.model.setTotalSteps(this.model.discussion.pages.length);
 		this.model.setDoing();
-		const pagesToDelete = this.model.discussion.getResolvedPagesNames()
+		const pagesToDelete = this.model.getResolvedPageNames()
 			.filter(pageName => this.verifyPage(pageName));
 
 		if ( pagesToDelete.length === 0 ) {

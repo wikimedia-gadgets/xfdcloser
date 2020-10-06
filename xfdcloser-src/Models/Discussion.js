@@ -1,5 +1,6 @@
 
-import { mw, OO } from "../../globals";
+import { OO } from "../../globals";
+import RedirectList from "./RedirectList";
 import { makeLink, encodeForWikilinkFragment } from "../util";
 // <nowiki>
 class Discussion {
@@ -23,7 +24,7 @@ class Discussion {
 		this.id = config.id;
 		this.venue = config.venue;
 		this.pages = config.pages || [];
-		this.redirects = [];
+		this.redirects = new RedirectList();
 		this.discussionPageName = config.discussionPageName;
 		this.sectionHeader = config.sectionHeader;
 		this.sectionNumber = config.sectionNumber;
@@ -66,60 +67,8 @@ class Discussion {
 		return this.talkpages.map(page => page.getPrefixedText());
 	}
 
-	/**
-	 * Get page name, resolved to the target page if it is a redirect.
-	 * 
-	 * @param {String[]} [pagesNames] names of pages, or omit to use all pages
-	 * @returns {String[]} resolved page names
-	 */
-	getResolvedPageName(pageName) {
-		const redirect = this.redirects.find(redirect => redirect.from === pageName);
-		return redirect ? redirect.to : pageName;
-	}
-
-	/**
-	 * Get page names, with redirects resolved to their target page.
-	 * 
-	 * @param {String[]} [pagesNames] names of pages, or omit to use all pages
-	 * @returns {String[]} resolved page names
-	 */
-	getResolvedPagesNames(pagesNames) {
-		pagesNames = pagesNames || this.pagesNames;
-		return pagesNames.map(pageName => this.getResolvedPageName(pageName));
-	}
-
-	/**
-	 * Resolve redirects resolved to their target page, then get their talk
-	 * page names. Filters out pages which are themselves talk pages, or which
-	 * cannot have talk pages.
-	 * 
-	 * @param {String[]} [pagesNames] names of pages, or omit to use all pages
-	 * @returns {String[]} resolved talk page names
-	 */
-	getResolvedTalkpagesNames(pagesNames) {
-		return this.getResolvedPagesNames(pagesNames)
-			.map(pageName => {
-				const title = mw.Title.newFromText(pageName);
-				return title && title.canHaveTalkPage() && !title.isTalkPage() && title.getTalkPage().getPrefixedText();
-			})
-			.filter(t => !!t);
-	}
-
-	/**
-	 * 
-	 * @param {String} pageName
-	 * @returns {String} unresolved page name
-	 */
-	getUnresolvedPageName(pageName) {
-		const redirect = this.redirects.find(redirect => redirect.to === pageName);
-		return redirect ? redirect.from : pageName;
-	}
-
-	setRedirects(redirects) {
-		this.redirects = Array.isArray(redirects) ? redirects : [];
-		this.redirects.forEach(redirect => {
-			mw.Title.exist.set(mw.Title.newFromText(redirect.to).getPrefixedDb(), true);
-		});
+	setRedirects(redirections) {
+		this.redirects = new RedirectList(redirections);
 	}
 
 	setRelistInfo(relistInfo) {

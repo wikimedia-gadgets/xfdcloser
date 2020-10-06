@@ -33,7 +33,7 @@ export default class Disambiguate extends TaskItemController {
 	}
 
 	doTask() {
-		const pageNames = this.model.getResolvedPagesNames();
+		const pageNames = this.model.getResolvedPageNames();
 		if ( pageNames.length === 0 ) {
 			this.model.addWarning("None found");
 			return rejection();
