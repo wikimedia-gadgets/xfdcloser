@@ -59,6 +59,8 @@ export default class  UnlinkBacklinks extends TaskItemController {
 				iuredirect: 1,
 				iutitle: pageName
 			};
+		} else {
+			return query;
 		}
 	}
 
