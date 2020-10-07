@@ -56,7 +56,7 @@ class UnlinkWindowController {
 			this.model.startTask();
 		} else if ( action === "abort" ) {
 			this.model.abortTask();
-		} else if ( !action && this.model.canClose ) {
+		} else if ( (!action || action === "close") && this.model.canClose ) {
 			this.window.close();
 		}
 		return new OO.ui.Process();
