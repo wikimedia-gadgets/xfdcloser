@@ -12,7 +12,7 @@ export default class Disambiguate extends TaskItemController {
 		// Check if aborted, and if there's a corresponding nominated page, and the page exists
 		if ( this.model.aborted ) {
 			return rejection("aborted");
-		} else if ( !this.model.getResolvedPagesNames().includes(docToModule(page.title)) ) {
+		} else if ( !this.model.getResolvedPageNames().includes(docToModule(page.title)) ) {
 			return rejection("unexpectedTitle");
 		} else if ( page.missing ) {
 			return rejection("doesNotExist");
