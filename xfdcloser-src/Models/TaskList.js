@@ -273,7 +273,7 @@ class TaskList {
 
 	makeItemsForRelist() {
 		const relistInfoTask = new TaskItem({
-			taskName: "CloseDiscussion",
+			taskName: "GetRelistInfo",
 			discussion: this.discussion,
 			result: this.result,
 		});
@@ -310,6 +310,9 @@ class TaskList {
 	startTasks() {
 		if ( this.started ) { return false; }
 		this.started = true;
+		if (!this.getItems().length) {
+			this.resetItems();
+		}
 		this.getItems()[0].start(); //forEach(item => item.start());
 		this.emit("update");
 	}
