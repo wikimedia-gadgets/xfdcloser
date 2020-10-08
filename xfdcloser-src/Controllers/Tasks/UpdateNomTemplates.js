@@ -13,7 +13,7 @@ export default class UpdateNewLogPage extends TaskItemController {
 		if ( this.aborted ) return rejection("Aborted");
 
 		// Check there's a corresponding nominated page
-		const pageName = this.model.discussion.getResolvedPagesNames().find(pagename => pagename === docToModule(page.title));
+		const pageName = this.model.getResolvedPageNames().find(pagename => pagename === docToModule(page.title));
 		if ( !pageName ) {
 			return rejection("unexpectedTitle");
 		}

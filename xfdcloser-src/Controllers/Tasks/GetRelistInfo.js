@@ -1,4 +1,5 @@
 import { $, mw } from "../../../globals";
+import config from "../../config";
 import TaskItemController from "../TaskItemController";
 import { rejection, ymdDateString, makeLink } from "../../util";
 // <nowiki>
@@ -36,12 +37,12 @@ export default class RelistInfo extends TaskItemController {
 			: { ...queryBase, rvsection: this.model.discussion.sectionNumber };
 	}
 
-	getrelistTemplate(content) {
+	getRelistTemplate(content) {
 		const relists = content.match(
 			/\[\[Wikipedia:Deletion process#Relisting discussions\|Relisted\]\]/g
 		);
 		const relistNumber = relists ? relists.length + 1 : 1;
-		return `{{subst:Relist|1=${this.mode.result.getRelistComment()}|2=${relistNumber}}}`;	
+		return `{{subst:Relist|1=${this.model.result.getRelistComment()}|2=${relistNumber}}}`;	
 	}
 
 	/**
@@ -51,7 +52,7 @@ export default class RelistInfo extends TaskItemController {
 	getRelistWikitext(content) {
 		const heading = content.slice(0, content.indexOf("\n"));
 		// Wikitext for new/relisted discussion
-		let newWikitext = content.trim() + `\n${this.relistTemplate(content)}\n`;
+		let newWikitext = content.trim() + `\n${this.getRelistTemplate(content)}\n`;
 		// Wikitext for old log page
 		let oldLogWikitext = "";
 
@@ -70,7 +71,7 @@ export default class RelistInfo extends TaskItemController {
 				.replace(/__RESULT__/, "relisted")
 				.replace(/__TO_TARGET__/, ` on [[${this.todaysLogpage}#${this.model.discussion.sectionHeader}|${RelistInfo.today}]]`)
 				.replace(/__RATIONALE__/, ".")
-				.replace(/__SIG__/, this.appConfig.user.sig);
+				.replace(/__SIG__/, config.user.sig);
 			// List of nominated pages
 			const pagesList = this.model.discussion.pages.map(
 				page => this.model.venue.wikitext.pagelinks.replace(
