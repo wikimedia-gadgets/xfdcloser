@@ -31,6 +31,7 @@ export default class UpdateNewLogPage extends TaskItemController {
 		if ( /(tfd|rfd|cfd)/.test(this.venue.type) ) {
 			params.section = relistInfo.newLogSection;
 		}
+		return params;
 	}
 
 	doTask() {

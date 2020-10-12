@@ -24,6 +24,7 @@ export default class UpdateDiscussion extends TaskItemController {
 		if ( this.model.venue.type === "mfd" ) {
 			params.section = this.model.discussion.sectionNumber;
 		}
+		return params;
 	}
 
 	doTask() {
