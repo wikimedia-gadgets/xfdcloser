@@ -154,6 +154,9 @@ export default class RelistInfo extends TaskItemController {
 	}
 
 	getNewLogInfo(page, curtimestamp) {
+		if (page.missing) {
+			return rejection("abort", "Today's log page does not yet exist");
+		}
 		const newLogTimestamps = {
 			start: curtimestamp,
 			base: page.revisions[0].timestamp
