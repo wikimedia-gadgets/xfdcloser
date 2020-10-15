@@ -170,7 +170,13 @@ class TaskItem {
 	 */
 	setPrecedingTask(task, requiredState) {
 		this.precedingTask = { task, requiredState };
-		task.connect(this, { "update": ["emit", "update"] });
+		task.connect(this, { "update": "onPrecedingTaskUpdate"});
+	}
+	onPrecedingTaskUpdate() {
+		if (this.canProceed()) {
+			this.start();
+		}
+		this.emit("update");
 	}
 	canProceed() {
 		if ( !this.precedingTask ) {
