@@ -17,8 +17,8 @@ export default class UpdateNewLogPage extends TaskItemController {
 			action: "edit",
 			title,
 			summary: `Relisting ${this.model.venue.type === "afd"
-				? `[[:${this.discussion.discussionPageName}]]`
-				: `"${this.discussion.sectionHeader}"`
+				? `[[:${this.model.discussion.discussionPageName}]]`
+				: `"${this.model.discussion.sectionHeader}"`
 			} ${config.script.advert}`,
 		};
 		params[relistInfo.newLogEditType] = this.model.venue.type === "afd"
@@ -28,7 +28,7 @@ export default class UpdateNewLogPage extends TaskItemController {
 			params.basetimestamp = relistInfo.newLogTimestamps.base;
 			params.starttimestamp = relistInfo.newLogTimestamps.start;
 		}
-		if ( /(tfd|rfd|cfd)/.test(this.venue.type) ) {
+		if ( /(tfd|rfd|cfd)/.test(this.model.venue.type) ) {
 			params.section = relistInfo.newLogSection;
 		}
 		return params;
