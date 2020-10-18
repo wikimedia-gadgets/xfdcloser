@@ -9,9 +9,10 @@ import DiscussionView from "./Views/DiscussionView";
 	// Quick checks that script should be running
 	if (
 		!config.mw.wgUserGroups.includes("extendedconfirmed") &&
-		!config.mw.wgUserGroups.includes("sysop")
+		!config.mw.wgUserGroups.includes("sysop") &&
+		config.mw.wgDBname !== "testwiki"
 	) {
-		// User is not extendedconfirmed or sysop
+		// User is not extendedconfirmed, nor sysop, nor on testwiki
 		return;
 	}
 

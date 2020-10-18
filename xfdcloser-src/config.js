@@ -8,7 +8,8 @@ let mwConfig = mw.config.get( [
 	"wgPageName",
 	"wgUserGroups",
 	"wgFormattedNamespaces",
-	"wgArticleId"
+	"wgArticleId",
+	"wgDBname"
 ] );
 // Set custom version of namespaces with description for namespace 0
 mwConfig.namespaces = $.extend({}, mwConfig.wgFormattedNamespaces, {0: "article"});
