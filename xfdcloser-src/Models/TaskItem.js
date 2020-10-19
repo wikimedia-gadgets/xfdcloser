@@ -54,7 +54,7 @@ class TaskItem {
 		return 100 * ( this.steps.completed + this.steps.skipped ) / this.steps.total;
 	}
 	get showProgressBar() {
-		return !this.done && !this.aborted;
+		return !this.done && !this.aborted && !this.failed;
 	}
 	get resultsByPage() {
 		return {}; // TODO... if needed
@@ -83,7 +83,7 @@ class TaskItem {
 		return message ? `${this.displayName}: ${message}` : this.displayName;
 	}
 	get notices() {
-		if ( this.aborted || this.done ) {
+		if ( this.aborted || this.done || this.failed ) {
 			return [];
 		} else if ( !this.started ) {
 			return ["Waiting..."];

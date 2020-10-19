@@ -416,6 +416,16 @@ describe("TaskItem", function() {
 			taskItem.setDone();
 			assert.strictEqual(taskItem.done, true);
 		});
+		it("sets the failed property when all staps fail", function() {
+			assert.strictEqual(taskItem.done, false);
+			taskItem.trackStep("failed");
+			taskItem.trackStep("failed");
+			taskItem.setDone();
+			assert.strictEqual(taskItem.failed, true, "failed===true");
+			assert.strictEqual(taskItem.done, false, "done===false");
+			assert.strictEqual(taskItem.showProgressBar, false, "showProgressBar===false");
+			assert.deepStrictEqual(taskItem.notices, [], "notices is empty");
+		});
 		it("does not show progress bar", function() {
 			taskItem.trackStep();
 			taskItem.trackStep();
