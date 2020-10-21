@@ -27,6 +27,9 @@ class API extends mw.Api {
 	 * @returns {Promise} resolved if all edits were successful, rejected if there were failures
 	 */
 	editWithRetry(titles, getParams, transform, onEachSuccess, onEachFail) {
+		if (!titles || titles.length === 0) {
+			throw new Error("No titles specified for editWithRetry");
+		}
 		getParams = getParams || {};
 		const watchlist = prefs.get("watchlist");
 		const processPage = (page, starttime) => {
