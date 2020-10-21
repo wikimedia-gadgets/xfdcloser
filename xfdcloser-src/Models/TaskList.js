@@ -107,8 +107,8 @@ class TaskList {
 					options: this.options
 				})
 			);
-			const notSoftRedirectPageResults = redirectActionPageResults.filter(result => !result.isSoft);
-			if (!notSoftRedirectPageResults.length) {
+			const notSoftRedirectPageResults = redirectActionPageResults.filter(result => !result.isSoft());
+			if (notSoftRedirectPageResults.length) {
 				tasks.push(
 					new TaskItem({
 						taskName: "RemoveCircularLinks",
