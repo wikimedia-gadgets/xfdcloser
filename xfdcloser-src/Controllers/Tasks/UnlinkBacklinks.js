@@ -1,6 +1,6 @@
 import { $ } from "../../../globals";
 import TaskItemController from "../TaskItemController";
-import { multiButtonConfirm, recursiveMerge, rejection, uniqueArray, multiCheckboxMessageDialog, makeLink, isFile } from "../../util";
+import { multiButtonConfirm, recursiveMerge, rejection, uniqueArray, multiCheckboxMessageDialog, isFile } from "../../util";
 // <nowiki>
 
 
@@ -91,7 +91,7 @@ export default class  UnlinkBacklinks extends TaskItemController {
 	 * @returns {Promise} Edits attempted or completed for each selected page name
 	 */
 	processSelection(selection) {
-		if ( this.aborted ) {
+		if ( this.model.aborted ) {
 			return rejection("aborted");
 		} else if ( !selection || selection.action !== "accept" ) {
 			this.model.addWarning("Cancelled by user");
@@ -134,11 +134,11 @@ export default class  UnlinkBacklinks extends TaskItemController {
 	 * @returns {Promise<Object<string,string|number>} Edit parameters
 	 */
 	transform(page) {
-		if (this.aborted) return rejection("aborted");
+		if (this.model.aborted) return rejection("aborted");
 
 		const newWikitext = extraJs.unlink(
 			page.content,
-			[...this.pages.map(page => page.getPrefixedText()), ...this.redirectTitles],
+			[...this.model.getResolvedPageNames(), ...this.redirectPageNames],
 			page.ns,
 			!!page.categories
 		);
@@ -171,7 +171,7 @@ export default class  UnlinkBacklinks extends TaskItemController {
 	 * @returns {Promise} {String} updated wikitext, {Boolean} Edit should be considered major
 	 */
 	processListItems(pageTitle, wikitext, isMajorEdit) {
-		if ( this.aborted ) return rejection("aborted");
+		if ( this.model.aborted ) return rejection("aborted");
 
 		// Find lines needing review - those marked with {{subst:void}}
 		var linesToReview = /^{{subst:void}}(.*)$/m.exec(wikitext);
@@ -190,15 +190,13 @@ export default class  UnlinkBacklinks extends TaskItemController {
 				.replace(/\[\[([^|\]]*?)\]\]/, "$1");
 
 		// Prompt user
-		const messages = [
-			"<p>A backlink has been removed from the following list item:</p>",
-			`<strong>List:</strong> [[${heading ? pageTitle + "#" + heading : pageTitle}]]`,
-			`<pre>${linesToReview[1]}</pre>`,
-			`<p>Please check if the item matches the list's ${makeLink("WP:LISTCRITERIA", "selection criteria")} before deciding to keep or remove the item from the list.</p>`
-		];
+		const message = `<p>A backlink has been removed from the following list item:</p>
+<strong>List:</strong> [[${heading ? pageTitle + "#" + heading : pageTitle}]]
+<pre>${linesToReview[1]}</pre>
+<p>Please check if the item matches the list's [[WP:LISTCRITERIA|selection criteria]] before deciding to keep or remove the item from the list.</p>`;
 		return this.queueMultiButtonConfirm({
 			title: "Review unlinked list item",
-			message: messages.join(""),
+			message: message,
 			actions: [
 				{ label:"Keep item", action:"keep", icon:"articleCheck", flags:"progressive" },
 				{ label:"Keep and request citation", action:"keep-cite", icon:"flag" },
@@ -248,7 +246,7 @@ export default class  UnlinkBacklinks extends TaskItemController {
 			return Array.prototype.slice.call(arguments).reduce(recursiveMerge);
 		}).then(result => {
 			this.model.setDoing();
-			if ( this.aborted ) {
+			if ( this.model.aborted ) {
 				return rejection("aborted");
 			}
 			if ( !result.imageusage ) {
