@@ -108,7 +108,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		// Filter out targets which are also nominated pages
 		const mergersToNotNominatedPages = mergers.filter(merger => !merger.isNominatedPage);
 
-		this.model.setTotalSteps(this.model.pageTitles.length + mergersToNotNominatedPages.length);
+		this.model.setTotalSteps(this.model.pageNames.length + mergersToNotNominatedPages.length);
 		this.model.setDoing();
 
 		// Edit the talk pages of the merge targets which are not nominated pages
