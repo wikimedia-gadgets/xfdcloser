@@ -57,7 +57,7 @@ export default class Redirect extends TaskItemController {
 				to: normalisePageName(pageResult.targetPageName),
 				deleteFirst: pageResult.isDeleteFirst(),
 				isSoft: pageResult.isSoft(),
-				options: this.model.options.getOptionValues(pageResult.name)
+				options: this.model.options.getOptionValues(pageResult.resultName)
 			}));
 	}
 
@@ -71,7 +71,7 @@ export default class Redirect extends TaskItemController {
 
 		let text;
 		const rcatshell = redirection.rcats && redirection.rcats.length
-			? `\n\n{{Rcat shell|\n${redirection.options.rcats.join("\n")}\n}}`
+			? `\n\n{{Rcat shell|\n${redirection.rcats.join("\n")}\n}}`
 			: "";
 		if ( isModule(redirection.from) ) {
 			if ( !isModule(redirection.to)) {

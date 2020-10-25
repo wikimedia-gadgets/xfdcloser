@@ -24,7 +24,7 @@ const widgets = {
 	emit: ()=>{}
 };
 
-describe("Disambiguate", function() {
+describe("Redirect", function() {
 	let discussion, result, options, model, task;
 	beforeEach(function() {
 		discussion = new Discussion({
@@ -69,7 +69,7 @@ describe("Disambiguate", function() {
 			to: "Qux",
 			deleteFirst: false,
 			isSoft: false,
-			rcats: options.getOptions("redirect").rcats
+			rcats: ["{{R to related topic}}"]
 		});
 	});
 	it("transforms redirection into edit parameters", function() {
@@ -78,7 +78,34 @@ describe("Disambiguate", function() {
 			throw new Error("returned a promise");
 		}
 		assert.deepStrictEqual(Object.keys(transformed), ["text", "summary"]);
+		assert.strictEqual(transformed.text, "#REDIRECT [[Qux]]\n\n{{Rcat shell|\n{{R to related topic}}\n}}");
+	});
+	it("transforms redirection without rcats into edit parameters", function() {
+		const redirection = task.redirections[0];
+		redirection.rcats = null;
+		const transformed = task.transform(redirection);
+		if (transformed.then) {
+			throw new Error("returned a promise");
+		}
+		assert.deepStrictEqual(Object.keys(transformed), ["text", "summary"]);
 		assert.strictEqual(transformed.text, "#REDIRECT [[Qux]]");
+		redirection.rcats = [];
+		const transformed2 = task.transform(redirection);
+		if (transformed2.then) {
+			throw new Error("returned a promise");
+		}
+		assert.deepStrictEqual(Object.keys(transformed2), ["text", "summary"]);
+		assert.strictEqual(transformed2.text, "#REDIRECT [[Qux]]");
+	});
+	it("transforms redirection with multiple rcats into edit parameters", function() {
+		const redirection = task.redirections[0];
+		redirection.rcats = ["{{R to foo}}", "{{R from bar}}"];
+		const transformed = task.transform(redirection);
+		if (transformed.then) {
+			throw new Error("returned a promise");
+		}
+		assert.deepStrictEqual(Object.keys(transformed), ["text", "summary"]);
+		assert.strictEqual(transformed.text, "#REDIRECT [[Qux]]\n\n{{Rcat shell|\n{{R to foo}}\n{{R from bar}}\n}}");
 	});
 	it("transforms soft redirection into edit parameters", function() {
 		result.singleModeResult.setSoftResult(true);
@@ -95,7 +122,7 @@ describe("Disambiguate", function() {
 			throw new Error("returned a promise");
 		}
 		assert.deepStrictEqual(Object.keys(transformed), ["text", "summary"]);
-		assert.strictEqual(transformed.text, "{{Soft redirect|Qux}}");
+		assert.strictEqual(transformed.text, "{{Soft redirect|Qux}}\n\n{{Rcat shell|\n{{R to related topic}}\n}}");
 	});
 	it("transforms module redirection into edit parameters", function() {
 		discussion.pages = [mw.Title.newFromText("Module:Foobar")];
