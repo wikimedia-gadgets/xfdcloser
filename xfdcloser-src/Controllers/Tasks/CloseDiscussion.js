@@ -53,7 +53,7 @@ export default class CloseDiscussion extends TaskItemController {
 
 		const xfd_close_top = this.model.venue.wikitext.closeTop
 			.replace(/__RESULT__/, this.model.result.getResultText() || "&thinsp;")
-			.replace(/__TO_TARGET__/, this.model.result.getFormattedTarget({prepend: "to "}))
+			.replace(/__TO_TARGET__/, this.model.result.getFormattedTarget({prepend: " to "}))
 			.replace(/__RATIONALE__/, this.model.result.getFormattedRationale("punctuated") || ".")
 			.replace(/__SIG__/, config.user.sig);
 		const section_content = page.content
