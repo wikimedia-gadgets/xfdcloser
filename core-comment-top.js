@@ -15,6 +15,6 @@
  * Author: Evad37
  * Licencing and attribution: [[WP:XFDC#Licencing and attribution]]
  */
-/* jshint esversion: 5, laxbreak: true, undef: true, eqnull: true, maxerr: 3000 */
+/* jshint esversion: 5, esnext:false, laxbreak: true, undef: true, eqnull: true, maxerr: 3000 */
 /* globals console, document, window, $, mw, OO, extraJs, Morebits */
 /* <nowiki> */
