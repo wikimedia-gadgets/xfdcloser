@@ -1,6 +1,7 @@
 import { $, OO } from "../../globals";
 import { makeLink, rejection } from "../util";
 import API from "../api";
+import * as prefs from "../prefs";
 // <nowiki>
 
 function toSmallSnippet(content) {
@@ -21,6 +22,35 @@ class TaskItemController {
 		this._doingTask = false;
 
 		this.model.connect(this, {update: "updateFromModel"});
+		
+		if (this.widget.showAllWarningsButton && this.widget.showAllErrorsButton) {
+			this.widget.showAllWarningsButton.connect(this, {click: "onShowWarningsButtonClick"});
+			this.widget.showAllErrorsButton.connect(this, {click: "onShowErrorsButtonClick"});
+		}
+	}
+
+	makeWarnings() {
+		if (this.model.showOverflowWarnings || this.model.warnings.length < prefs.get("collapseWarnings")) {
+			return this.model.warnings.map(toSmallSnippet);
+		} else {
+			return [];
+		}
+	}
+	onShowWarningsButtonClick() {
+		this.model.showOverflowWarnings = true;
+		this.updateFromModel();
+	}
+
+	makeErrors() {
+		if (this.model.showOverflowErrors || this.model.errors.length < prefs.get("collapseErrors")) {
+			return this.model.errors.map(toSmallSnippet);
+		} else {
+			return [];
+		}
+	}
+	onShowErrorsButtonClick() {
+		this.model.showOverflowErrors = true;
+		this.updateFromModel();
 	}
 
 	updateFromModel() {
@@ -30,8 +60,14 @@ class TaskItemController {
 		this.widget.progressbar.setProgress(this.model.progress);
 		this.widget.progressbar.toggle(this.model.showProgressBar);
 		this.widget.field.setNotices(this.model.notices.map(toSmallSnippet));
-		this.widget.field.setWarnings(this.model.warnings.map(toSmallSnippet));
-		this.widget.field.setErrors(this.model.errors.map(toSmallSnippet));
+		this.widget.field.setWarnings(this.makeWarnings());
+		this.widget.field.setErrors(this.makeErrors());
+		if (this.widget.showAllWarningsButton && this.widget.showAllErrorsButton) {
+			this.widget.showAllWarningsButton.toggle(!this.model.showOverflowWarnings && this.model.warnings.length >= prefs.get("collapseWarnings"));
+			this.widget.showAllWarningsButton.setLabel(`Show ${this.model.warnings.length} warnings`);
+			this.widget.showAllErrorsButton.toggle(!this.model.showOverflowErrors && this.model.errors.length >= prefs.get("collapseErrors"));
+			this.widget.showAllErrorsButton.setLabel(`Show ${this.model.errors.length} errors`);
+		}
 		this.widget.emit("update");
 
 		if ( this.model.starting && !this._doingTask && this.model.canProceed() ) {

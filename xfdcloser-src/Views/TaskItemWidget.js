@@ -45,6 +45,16 @@ function TaskItemWidget(model) {
 		$element: this.$element
 	});
 	this.$element.find(".oo-ui-fieldLayout-messages").css("clear","both");
+	this.showAllWarningsButton = new OO.ui.ButtonWidget({
+		label: "Show warnings",
+		icon: "alert"
+	});
+	this.showAllErrorsButton = new OO.ui.ButtonWidget({
+		label: "Show errors",
+		icon: "error",
+		flags: "destructive"
+	});
+	this.$element.append(this.showAllWarningsButton.$element, this.showAllErrorsButton.$element);
 
 	// Controller
 	this.controller = new controllers[model.taskName](model, this);

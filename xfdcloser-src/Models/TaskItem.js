@@ -28,7 +28,9 @@ class TaskItem {
 		this.displayName = config.displayName;
 		this.summary = config.summary;
 		this.warnings = [];
+		this.showOverflowWarnings = false;
 		this.errors = [];
+		this.showOverflowErrors = false;
 		this.steps = {
 			total: 0,
 			completed: 0,
