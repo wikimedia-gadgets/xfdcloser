@@ -18,6 +18,8 @@ export default class AddOldXfdTask extends TaskItemController {
 	makeOldxfdWikitext(altpage) {
 		var result = this.model.venue.wikitext.oldXfd
 			.replace(/__DATE__/, dmyDateString(this.model.discussion.nominationDate))
+			.replace(/__DATE_YMD__/, ymdDateString(this.model.discussion.nominationDate))
+			.replace(/__ACTION__/, this.model.discussion.action)
 			.replace(/__SECTION__/, this.model.discussion.sectionHeader)
 			.replace(/__RESULT__/, this.model.result.getResultText())
 			.replace(/__FIRSTDATE__/, dmyDateString(this.model.discussion.firstCommentDate))

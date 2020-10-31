@@ -162,6 +162,7 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 	}
 	var pages = [];
 	var firstDate;
+	var action = "";
 	if (venue.type === "cfd") {
 		//CFDs: Nominates pages are the first link of an <li> item in a <ul> list, within a <dl> list
 		pages = $heading
@@ -182,6 +183,14 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 				.not(".external")
 				.map(function () { return mw.Title.newFromText($(this).text()); })
 				.get();
+		}
+		// Try to find the proposed action
+		const $action = $heading
+			.next()
+			.find("dd > ul > li > b")
+			.first();
+		if ($action.length) {
+			action = $action.text().replace(/propose /i, "");
 		}
 	}
 	else if (venue.type === "rfd" || venue.type === "mfd") {
@@ -275,6 +284,7 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 		id: "XFDC" + headingIndex,
 		venue,
 		pages,
+		action,
 		discussionPageName: nompage,
 		sectionHeader,
 		sectionNumber: editsection,

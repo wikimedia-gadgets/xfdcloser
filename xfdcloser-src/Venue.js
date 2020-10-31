@@ -88,7 +88,7 @@ Venue.Cfd = () => {
 		wikitext: {
 			closeTop:		"{{subst:cfd top}} '''__RESULT__'''__TO_TARGET____RATIONALE__ __SIG__",
 			closeBottom:	"{{subst:cfd bottom}}",
-			oldXfd:			"{{Old CfD |__SECTION__ |date=__DATE__ |action=__ACTION__ "+
+			oldXfd:			"{{Old CfD |__SECTION__ |date=__DATE_YMD__ |action=__ACTION__ "+
 				"|result=__RESULT__}}\n",
 			alreadyClosed:	"<!-- Template:Cfd top -->",
 			relistReplace:	" full|day=__DAY__|month=__MONTH__|year=__YEAR__",			

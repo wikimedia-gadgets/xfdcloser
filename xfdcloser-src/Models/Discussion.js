@@ -24,6 +24,7 @@ class Discussion {
 		this.id = config.id;
 		this.venue = config.venue;
 		this.pages = config.pages || [];
+		this.action = config.action || "";
 		this.redirects = new RedirectList();
 		this.discussionPageName = config.discussionPageName;
 		this.sectionHeader = config.sectionHeader;
