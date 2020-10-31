@@ -17,7 +17,7 @@ const resultsData = [
 	{
 		name: "delete",
 		label: "Delete",
-		title: "Close discussion as \"deep\"",
+		title: "Close discussion as \"delete\"",
 		allowSpeedy: true,
 		allowSoft: true,
 		sysopOnly: true,
