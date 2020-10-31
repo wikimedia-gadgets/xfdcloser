@@ -579,10 +579,10 @@ const prefs = [{
 		data: "watch",
 		label: "Always"
 	}, {
-		data: "preferences",
+		data: "nochange",
 		label: "Never"
 	}],
-	help: "Default behaviour depends on your \"Add pages and files I edit to my watchlist\" setting in Special:Preferences",
+	help: "Default behaviour follows your \"Watched pages\" settings in Special:Preferences § Watchlist",
 	default: "preferences"
 }, {
 	name: "tfdDeleteAction",
