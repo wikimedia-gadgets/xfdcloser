@@ -96,7 +96,8 @@ Venue.Cfd = () => {
 		regex: {
 			nomTemplate:	/<!--\s*BEGIN CFD TEMPLATE\s*-->(?:.|\n)+<!--\s*END CFD TEMPLATE\s*-->\n*/gi,
 			relistPattern:	/ full\|day=\d\d?\|month=\w+\|year=\d{4}/gi
-		}
+		},
+		relistTasks:		["UpdateOldLogPage", "UpdateNewLogPage", "UpdateNomTemplates"]
 	});
 	// Override prototype
 	cfdVenue.updateNomTemplateAfterRelist = function(wikitext, today, /*_sectionHeader*/) {
