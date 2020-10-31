@@ -3,6 +3,8 @@ $.when(
 	mw.loader.using([
 		"mediawiki.util", "mediawiki.api", "mediawiki.Title",
 		"oojs-ui-core", "oojs-ui-widgets", "oojs-ui-windows",
+		"oojs-ui.styles.icons-interactions", "oojs-ui.styles.icons-content",
+		"oojs-ui.styles.icons-moderation", "oojs-ui.styles.icons-alerts"
 	]),
 	mw.loader.using("ext.gadget.libExtraUtil").catch(function() { console.log("libExtraUtil not loaded"); }),
 	// Page ready
