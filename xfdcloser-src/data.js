@@ -206,7 +206,7 @@ const resultsData = [
 		label: "Custom",
 		title: "Close discussion with a custom result",
 		sysopOnly: true,
-		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
+		venues: ["afd", "ffd", "mfd", "rfd", "tfd"],
 		actions: ["updatePages", "deletePages", "noActions"]
 	},
 	// Custom (sysop, CFD)
