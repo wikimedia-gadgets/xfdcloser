@@ -69,7 +69,7 @@ Venue.Mfd = () => new Venue("mfd", {
             "{{collapse bottom}}|}}"
 	},
 	regex: {
-		nomTemplate:	/(?:<noinclude>\s*)?(?:{{mfd[^}}]*}}|<span id="mfd".*?<\/span>&nbsp;\[\[Category:Miscellaneous pages for deletion\|?.*\]\]\s*)(?:\s*<\/noinclude>)?/gi
+		nomTemplate:	/(?:<noinclude>\s*)?(?:{{mfd[^}}]*}}|<span id="mfd".*?<\/span>&nbsp;{{#invoke:Noinclude\|noinclude\|text=\[\[Category:Miscellaneous pages for deletion\|{{PAGENAME}}\]\]}}\s*)(?:\s*<\/noinclude>)?/gi
 	},
 	relistTasks:		["UpdateDiscussion"]
 });
