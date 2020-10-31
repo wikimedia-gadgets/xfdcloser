@@ -1,7 +1,9 @@
 import { $, mw, OO } from "../../globals";
 import DiscussionViewController from "../Controllers/DiscussionViewController";
+import { getRelevantResults } from "../data";
 import Discussion from "../Models/Discussion";
 import { dateFromSigTimestamp } from "../util";
+import * as prefs from "../prefs";
 // <nowiki>
 
 function xfdcActionLabel(label) {
@@ -46,21 +48,30 @@ function DiscussionView(model) {
 		title: "Relist discussion...",
 		classes: "xfdc-action"
 	});
-	this.quickCloseMenuOptions = [
-		new OO.ui.MenuOptionWidget( {
-			data: "quickKeep",
-			label: "Quick Keep",
-			title: "close as \"keep\", remove nomination templates, add old xfd templates to talk pages",
-			classes: ["xfdc-menuOptionWidget"]
-		} ),
-		new OO.ui.MenuOptionWidget( {
-			data: "quickDelete",
-			label: "Quick Delete",
-			title: "quickDelete: close as \"delete\", delete nominated pages & their talk pages",
-			classes: ["xfdc-menuOptionWidget"]
-		} )
-	];
-	//const calculatedMenuWidth = Discussion.calculateButtonMenuWidth();
+	const quickKeepMenuOption = new OO.ui.MenuOptionWidget( {
+		data: "quickKeep",
+		label: "Quick Keep",
+		title: "close as \"keep\", remove nomination templates, add old xfd templates to talk pages",
+		classes: ["xfdc-menuOptionWidget"]
+	} );
+	const canQuickDelete = !!getRelevantResults(this.model.venue.type, this.model.userIsSysop).find(resultData => resultData.name === "delete");
+	if (canQuickDelete) {
+		const quickDeleteDescription = !this.model.userIsSysop || (this.model.venue.type === "tfd" && prefs.get("tfdDeleteAction") === "holdingCell")
+			? "list nominated pages for deletion"
+			: "delete nominated pages & their talk pages";
+		this.quickCloseMenuOptions = [
+			quickKeepMenuOption,
+			new OO.ui.MenuOptionWidget( {
+				data: "quickDelete",
+				label: "Quick Delete",
+				title: `quickDelete: close as "delete", ${quickDeleteDescription}`,
+				classes: ["xfdc-menuOptionWidget"]
+			} )
+		];
+	} else {
+		this.quickCloseMenuOptions = [ quickKeepMenuOption ];
+	}
+	
 	this.quickCloseButtonMenu = new OO.ui.ButtonMenuSelectWidget( {
 		framed: false,
 		indicator: "down",
