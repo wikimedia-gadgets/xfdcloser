@@ -206,7 +206,7 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 	}
 	else if (venue.type === "rfd" || venue.type === "mfd") {
 		// For MFD, closed discussion are within a collapsed table
-		$("table.collapsible").has("div.xfd-closed").addClass("xfd-closed");
+		$("table.mw-collapsible").has("div.xfd-closed").addClass("xfd-closed");
 		// MFD & RFD have nominated page links prior to span with classes plainlinks, lx
 		pages = $heading
 			.nextUntil(venue.html.head + ", div.xfd-closed, table.xfd-closed")
