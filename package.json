@@ -1,6 +1,6 @@
 {
   "name": "xfdcloser",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Wikipedia userscript that helps assess pages for WikiProjects",
   "homepage": "https://github.com/evad37/xfdcloser",
   "browser": "index.js",
