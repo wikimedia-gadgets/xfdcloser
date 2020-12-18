@@ -170,7 +170,7 @@ export default class RelistInfo extends TaskItemController {
 			newLogTimestamps,
 			newLogSection: h4 ? 2 : 1,
 			newLogEditType: (h4 && h4.toUpperCase() !== "NEW NOMINATIONS")
-				? "prependText"
+				? "prependtext"
 				: "appendtext"
 		};
 	}
