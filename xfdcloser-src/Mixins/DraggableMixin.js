@@ -25,14 +25,32 @@ function DraggableMixin(/* config */) {
 }
 OO.initClass( DraggableMixin );
 
-DraggableMixin.prototype.makeDraggable = function() {
+/**
+ * Sets up dialog draggabiliy.
+ * 
+ * @param {number} [xi] initial horizontal offset
+ * @param {number} [yi] initial vertical offset
+ */
+DraggableMixin.prototype.makeDraggable = function(xi, yi) {
 	$("body").addClass("ooui-draggbleWindow-open");
 
 	let $frameEl = this.$element.find(".oo-ui-window-frame");
 	let $handleEl = this.$element.find(".oo-ui-processDialog-location").css({"cursor":"move"});
-	// Position for css translate transformations, relative to initial position
-	// (which is centered on viewport when scrolled to top)
-	let position = { x: 0, y: 0 };
+	
+	// Position for css translate transformations, relative to initial position when
+	// no css transformation has been applied (centered on viewport when scrolled to top)
+	let position = {
+		x: xi || 0,
+		y: yi || 0
+	};
+
+	// Set intiatial offsets, if any
+	if (xi || yi) {
+		$frameEl.css("transform", `translate(${position.x}px, ${position.y}px)`);
+		// Scroll by the initial offset amounts
+		window.scrollTo(position.x, position.y);
+	}
+
 	const constrain = function(val, minVal, maxVal) {
 		if (val < minVal) return minVal;
 		if (val > maxVal) return maxVal;

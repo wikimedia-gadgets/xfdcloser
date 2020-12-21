@@ -1,6 +1,6 @@
 import { $, mw, OO } from "../../globals";
 import API from "../api";
-import { dateFromSubpageName, scrollToElem } from "../util"; 
+import { dateFromSubpageName } from "../util"; 
 import MainWindowModel from "../Models/MainWindowModel";
 import windowManager from "../windowManager";
 
@@ -84,12 +84,11 @@ class DiscussionViewController {
 			model: new MainWindowModel({
 				type,
 				discussion: this.model
-			})
+			}),
+			offsetTop: window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
 		});
 		windowInstance.closed.then(winData => {
 			this.model.setClosedWindowData(winData);
-			// Scroll discussion into view
-			scrollToElem(document.getElementById(this.model.id).parentNode);
 		});
 		this.model.setWindowOpened(type);
 	}
@@ -106,12 +105,11 @@ class DiscussionViewController {
 			discussion: this.model,
 		});
 		const windowInstance = windowManager.openWindow("main", {
-			model: windowModel
+			model: windowModel,
+			offsetTop: window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
 		});
 		windowInstance.closed.then(winData => {
 			this.model.setClosedWindowData(winData);
-			// Scroll discussion into view
-			scrollToElem(document.getElementById(this.model.id).parentNode);
 		});
 		this.model.setWindowOpened("close");
 		windowModel.result.singleModeResult.setSelectedResultName(quickCloseResult.replace("quick", "").toLowerCase());

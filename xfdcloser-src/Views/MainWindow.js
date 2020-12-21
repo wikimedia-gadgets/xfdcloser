@@ -172,7 +172,6 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 	}
 	return MainWindow.super.prototype.getSetupProcess.call( this, data )
 		.next( () => {
-			this.makeDraggable();
 			this.model = data.model;
 
 			this.resultPanel = new ResultPanel({
@@ -216,7 +215,10 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 MainWindow.prototype.getReadyProcess = function ( data ) {
 	data = data || {};
 	return MainWindow.super.prototype.getReadyProcess.call( this, data )
-		.next( () => { /* TODO: Set focus */ } );
+		.next( () => { 
+			this.makeDraggable(0, data.offsetTop);
+			/* TODO: Set focus */
+		} );
 };
 
 // Use the getActionProcess() method to do things when actions are clicked
