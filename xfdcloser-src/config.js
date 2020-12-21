@@ -2,7 +2,7 @@ import { $, mw } from "../globals";
 import Venue from "./Venue";
 
 // <nowiki>
-const scriptVersion = "4.0.1-beta";
+const scriptVersion = "4.0.2-beta";
 
 let mwConfig = mw.config.get( [
 	"wgPageName",
