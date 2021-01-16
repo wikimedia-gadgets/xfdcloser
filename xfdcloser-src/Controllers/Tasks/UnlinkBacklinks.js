@@ -202,7 +202,8 @@ export default class  UnlinkBacklinks extends TaskItemController {
 				{ label:"Keep and request citation", action:"keep-cite", icon:"flag" },
 				{ label:"Remove item", action:"remove", icon:"trash", flags:"destructive"}
 			],
-			size: "large"
+			size: "large",
+			scrolled: true
 		}).then(action => {
 			if ( action === "keep" ) {
 				// Remove the void from the start of the line
@@ -277,7 +278,8 @@ export default class  UnlinkBacklinks extends TaskItemController {
 					label: pageName,
 					selected: true
 				})),
-				size: "medium"
+				size: "medium",
+				scrolled: true
 			}).then(selection => this.processSelection(selection));
 		});
 	}

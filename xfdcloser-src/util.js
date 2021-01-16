@@ -1,4 +1,5 @@
 import { $, mw, OO } from "../globals";
+import ScrolledMessageDialog from "./Components/ScrolledMessageDialog";
 import Month from "./Month";
 // <nowiki>
 
@@ -165,14 +166,16 @@ const dateFromUserInput = function(text) {
 
 /** multiButtonConfirm
  * @param {Object} config
- * @param {String} config.title  Title for the dialogue
- * @param {String} config.message  Message for the dialogue. HTML tags (except for <br>, <p>, <ul>,
- *  <li>, <hr>, and <pre> tags) are escaped; wikilinks are turned into real links.
- * @param {Array} config.actions  Optional. Array of configuration objects for OO.ui.ActionWidget
- *  <https://doc.wikimedia.org/oojs-ui/master/js/#!/api/OO.ui.ActionWidget>.
- *  If not specified, the default actions are 'accept' (with label 'OK') and 'reject' (with
- *  label 'Cancel').
- * @param {String} config.size  Symbolic name of the dialog size: small, medium, large, larger or full.
+ *  @param {String} config.title  Title for the dialogue
+ *  @param {String} config.message  Message for the dialogue. HTML tags (except for <br>, <p>, <ul>,
+ *   <li>, <hr>, and <pre> tags) are escaped; wikilinks are turned into real links.
+ *  @param {Array} config.actions  Optional. Array of configuration objects for OO.ui.ActionWidget
+ *   <https://doc.wikimedia.org/oojs-ui/master/js/#!/api/OO.ui.ActionWidget>.
+ *   If not specified, the default actions are 'accept' (with label 'OK') and 'reject' (with
+ *   label 'Cancel').
+ *  @param {String} config.size  Symbolic name of the dialog size: small, medium, large, larger or full.
+ *  @param {Boolean} [config.scrollBy]  Whether the dialog should be translated to (and window scrolled to)
+ *   the window vertical offset prior to the dialog opening
  * @return {Promise<String>} action taken by user
  */
 const multiButtonConfirm = function(config) {
@@ -182,14 +185,17 @@ const multiButtonConfirm = function(config) {
 	);
 
 	const windowManager = new OO.ui.WindowManager();
-	const messageDialog = new OO.ui.MessageDialog();
+	const messageDialog = config.scrolled
+		? new ScrolledMessageDialog()
+		: new OO.ui.MessageDialog();
 	$("body").append( windowManager.$element );
 	windowManager.addWindows( [ messageDialog ] );
 	const instance = windowManager.openWindow( messageDialog, {
 		"title": config.title,
 		"message": htmlSnippetMessage,
 		"actions": config.actions,
-		"size": config.size
+		"size": config.size,
+		"scrollBy": config.scrolled && windowOffsetTop()
 	} );
 	return instance.closed.then(function(data) {
 		windowManager.destroy();
@@ -205,15 +211,19 @@ const multiButtonConfirm = function(config) {
  *   @param {*} config.items[].data Data for the checkbox item
  *   @param {String} config.items[].label Label for the checkbox item
  *   @param {Boolean} config.items[].selected Item is initial selected
- * @param {String} config.size Symbolic name of the dialog size: small, medium,
- *  large, larger or full.
+ *  @param {String} config.size Symbolic name of the dialog size: small, medium,
+ *   large, larger or full.
+ *  @param {Boolean} [config.scrolled]  Whether the dialog should be translated to (and window scrolled to)
+ *   the window vertical offset prior to the dialog opening
  * @return {Promise<Object<string,string|*[]>>} { action, items }
  *  where action is "accept" or "reject", and items is an array of the
  *  selected items' data
  */
 const multiCheckboxMessageDialog = function(config) {
 	const windowManager = new OO.ui.WindowManager();
-	const messageDialog = new OO.ui.MessageDialog();
+	const messageDialog = config.scrolled
+		? new ScrolledMessageDialog()
+		: new OO.ui.MessageDialog();
 	const selectAllCheckbox = new OO.ui.CheckboxMultioptionWidget({
 		label: $("<strong>Select all</strong>"),
 		selected: config.items.every(item => item.selected)
@@ -236,7 +246,8 @@ const multiCheckboxMessageDialog = function(config) {
 			checkboxMultiselect.$element
 		),
 		"actions": config.actions,
-		"size": config.size
+		"size": config.size,
+		"scrollBy": config.scrolled && windowOffsetTop()
 	} );
 	return instance.closed.then(function(data) {
 		windowManager.destroy();
@@ -389,6 +400,14 @@ const normalisePageName = function(pageName) {
 	return title && title.getPrefixedText();
 };
 
+/**
+ * Gets the window offset from top (scrolled amount)
+ * @returns {number}
+ */
+const windowOffsetTop = function() {
+	return window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
+};
+
 export {
 	encodeForUrl,
 	encodeForWikilinkFragment,
@@ -412,6 +431,7 @@ export {
 	decodeHtml,
 	uppercaseFirst,
 	mostFrequent,
-	normalisePageName
+	normalisePageName,
+	windowOffsetTop
 };
 // </nowiki>

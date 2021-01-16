@@ -129,7 +129,8 @@ TaskFormWidget.prototype.doSanityChecks = function() {
 				{ label: "Cancel", flags: "safe" },
 				{ label: "Continue", action: "proceed", flags: "progressive" }
 			],
-			size: "large"
+			size: "large",
+			scrolled: true
 		})
 		: $.Deferred().resolve("proceed");
 
@@ -174,7 +175,8 @@ TaskFormWidget.prototype.resolveRedirects = function() {
 						{ label: "Use redirects", action: "reject" },
 						{ label: "Use targets", action: "accept", flags: "progressive" }
 					],
-					size: "medium"
+					size: "medium",
+					scrolled: true
 				})
 					.then(function(action) {
 						if ( action === "accept" ) {

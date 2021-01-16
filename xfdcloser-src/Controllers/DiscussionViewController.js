@@ -1,6 +1,6 @@
 import { $, mw, OO } from "../../globals";
 import API from "../api";
-import { dateFromSubpageName } from "../util"; 
+import { dateFromSubpageName, windowOffsetTop } from "../util"; 
 import MainWindowModel from "../Models/MainWindowModel";
 import windowManager from "../windowManager";
 
@@ -85,7 +85,7 @@ class DiscussionViewController {
 				type,
 				discussion: this.model
 			}),
-			offsetTop: window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
+			offsetTop: windowOffsetTop()
 		});
 		windowInstance.closed.then(winData => {
 			this.model.setClosedWindowData(winData);
@@ -106,7 +106,7 @@ class DiscussionViewController {
 		});
 		const windowInstance = windowManager.openWindow("main", {
 			model: windowModel,
-			offsetTop: window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
+			offsetTop: windowOffsetTop()
 		});
 		windowInstance.closed.then(winData => {
 			this.model.setClosedWindowData(winData);

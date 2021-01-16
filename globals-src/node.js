@@ -9,7 +9,8 @@ const $ = jQueryInstance( window );
 global.$ = jQueryInstance( window );
 const OO = require("oojs");
 OO.ui = {
-	HtmlSnippet: function(content) { this.content = content; }
+	HtmlSnippet: function(content) { this.content = content; },
+	MessageDialog: function(content) { this.content = content; }
 }
 global.window = window;
 
