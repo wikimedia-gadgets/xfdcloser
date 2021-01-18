@@ -6,7 +6,7 @@
   "browser": "index.js",
   "scripts": {
     "test": "npm run globals:node && mocha --require @babel/register --reporter list && npm run globals:window",
-    "test:all": "node testall && npm run test",
+    "test:all": "node bin/testall && npm run test",
     "test:delay": "mocha --delay --require @babel/register --reporter list",
     "lint:es5": "jshint \"dist/loader-dev.js\" \"dist/loader-gadget.js\"",
     "lint:es5:dev": "jshint \"dist/loader-dev.js\"",
