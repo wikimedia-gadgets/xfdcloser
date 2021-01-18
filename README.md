@@ -32,8 +32,11 @@ Will be available at [https://en.wikipedia.org/wiki/Wikipedia:XFDcloser](https:/
 - **concat-cli** for concatenation
 
 ## On-wiki testing
-### Testwiki
-1. Add code like the following to [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js):
+On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/wiki/Main_Page) (testwiki).
+- Note that the `extendedconfirmed` permission does not exist there, so the gadget definition lines need to be adjusted accordingly when testing non-admin accounts.
+### Testing development version
+1. Ensure the XFDcloser gadget is *not* enabled in your preferences.
+2. Add code like the following to [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js):
 
    ```js
    // Dev version of XFDcloser
@@ -44,39 +47,15 @@ Will be available at [https://en.wikipedia.org/wiki/Wikipedia:XFDcloser](https:/
    });
    ```
 
-2. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
-3. Run `node server` in a terminal (in the directory where your local repistory is located)
-4. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
-
-### English Wikipedia
-1. Add code like the following to [your common.js](https://en.wikipedia.org/wiki/Special:MyPage/common.js), replacing `YOURUSERNAME` with your user name:
-
-   ```js
-   // <nowiki>
-   var XFDC_SANDBOX = true;
-   var XFDC_MAKE_SANDBOX_CONFIG = function(config) {
-      config.user.isSysop = true;
-      config.user.sig = config.user.isSysop ? '~~~~' : '<small>[[Wikipedia:NACD|(non-admin closure)]]</small> ~~~~';
-      config.xfd.path = 'User:YOURUSERNAME/sandbox/' + config.xfd.path;
-      config.xfd.subpagePath = 'User:YOURUSERNAME/sandbox/' + config.xfd.subpagePath;
-      config.script.advert = ' ([[User:YOURUSERNAME/XFDcloser/sandbox.js|XFDcloser/sandbox]])';
-      config.script.version += '-sandbox';
-      config.xfd.ns_logpages = 2; // User
-      config.xfd.ns_unlink = ['3']; // User_talk
-      console.log('[XFDcloser] isSysop: ' + config.user.isSysop);
-      return config;
-   };
-   // </nowiki>
-   var xfdcDevUrl = "http://localhost:8125/dist/loader-dev.js";
-   mw.loader.getScript(xfdcDevUrl).catch(function(e) {
-      e.message += " " + xfdcDevUrl;
-      console.error(e);
-   });
-   ```
-
-2. Create XFD log/discussion pages in your userspace, similar to [User:Evad37/sandbox/Wikipedia:Templates_for_discussion/Log/2016_August_31](https://en.wikipedia.org/wiki/User:Evad37/sandbox/Wikipedia:Templates_for_discussion/Log/2016_August_31)
-3. Run `node server` in a terminal (in the directory where your local repistory is located)
-4. Now when you visit the XFD log/discussion pages (including in your userspace), the most recently built version of the script will be loaded.
+3. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
+4. Run `node server` in a terminal (in the directory where your local repistory is located)
+5. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
+### Testing deployment
+1. Comment out or remove the code that load the development version from [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js)
+2. Ensure the XFDcloser gadget is enabled in your preferences.
+3. Deploy to testwiki (see "Repository structure" section above for what goes where)
+4. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
+5. Now when you visit the XFD log/discussion pages, the testwiki gadget with the files you deployed will be loaded.
 
 ## Planned features
 A general overview of planned features:

@@ -2,7 +2,7 @@
   "name": "xfdcloser",
   "version": "4.0.3",
   "description": "Wikipedia userscript that helps assess pages for WikiProjects",
-  "homepage": "https://github.com/evad37/xfdcloser",
+  "homepage": "https://github.com/wikimedia-gadgets/xfdcloser",
   "browser": "index.js",
   "scripts": {
     "test": "npm run globals:node && mocha --require @babel/register --reporter list && npm run globals:window",
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/evad37/xfdcloser.git"
+    "url": "https://github.com/wikimedia-gadgets/xfdcloser.git"
   },
   "license": "(MIT OR CC-BY-4.0)",
   "devDependencies": {
