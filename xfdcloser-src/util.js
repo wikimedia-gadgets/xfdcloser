@@ -4,7 +4,7 @@ import Month from "./Month";
 // <nowiki>
 
 /**
- * 
+ * Escape html tag characters, replacing with ampersand-encoded versions
  * @param {String} string
  * @returns {String} escaped string 
  */
@@ -25,6 +25,11 @@ const escapeHtml = function(string) {
 	});
 };
 
+/**
+ * Percent-encodes characters which are not safe for urls
+ * @param {string} text
+ * @returns {string} url-encoded text
+ */
 const encodeForUrl = function(text) {
 	return encodeURIComponent(String(text)) // Percent-encode everything except: A-Z a-z 0-9 - _ . ! ~ * ' ( )
 		.replace(/'/g, "%27") // Percent-encode the ' character
@@ -33,6 +38,12 @@ const encodeForUrl = function(text) {
 		.replace(/%3B/g, ";").replace(/%40/g, "@").replace(/%24/g, "$").replace(/%2C/g, ",").replace(/%2F/g, "/").replace(/%3A/g, ":");
 };
 
+/**
+ * Makes a link to a wiki page - as a string, with approporiate escaping and encoding
+ * @param {string} target Target page name
+ * @param {string} [text] Displayed text for link, if different to the target page name
+ * @returns {string} Outer html of link
+ */
 const makeLink = function(target, text) {
 	if ( !text ) {
 		text = target;
@@ -41,6 +52,11 @@ const makeLink = function(target, text) {
 	return `<a href="${url}" target="_blank">${escapeHtml(text.trim())}</a>`;
 };
 
+/**
+ * Encodes text to be used as a fragment in a wikilink.
+ * Same as #encodeForUrl above, but with underscored replaced by spaces.
+ * @param {*} text
+ */
 const encodeForWikilinkFragment = function(text) {
 	return encodeForUrl(text).replace(/_/g, " ");
 };
@@ -53,7 +69,7 @@ const encodeForWikilinkFragment = function(text) {
  * Input will first be escaped using #escapeHtml unless specified 
  * @param {String} text
  * @param {Object} config Configuration options
- * @config {Boolean} noEscape - do not escape the input first
+ *  @param {Boolean} config.noEscape - do not escape the input first
  * @returns {String} unescaped text
  */
 const safeUnescape = function(text, config) {
@@ -87,19 +103,31 @@ const safeUnescape = function(text, config) {
 		);
 };
 
+/**
+ * Formats a date object as `d Mmmm YYYY`
+ * @param {Date} date 
+ * @returns {string} formatted date
+ */
 const dmyDateString = function(date) {
 	return `${date.getUTCDate()} ${Month.nameFromIndex(date.getUTCMonth())} ${date.getUTCFullYear()}`;
 };
+
+/**
+ * Formats a date object as `YYYY Mmmm d`
+ * @param {Date} date
+ * @returns {string} formatted date 
+ */
 const ymdDateString = function(date) {
 	return `${date.getUTCFullYear()} ${Month.nameFromIndex(date.getUTCMonth())} ${date.getUTCDate()}`;
 };
 
 /**
- * 
+ * Parses a date from its component parts
  * @param {String|Number} year 
  * @param {String|Number} day 
  * @param {String} monthName
  * @param {String} [time] time formatted as hh:mm
+ * @returns {Date|NaN} Date object, or NaN if date could not be parsed
  */
 const dateFromParts = function(year, monthName, day, time) {
 	const month = Month.newFromMonthName(monthName);
@@ -125,11 +153,23 @@ const dateFromSigTimestamp = function(sigTimestamp) {
 	return dateFromParts(year, monthName, day, time);
 };
 
+/**
+ * Parses a date from a dated subpage, in `YY Mmmm d` format
+ * @param {string} subpageName
+ * @returns {Date|NaN} Date object, or NaN if date could not be parsed
+ */
 const dateFromSubpageName = function(subpageName) {
 	const [year, monthName, day] = subpageName.split(" ");
 	return dateFromParts(year, monthName, day);
 };
 
+/**
+ * Parses a date from within text. Will find a date if formatted as
+ * MDY, DMY, or YMD (e.g. "March 18, 2020" or "18 March 2020" or
+ * "2020 March 18")
+ * @param {string} text
+ * @returns {Date|NaN} Date object, or NaN if date could not be parsed
+ */
 const dateFromUserInput = function(text) {
 	let day, monthName, year;
 	// Probably formatted like "18 March 2020" or "2020 March 18"
@@ -153,18 +193,8 @@ const dateFromUserInput = function(text) {
 	return dateFromParts(year, month.name, day);
 };
 
-// Additional functions for working with mw.Title objects
-// var hasCorrectNamespace = function(mwTitleObject) {
-// 	return (
-// 		config.venue.ns_number === null ||
-// 		config.venue.ns_number.includes(mwTitleObject.getNamespaceId())
-// 	);
-// };
-// var setExistence = function(mwTitleObject, exists) {
-// 	mw.Title.exist.set(mwTitleObject.toString(), exists);
-// };
-
-/** multiButtonConfirm
+/**
+ * Presents a confirmation dialog which can have multiple action buttons
  * @param {Object} config
  *  @param {String} config.title  Title for the dialogue
  *  @param {String} config.message  Message for the dialogue. HTML tags (except for <br>, <p>, <ul>,
@@ -174,8 +204,9 @@ const dateFromUserInput = function(text) {
  *   If not specified, the default actions are 'accept' (with label 'OK') and 'reject' (with
  *   label 'Cancel').
  *  @param {String} config.size  Symbolic name of the dialog size: small, medium, large, larger or full.
- *  @param {Boolean} [config.scrollBy]  Whether the dialog should be translated to (and window scrolled to)
- *   the window vertical offset prior to the dialog opening
+ *  @param {Boolean} [config.scrolled]  Whether the dialog should be translated to (and window scrolled to)
+ *   the window vertical offset prior to the dialog opening. If not specified or false, the page will scroll
+ *   to the top and the dialog will open there.  
  * @return {Promise<String>} action taken by user
  */
 const multiButtonConfirm = function(config) {
@@ -203,7 +234,8 @@ const multiButtonConfirm = function(config) {
 	});
 };
 
-/** multiCheckboxMessageDialog
+/**
+ * Presents a confirmation dialog for the user to select checkbox items
  * @param {Object} config
  *  @param {String} config.title  Title for the dialogue
  *  @param {String|JQuery} config.message Message for above the checkboxes
@@ -259,6 +291,11 @@ const multiCheckboxMessageDialog = function(config) {
 	});
 };
 
+/**
+ * Checks if the input is a plain javascript object, based on
+ * type and constructor 
+ * @param {*} obj 
+ */
 const isPlainObject = function(obj) {
 	return !!obj && typeof obj === "object" && obj.constructor === Object;
 };
@@ -266,8 +303,8 @@ const isPlainObject = function(obj) {
 /**
  * Merge two objects recursively, including arrays. Returns a new object without modifying either input.
  * Keys present in both the target and the source take on the value of the source, except if:
- * - both are objects, in which case those objects are merged
- * - both are arrays, in which case those arrays are merged  
+ * - both values are plain objects, in which case those objects are merged
+ * - both values are arrays, in which case those arrays are merged  
  * 
  * @param {Object} target
  * @param {Object} source
@@ -277,7 +314,7 @@ const recursiveMerge = (target, source) => {
 	const result = {};
 	// Get all keys from both objects
 	const keys = Object.keys({...target, ...source});
-	// Check if the value each key is an array, or plain object, or neither
+	// Check if the value of each key is an array, or plain object, or neither
 	keys.forEach(key => {
 		if ( Array.isArray(target[key]) && Array.isArray(source[key]) ) {
 			// Both values are arrays, so merge them
@@ -295,16 +332,32 @@ const recursiveMerge = (target, source) => {
 	return result;
 };
 
+/**
+ * Returns a promise that is rejected (with the passed arguments, if any)
+ * @param {*} ...args Rejection arguments
+ * @return {Promise} Rejected promise
+ */
 const rejection = function() {
 	return $.Deferred().reject(...arguments);
 };
 
+/**
+ * Returns a promise that is resolved after a delay
+ * @param {number} delay Timeout delay in milliseconds
+ * @returns {Promise} Promise that will resolve after delay
+ */
 const timeout = function(delay) {
 	const deferred = $.Deferred();
 	setTimeout(deferred.resolve, delay);
 	return deferred.promise();
 };
 
+/**
+ * Removes duplicate values from an array. Values with different types are
+ * considered unique, e.g. the number 1 is not dulicated by the string "1".
+ * @param {*[]} array
+ * @returns {*[]} array of unique values
+ */
 const uniqueArray = function(array) {
 	const vals = {};
 	array.forEach(val => {
@@ -332,6 +385,7 @@ const isFile = function(pageName) {
 const isModule = function(pageName) {
 	return mw.Title.newFromText(pageName).getNamespaceId() === 828; //"Module:";
 };
+
 /**
  * 
  * @param {String} pageName 
@@ -340,6 +394,7 @@ const isModule = function(pageName) {
 const moduleToDoc = function(pageName) {
 	return isModule(pageName) ? pageName + "/doc" : pageName;
 };
+
 /**
  * 
  * @param {String} pageName 
@@ -362,19 +417,19 @@ const decodeHtml = function(t) {
 };
 
 /**
- * 
+ * Uppercases the first character of a string
  * @param {String} text
  * @returns {String} text with the initial character uppercased 
  */
 function uppercaseFirst(text) {
-	return text.slice(0, 1).toUpperCase() + text.slice(1);	
+	return text.slice(0, 1).toUpperCase() + text.slice(1);
 }
 
 /**
- * 
+ * Returns the most frequently occuring item within an array,
+ * e.g. `mostFrequent(["apple", "apple", "orange"])` returns `"apple"`
  * @param {string[]|number[]} array 
  * @returns {string|null} item with the highest frequency
- * e.g. `mostFrequent(["apple", "apple", "orange"])` returns `"apple"`
  */
 function mostFrequent(array) {
 	if ( !array || !Array.isArray(array) || array.length === 0 )
@@ -391,9 +446,9 @@ function mostFrequent(array) {
 }
 
 /**
- * 
+ * Normalises a page name (full namespace, initial caps, etc)
  * @param {String} pageName
- * @returns {Stirng|null} Normalised page name, or null if invalid 
+ * @returns {String|null} Normalised page name, or null if invalid 
  */
 const normalisePageName = function(pageName) {
 	const title = mw.Title.newFromText(pageName);
