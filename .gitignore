@@ -3,3 +3,5 @@ node_modules
 dist/*
 # ignore globals.js - built during building and/or testing
 globals.js
+# ignore credentials used for deployment
+credentials.json
