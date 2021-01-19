@@ -1,8 +1,20 @@
 import { $, mw } from "../globals";
 import Venue from "./Venue";
-
+let scriptVersion = require("../package.json").version; // eslint-disable-line no-undef
 // <nowiki>
-const scriptVersion = "4.0.3-beta";
+
+// Add beta flag to version if needed
+(function(){
+	let options;
+	try {
+		options = JSON.parse(mw.user.options.get("userjs-xfdc")) || {};
+	} catch(e) {
+		options = {};
+	}
+	if (options.beta) {
+		scriptVersion += "-beta";
+	}
+})();
 
 let mwConfig = mw.config.get( [
 	"wgPageName",
