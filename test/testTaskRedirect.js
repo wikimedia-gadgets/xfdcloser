@@ -182,5 +182,22 @@ describe("Redirect", function() {
 			.then(p => { throw new Error("promise resolved", p);})
 			.catch(e => assert.strictEqual(e, "targetIsNotModule"));
 	});
+	it("keeps section when specified in target", function() {
+		result.singleModeResult.setTargetPageName("Qux#Bazbar");
+		const model = new TaskItem({
+			taskName: "foo",
+			relaventPageNames: discussion.pagesNames,
+			discussion,
+			result,
+			options
+		});
+		const task = new Redirect(model, widgets);
+		const transformed = task.transform(task.redirections[0]);
+		if (transformed.then) {
+			throw new Error("returned a promise");
+		}
+		assert.deepStrictEqual(Object.keys(transformed), ["text", "summary"]);
+		assert.strictEqual(transformed.text, "#REDIRECT [[Qux#Bazbar]]\n\n{{Rcat shell|\n{{R to related topic}}\n}}");
+	});
 
 });

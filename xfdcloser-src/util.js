@@ -446,13 +446,20 @@ function mostFrequent(array) {
 }
 
 /**
- * Normalises a page name (full namespace, initial caps, etc)
+ * Normalises a page name (full namespace, initial caps, etc).
+ * Fragments are retained, e.g "wp:foo#Section" => "Wikpedia:Foo#Section" 
  * @param {String} pageName
  * @returns {String|null} Normalised page name, or null if invalid 
  */
 const normalisePageName = function(pageName) {
 	const title = mw.Title.newFromText(pageName);
-	return title && title.getPrefixedText();
+	if (title == null) { return null; }
+	const prefixedText = title.getPrefixedText();
+	const fragment = title.getFragment();
+	if (fragment) {
+		return prefixedText + "#" + fragment;
+	}
+	return prefixedText;
 };
 
 /**
