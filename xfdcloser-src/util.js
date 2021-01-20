@@ -109,6 +109,9 @@ const safeUnescape = function(text, config) {
  * @returns {string} formatted date
  */
 const dmyDateString = function(date) {
+	if (date.constructor.name !== "Date") {
+		throw new Error(`dmyDateString: expected a Date object, instead found ${date.constructor.name}`);
+	}
 	return `${date.getUTCDate()} ${Month.nameFromIndex(date.getUTCMonth())} ${date.getUTCFullYear()}`;
 };
 
@@ -118,14 +121,17 @@ const dmyDateString = function(date) {
  * @returns {string} formatted date 
  */
 const ymdDateString = function(date) {
+	if (date.constructor.name !== "Date") {
+		throw new Error(`ymdDateString: expected a Date object, instead found ${date.constructor.name}`);
+	}
 	return `${date.getUTCFullYear()} ${Month.nameFromIndex(date.getUTCMonth())} ${date.getUTCDate()}`;
 };
 
 /**
  * Parses a date from its component parts
  * @param {String|Number} year 
- * @param {String|Number} day 
  * @param {String} monthName
+ * @param {String|Number} day 
  * @param {String} [time] time formatted as hh:mm
  * @returns {Date|NaN} Date object, or NaN if date could not be parsed
  */
@@ -478,6 +484,7 @@ export {
 	safeUnescape,
 	dmyDateString,
 	ymdDateString,
+	dateFromParts,
 	dateFromSigTimestamp,
 	dateFromSubpageName,
 	dateFromUserInput,

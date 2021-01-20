@@ -93,24 +93,11 @@ class API extends mw.Api {
 				...getParams
 			}).then(response => {
 				const starttime = response.curtimestamp;
-				const normalizeds = response.query.normalized || [];
-				const redirects = response.query.redirects || [];
-
 				// Get an array of promises of edits (which may either be resolved or rejected)				
-				const pages = response.query.pages.map(page => {
-					const redirect = redirects.find(redirect => redirect.to === page.title) || {};
-					const normalized = normalizeds.find(normalized => normalized.to === page.title || normalized.to === redirect.from ) || {};
-					return processPage({
-						...page,
-						redirect,
-						titleTransformation: {
-							original: normalized.from || redirect.from || page.title,
-							normalized: normalized.to,
-							redirected: redirect.to,
-						},
-						content: page.revisions && page.revisions[0].slots.main.content 
-					}, starttime);
-				});
+				const pages = response.query.pages.map(page => processPage({
+					...page,
+					content: page.revisions && page.revisions[0].slots.main.content 
+				}, starttime));
 				
 				// Convert the array of promises into a single promise, resolved if all were
 				// resolved, or rejected with an array of errors of all that failed.

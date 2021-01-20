@@ -2,7 +2,7 @@ import { $, mw, OO } from "../../globals";
 import DiscussionViewController from "../Controllers/DiscussionViewController";
 import { getRelevantResults } from "../data";
 import Discussion from "../Models/Discussion";
-import { dateFromSigTimestamp } from "../util";
+import { dateFromSigTimestamp, dateFromParts } from "../util";
 import * as prefs from "../prefs";
 // <nowiki>
 
@@ -236,7 +236,10 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 			// Find first timestamp date
 			var firstDatePatt = /(?:\d\d:\d\d, )(\d{1,2} \w+ \d{4})(?: \(UTC\))/;
 			var firstDateMatch = firstDatePatt.exec(discussionText);
-			firstDate = firstDateMatch && firstDateMatch[1];
+			const firstDateString = firstDateMatch && firstDateMatch[1];
+			if (firstDateString) {
+				firstDate = dateFromParts.apply(null, firstDateString.split(" ").reverse() );
+			}
 		}
 	}
 	else {
