@@ -71,6 +71,16 @@ On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/
 4. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
 5. Now when you visit the XFD log/discussion pages, the testwiki gadget with the files you deployed will be loaded.
 
+## Deployment
+As XFDcloser is a gadget, you must have interface-admin rights to deploy to the wiki.
+1. Ensure:
+   - changes are committed and merged to master branch on GitHub rep 
+   - you are currently on the master branch, and synced with GitHub repo
+2. Bump the version number. See the comments in the `bin\version.js` file for how to do this from the terminal. 
+3. Commit the version change, and push/sync to GitHub repo
+4. Run a full build: run `npm run build` in terminal
+5. You are now ready to deploy: see the comments in the `bin\deploy.js` file for how to do this from the terminal.
+
 ## Planned features
 A general overview of planned features:
 - [ ] Redo interface using OOUI, similar to Rater
