@@ -37,7 +37,8 @@ export default class DeleteRedirects extends TaskItemController {
 				{ label:"View redirects...", action:"show" },
 				{ label:"Delete redirects", action:"accept", flags:"progressive" }
 			],
-			size: "medium"
+			size: "medium",
+			scrolled: true
 		}).then(action => {
 			if (action !== "show") { return action; }
 			
@@ -50,7 +51,8 @@ export default class DeleteRedirects extends TaskItemController {
 					{ label:"Cancel", flags:"safe" },
 					{ label:"Delete redirects", action:"accept", flags:"progressive" }
 				],
-				size: "medium"
+				size: "medium",
+				scrolled: true
 			});
 		}).then(action => {
 			if (action !== "accept") {
