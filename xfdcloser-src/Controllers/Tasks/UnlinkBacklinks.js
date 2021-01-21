@@ -187,6 +187,7 @@ export default class  UnlinkBacklinks extends TaskItemController {
 			? null
 			: allHeadings[allHeadings.length - 1]
 				.replace(/(^=* *| *=*$)/g, "")
+				.replace(/\{\{.*?\}\}/g, "") // remove hidden templates, e.g. {{anchor}}
 				.replace(/\[\[([^|\]]*?)\|([^\]]*?)\]\]/, "$2")
 				.replace(/\[\[([^|\]]*?)\]\]/, "$1");
 
