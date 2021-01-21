@@ -1,6 +1,6 @@
 import { $, mw, OO } from "../../globals";
 import ResultItem from "./ResultItem";
-import { getRelevantResults } from "../data";
+import { getRelevantResults, makeSoftDeleteRationale, softDeletionRationaleTemplate } from "../data";
 import ResultList from "./ResultList";
 // <nowiki>
 
@@ -49,7 +49,10 @@ class Result {
 		const availableResults = getRelevantResults(this.discussion.venue.type, config.userIsSysop);
 
 		this.singleModeResult = new ResultItem({availableResults});
-		this.singleModeResult.connect(this, {update: ["emit", "update"]});
+		this.singleModeResult.connect(this, {
+			update: ["emit", "update"],
+			softDeleteSelect: "onSoftDeleteSelect"
+		});
 
 		this.multimodeResults = new ResultList({availableResults, pageNames: this.discussion.pagesNames});
 		this.multimodeResults.connect(this, {update: ["emit", "update"]});
@@ -287,10 +290,29 @@ class Result {
 		this.emit("update");
 	}
 
+	/**
+	 * Prepends text to the start of the rationale
+	 * @param {string} value text to be prepended
+	 */
+	prependToRationale(value) {
+		this.setRationale((value + " " + this.rationale).trim());
+	}
+
 	setNewSentence(isSelected) {
 		if ( this.newSentence === isSelected ) { return false; }
 		this.newSentence = isSelected;
 		this.emit("update");
+	}
+
+	onSoftDeleteSelect() {
+		if (!this.rationale.includes(softDeletionRationaleTemplate)) {
+			const pageName = this.discussion.pages[0].getPrefixedText();
+			const nomLink = this.discussion.discussionPageLink;
+			const isMulti = this.discussion.pages.length > 1;
+			this.prependToRationale(
+				makeSoftDeleteRationale(pageName, nomLink, isMulti)
+			);
+		}
 	}
 }
 

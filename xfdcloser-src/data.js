@@ -681,7 +681,20 @@ const getRelevantPrefs = function(userIsSysop) {
 	return prefs.filter(isRelevant(null, userIsSysop));
 };
 
-export { getRelevantResults, getRelevantActions, getRelevantOptions, getRelevantPrefs };
+const softDeletionRationaleTemplate = "Wikipedia:XFDcloser/Soft deletion rationale";
+/**
+ * 
+ * @param {string} pageName 
+ * @param {string} nomLink 
+ * @param {boolean} [isMulti]
+ * @returns {string} Wikitext of soft deletion rationale template
+ */
+const makeSoftDeleteRationale = function(pageName, nomLink, isMulti) {
+	const multiParam = isMulti ? "|multi=yes" : "";
+	return `{{subst:${softDeletionRationaleTemplate}|1=${pageName}|2=${nomLink}${multiParam}}}`;
+};
 
-export { resultsData, actions, options, prefs, defaultPrefValues };
+export { getRelevantResults, getRelevantActions, getRelevantOptions, getRelevantPrefs, makeSoftDeleteRationale };
+
+export { resultsData, actions, options, prefs, defaultPrefValues, softDeletionRationaleTemplate };
 // </nowiki>

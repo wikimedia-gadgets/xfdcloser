@@ -171,6 +171,13 @@ class ResultItem {
 	isSoft() {
 		return this.showSoftResult && this.softResult;
 	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	isSoftDelete() {
+		return this.isSoft() && this.selectedResultName === "delete";
+	}
 	
 	/**
 	 * @returns {Boolean}
@@ -196,6 +203,9 @@ class ResultItem {
 			this.deleteFirstResult = false;
 		}
 		this.emit("update");
+		if (this.isSoftDelete()) {
+			this.emit("softDeleteSelect");
+		}
 	}
 
 	setSpeedyResult(isSpeedy) {
