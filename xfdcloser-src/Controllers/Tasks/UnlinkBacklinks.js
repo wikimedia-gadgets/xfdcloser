@@ -1,6 +1,6 @@
 import { $ } from "../../../globals";
 import TaskItemController from "../TaskItemController";
-import { multiButtonConfirm, recursiveMerge, rejection, uniqueArray, multiCheckboxMessageDialog, isFile } from "../../util";
+import { multiButtonConfirm, recursiveMerge, rejection, uniqueArray, multiCheckboxMessageDialog, isFile, cleanupVoidTemplates } from "../../util";
 import unlink from "../../unlink";
 // <nowiki>
 
@@ -152,7 +152,7 @@ export default class  UnlinkBacklinks extends TaskItemController {
 					(isMajorEdit ? " / list item(s)" : "") +
 					(isFile(page.title) ? " / file usage(s)" : "");
 				const req = {
-					text: updatedWikitext,
+					text: cleanupVoidTemplates(updatedWikitext),
 					summary: this.model.getEditSummary({prefix}),
 					nocreate: 1
 				};

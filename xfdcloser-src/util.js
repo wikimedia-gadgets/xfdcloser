@@ -476,6 +476,16 @@ const windowOffsetTop = function() {
 	return window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
 };
 
+/**
+ * Removes substituted void templates from wikitext,
+ * such as those added by unlink.js
+ * @param {string} wikitext
+ * @returns {string}
+ */
+const cleanupVoidTemplates = function(wikitext) {
+	return wikitext.replace(/\{\{subst:(?:\^|void)[^}]*\}\}/gi, "");
+}; 
+
 export {
 	encodeForUrl,
 	encodeForWikilinkFragment,
@@ -501,6 +511,7 @@ export {
 	uppercaseFirst,
 	mostFrequent,
 	normalisePageName,
-	windowOffsetTop
+	windowOffsetTop,
+	cleanupVoidTemplates
 };
 // </nowiki>
