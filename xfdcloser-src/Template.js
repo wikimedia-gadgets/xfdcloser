@@ -187,7 +187,7 @@ export default class Template {
 			template.setName(name);
 			parameterChunks.forEach(chunk => {
 				template.addParam(
-					Parameter.newFromWikitext(chunk, Template.parameters)
+					Parameter.newFromWikitext(chunk, template.parameters)
 				);
 			});
 			

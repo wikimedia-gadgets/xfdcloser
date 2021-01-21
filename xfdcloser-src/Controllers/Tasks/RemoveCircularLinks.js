@@ -1,6 +1,7 @@
 import { mw } from "../../../globals";
 import TaskItemController from "../TaskItemController";
 import { rejection, uniqueArray } from "../../util";
+import unlink from "../../unlink";
 // <nowiki>
 
 export default class RemoveCircularLinks extends TaskItemController {
@@ -37,7 +38,7 @@ export default class RemoveCircularLinks extends TaskItemController {
 			// Error if multiple nom templates found
 			return rejection("couldNotUpdate", e);
 		}
-		newWikitext = extraJs.unlink(newWikitext, this.model.getResolvedPageNames());
+		newWikitext = unlink(newWikitext, this.model.getResolvedPageNames());
 		if ( newWikitext === page.content ) {
 			// No links to unlink
 			return rejection("skippedNoneFound");

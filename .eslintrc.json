@@ -11,8 +11,7 @@
         "mw": "off",
         "OO": "off",
         "importScript": "readonly",
-        "importStylesheet": "readonly",
-        "extraJs": "readonly"
+        "importStylesheet": "readonly"
     },
     "parserOptions": {
         "ecmaVersion": 2018,

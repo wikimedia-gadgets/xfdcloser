@@ -24,7 +24,7 @@ const widgets = {
 	emit: ()=>{}
 };
 
-// Note: transform method can not be unit tested since it uses extraJs.unlink
+// TODO: transform method not yet unit tested since it previously used extraJs.unlink
 describe("RemoveCircularLinks", function() {
 	describe("for single page", function() {
 		let discussion, result, options, model, task;

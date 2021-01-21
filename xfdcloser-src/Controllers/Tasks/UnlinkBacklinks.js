@@ -1,6 +1,7 @@
 import { $ } from "../../../globals";
 import TaskItemController from "../TaskItemController";
 import { multiButtonConfirm, recursiveMerge, rejection, uniqueArray, multiCheckboxMessageDialog, isFile } from "../../util";
+import unlink from "../../unlink";
 // <nowiki>
 
 
@@ -136,7 +137,7 @@ export default class  UnlinkBacklinks extends TaskItemController {
 	transform(page) {
 		if (this.model.aborted) return rejection("aborted");
 
-		const newWikitext = extraJs.unlink(
+		const newWikitext = unlink(
 			page.content,
 			[...this.model.getResolvedPageNames(), ...this.redirectPageNames],
 			page.ns,

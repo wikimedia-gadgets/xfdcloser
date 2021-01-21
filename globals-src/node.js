@@ -21,7 +21,10 @@ const mw  = {
 	config: {
 		get: () => ({wgUserGroups: [], wgPageName:"wgPageName"})
 	},
-	Api: () => {}
+	Api: () => {},
+	util: {
+		escapeRegExp: function(str){return str.replace(/([\\{}()|.?*+\-^$\[\]])/g,'\\$1');}
+	}
 };
 
 export { $, OO, mw };
