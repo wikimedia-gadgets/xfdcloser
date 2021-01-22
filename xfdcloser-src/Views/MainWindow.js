@@ -170,6 +170,7 @@ MainWindow.prototype.getSetupProcess = function ( data ) {
 	if (!data.preferences) {
 		data.preferences = {};
 	}
+	this.setupDraggablityStyles();
 	return MainWindow.super.prototype.getSetupProcess.call( this, data )
 		.next( () => {
 			this.model = data.model;

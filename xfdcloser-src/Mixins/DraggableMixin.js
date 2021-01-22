@@ -10,7 +10,17 @@ function DraggableMixin(/* config */) {}
 OO.initClass( DraggableMixin );
 
 /**
- * Sets up dialog draggabiliy.
+ * Sets up the styles to enable dragability. Should be called at the
+ * time of window opening, prior to being attached to the DOM (i.e.
+ * during #getSetupProcess).
+ */
+DraggableMixin.prototype.setupDraggablityStyles = function() {
+	$("body").addClass("ooui-draggbleWindow-open");
+};
+
+/**
+ * Sets up dialog draggabiliy. Should be called once the window is ready
+ * and attached to the DOM (i.e. during #getReadyProcess).
  * 
  * @param {number} [xi] initial horizontal offset
  * @param {number} [yi] initial vertical offset
@@ -92,6 +102,10 @@ DraggableMixin.prototype.makeDraggable = function(xi, yi) {
 	$("body").on(pointer+"up.oouiDraggableWin", onDragEnd);
 };
 
+/**
+ * Removes draggability styles and event listeners. Should be called when
+ * window is closing (i.e. during #getTeardownProcess) 
+ */
 DraggableMixin.prototype.removeDraggability = function() {
 	$("body").removeClass("ooui-draggbleWindow-open");
 

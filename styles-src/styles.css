@@ -81,6 +81,7 @@
 html body.ooui-draggbleWindow-open {
 	position: unset;
 	overflow: unset;
+	margin-right: unset !important; /* phab:T231138 */
 }
 
 html body.ooui-draggbleWindow-open .oo-ui-windowManager-modal > .oo-ui-dialog.oo-ui-window-active {

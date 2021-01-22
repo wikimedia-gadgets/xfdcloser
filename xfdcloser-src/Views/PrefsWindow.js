@@ -78,9 +78,9 @@ PrefsWindow.prototype.initialize = function () {
 
 PrefsWindow.prototype.getSetupProcess = function ( data ) {
 	data = data || {};
+	this.setupDraggablityStyles();
 	return PrefsWindow.super.prototype.getSetupProcess.call( this, data )
 		.next(() => {
-			this.makeDraggable();
 			this.model = new PrefsWindowModel({
 				userIsSysop: data.userIsSysop
 			});
@@ -102,6 +102,7 @@ PrefsWindow.prototype.getReadyProcess = function ( data ) {
 	data = data || {};
 	return PrefsWindow.super.prototype.getReadyProcess.call( this, data )
 		.next( () => {
+			this.makeDraggable(0, data.offsetTop);
 			// Set focus to first input
 			this.prefsPanel.fieldset.items[0].fieldLayout.getField().focus();
 		});

@@ -87,9 +87,9 @@ UnlinkWindow.prototype.initialize = function () {
 
 UnlinkWindow.prototype.getSetupProcess = function ( data ) {
 	data = data || {};
+	this.setupDraggablityStyles();
 	return UnlinkWindow.super.prototype.getSetupProcess.call( this, data )
 		.next(() => {
-			this.makeDraggable();
 			this.model = new UnlinkWindowModel({
 				pageName: data.pageName,
 				summary: data.summary
@@ -119,6 +119,7 @@ UnlinkWindow.prototype.getReadyProcess = function ( data ) {
 	data = data || {};
 	return UnlinkWindow.super.prototype.getReadyProcess.call( this, data )
 		.next( () => {
+			this.makeDraggable(0, data.offsetTop);
 			// Set focus
 			this.summaryPanel.summaryInput.focus();
 		});
@@ -135,6 +136,15 @@ UnlinkWindow.prototype.getBodyHeight = function () {
 	return this.controller
 		? this.controller.getBodyHeight()
 		: UnlinkWindow.super.prototype.getBodyHeight.call(this);
+};
+
+// Use the getTeardownProcess() method to perform actions whenever the dialog is closed.
+// `data` is the data passed into the window's .close() method.
+UnlinkWindow.prototype.getTeardownProcess = function ( data ) {
+	return UnlinkWindow.super.prototype.getTeardownProcess.call( this, data )
+		.first( () => {
+			this.removeDraggability();
+		} );
 };
 
 export default UnlinkWindow;
