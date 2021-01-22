@@ -1,28 +1,12 @@
-import { $, mw, OO } from "../../globals";
+import { $, OO } from "../../globals";
 // <nowiki>
 
-// CSS to override OOUI window manager preventing background scrolling/interaction
-const dragCSS = `html body.ooui-draggbleWindow-open {
-	position: unset;
-	overflow: unset;
-}
-html body.ooui-draggbleWindow-open .oo-ui-windowManager-modal > .oo-ui-dialog.oo-ui-window-active {
-    position: static;
-    padding: 0;
-}` +
-// Increase z-index, to be above skin menus etc; smooth transition for dragging (transform:translate)
-`html body.ooui-draggbleWindow-open .oo-ui-dialog.oo-ui-window-active > div {
-    z-index: 110;
-    transition: all 0.25s ease-out 0s, transform 0s !important
-}
-`;
+// Note: CSS overrides OOUI window manager preventing background scrolling/interaction
 
 /**
  * A mixin to for making ProcessDialogs draggable.
  */
-function DraggableMixin(/* config */) {
-	mw.util.addCSS(dragCSS);
-}
+function DraggableMixin(/* config */) {}
 OO.initClass( DraggableMixin );
 
 /**

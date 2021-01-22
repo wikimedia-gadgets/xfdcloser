@@ -17,7 +17,6 @@
 }
 
 .xfdc-action {
-	margin-left: 13px; /* DEPRECATED, retain until beta testing is finished */
 	font-weight: normal;
 }
 .xfdc-action a { cursor: pointer; }
@@ -75,4 +74,22 @@
 /* Force task notices, warnings, and errors to all be shown on their own line */
 .xfdc-taskItemWidget > .oo-ui-fieldLayout-messages {
 	clear: both;
+}
+
+/* == draggbleWindow styles == */
+
+html body.ooui-draggbleWindow-open {
+	position: unset;
+	overflow: unset;
+}
+
+html body.ooui-draggbleWindow-open .oo-ui-windowManager-modal > .oo-ui-dialog.oo-ui-window-active {
+	position: static;
+	padding: 0;
+}
+
+/* Increase z-index, to be above skin menus etc; smooth transition for dragging (transform:translate) */
+html body.ooui-draggbleWindow-open .oo-ui-dialog.oo-ui-window-active > div {
+	z-index: 110;
+	transition: all 0.25s ease-out 0s, transform 0s !important;
 }
