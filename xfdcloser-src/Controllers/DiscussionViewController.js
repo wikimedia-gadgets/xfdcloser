@@ -70,6 +70,10 @@ class DiscussionViewController {
 		this.statusLabel.setLabel(new OO.ui.HtmlSnippet(this.model.status)).toggle(this.model.showStatus);
 		this.buttonGroup.toggle(this.model.showButtons);
 		this.quickCloseButton.toggle(this.model.showQuickClose);
+		if (this.model.actioned) {
+			this.model.$headlineSpan.addClass("xfdc-actioned-heading");
+			$(`.${this.model.id}-discussion-node`).addClass("xfdc-actioned-discussion");
+		}
 	}
 	
 	/**

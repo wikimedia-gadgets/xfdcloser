@@ -7,6 +7,7 @@ class Discussion {
 	/**
 	 * 
 	 * @param {Object} config
+	 * @param {jQuery} config.$headlineSpan
 	 * @param {String} config.id unique id
 	 * @param {Venue} config.venue Venue
 	 * @param {mw.Title[]} config.pages pages nominated for discussion
@@ -21,6 +22,7 @@ class Discussion {
 		// Call mixin constructor
 		OO.EventEmitter.call(this);
 		
+		this.$headlineSpan = config.$headlineSpan;
 		this.id = config.id;
 		this.venue = config.venue;
 		this.pages = config.pages || [];
@@ -115,6 +117,7 @@ class Discussion {
 			const actioned = this.type.slice(0,1).toUpperCase() + this.type.slice(1).replace(/e$/, "") + "ed";
 			const as = windowData.result ? ` as "${windowData.result}"` : "";
 			this.status = `<strong>${actioned}</strong>${as} (reload page to see the actual ${this.type})`;
+			this.actioned = true;
 			break;
 		}
 		default: // cancelled

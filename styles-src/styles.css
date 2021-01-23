@@ -38,6 +38,13 @@
 .xfdc-unknownAge .xfdc-action { background-color: #ffffc6; }
 .xfdc-notOld.xfdc-relisted .xfdc-action { background-color: #ffe9c6; }
 
+/* Styles for actioned (closed/relisted) discussions */
+.xfdc-actioned-heading {
+	text-decoration: line-through double black;
+	opacity: 75%;
+}
+.xfdc-actioned-discussion { opacity: 50%; }
+
 /* Show/hide box */
 #XFDcloser-showhide {
 	bottom: 0;
