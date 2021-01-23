@@ -51,6 +51,8 @@ const resultsData = [
 		name: "delete",
 		label: "Delete",
 		title: "Close discussion as \"delete\"",
+		allowSpeedy: true,
+		allowSoft: true,
 		nonSysopOnly: true,
 		venues: ["tfd"],
 		actions: ["holdingCell", "noActions"]
@@ -527,7 +529,8 @@ const options = [
 		type: "toggleSwitch",
 		for: "deletePages",
 		venues: ["tfd"],
-		nonSysopOnly: true
+		nonSysopOnly: true,
+		value: false // initial value
 	},
 	{
 		name: "holdcellMergeSection",
