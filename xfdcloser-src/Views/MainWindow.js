@@ -57,7 +57,7 @@ MainWindow.static.actions = [
 	// Safe actions (top left)
 	{
 		action: "closePrefs",
-		label: "Cancel",
+		label: "Back",
 		flags: "safe",
 		modes: "prefs"
 	},

@@ -87,7 +87,7 @@ class Result {
 		if ( !this.userIsSysop && this.type === "close" ) {
 			this.topNotes.push({
 				name: "nonAdminWarning",
-				title: "Take care to avoid innapropriate non-administrator closes",
+				title: "Take care to avoid inappropriate non-administrator closes",
 				content: $("<span>").append(
 					"See the ",
 					makeLink("WP:NACD"),
