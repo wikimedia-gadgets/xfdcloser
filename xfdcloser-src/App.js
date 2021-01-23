@@ -1,7 +1,7 @@
 import { $, mw } from "../globals";
 import config from "./config";
 import ShowHideTag from "./ShowHideTag";
-import windowManager from "./windowManager";
+import windowSetManager from "./windowSetManager";
 import DiscussionView from "./Views/DiscussionView";
 // <nowiki>
 
@@ -18,7 +18,7 @@ import DiscussionView from "./Views/DiscussionView";
 
 	// Warn if unloading before closes/relists are completed
 	$(window).on("beforeunload", function(e) {
-		if ( windowManager.hasOpenWindow() ) {
+		if ( windowSetManager.hasOpenWindows() ) {
 			e.returnValue = "";
 			return "";		
 		}
@@ -28,7 +28,7 @@ import DiscussionView from "./Views/DiscussionView";
 	mw.util.addPortletLink("p-cactions", "#", "XFDC prefs", "p-xfdc-prefs", "XFDcloser preferences");
 	$("#p-xfdc-prefs").click(e => {
 		e.preventDefault();
-		windowManager.openWindow("prefs", {
+		windowSetManager.openWindow("prefs", {
 			userIsSysop: config.user.isSysop
 		});
 	});
@@ -60,7 +60,7 @@ import DiscussionView from "./Views/DiscussionView";
 					.replace(/ \(\[\[Wikipedia:XFDC(#[\d.]+)?|XFDcloser]]\)/, "")
 					.slice(1,-1);
 			}
-			windowManager.openWindow("unlink", {
+			windowSetManager.openWindow("unlink", {
 				summary: comment,
 				pageName: config.mw.wgPageName
 			});

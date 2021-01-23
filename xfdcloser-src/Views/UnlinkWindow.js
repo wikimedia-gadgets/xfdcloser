@@ -15,7 +15,7 @@ OO.inheritClass( UnlinkWindow, OO.ui.ProcessDialog );
 OO.mixinClass( UnlinkWindow, DraggableMixin );
 
 UnlinkWindow.static.name = "unlink";
-UnlinkWindow.static.title = $("<span>").css({"font-weight":"normal"}).append(
+UnlinkWindow.static.title = () => $("<span>").css({"font-weight":"normal"}).append(
 	$("<a>").css({"font-weight": "bold"}).attr({"href": mw.util.getUrl("WP:XFDC"), "target": "_blank"}).text("XFDcloser"),
 	"/Unlink (",
 	$("<a>").attr({"href": mw.util.getUrl("WT:XFDC"), "target": "_blank"}).text("talk"),

@@ -2,7 +2,7 @@ import { $, mw, OO } from "../../globals";
 import API from "../api";
 import { dateFromSubpageName, windowOffsetTop } from "../util"; 
 import MainWindowModel from "../Models/MainWindowModel";
-import windowManager from "../windowManager";
+import windowSetManager from "../windowSetManager";
 
 // <nowiki>
 class DiscussionViewController {
@@ -77,10 +77,7 @@ class DiscussionViewController {
 	 * @param {String} type "close" or "relist" 
 	 */
 	onButtonClick(type) {
-		if ( windowManager.hasOpenWindow() ) {
-			return false;
-		}
-		const windowInstance = windowManager.openWindow("main", {
+		const windowInstance = windowSetManager.openWindow("main", {
 			model: new MainWindowModel({
 				type,
 				discussion: this.model
@@ -95,16 +92,13 @@ class DiscussionViewController {
 
 	onQuickCloseChoose(menuOption) {
 		const quickCloseResult = menuOption.getData();
-		if ( windowManager.hasOpenWindow() ) {
-			return false;
-		}
 		const windowModel = new MainWindowModel({
 			type: "close",
 			quick: true,
 			result: quickCloseResult,
 			discussion: this.model,
 		});
-		const windowInstance = windowManager.openWindow("main", {
+		const windowInstance = windowSetManager.openWindow("main", {
 			model: windowModel,
 			offsetTop: windowOffsetTop()
 		});

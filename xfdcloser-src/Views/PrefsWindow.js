@@ -14,7 +14,7 @@ OO.inheritClass( PrefsWindow, OO.ui.ProcessDialog );
 OO.mixinClass( PrefsWindow, DraggableMixin );
 
 PrefsWindow.static.name = "prefs";
-PrefsWindow.static.title = $("<span>").css({"font-weight":"normal"}).append(
+PrefsWindow.static.title = () => $("<span>").css({"font-weight":"normal"}).append(
 	$("<a>").css({"font-weight": "bold"}).attr({"href": mw.util.getUrl("WP:XFDC"), "target": "_blank"}).text("XFDcloser"),
 	" (",
 	$("<a>").attr({"href": mw.util.getUrl("WT:XFDC"), "target": "_blank"}).text("talk"),

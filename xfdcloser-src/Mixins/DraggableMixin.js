@@ -1,4 +1,5 @@
 import { $, OO } from "../../globals";
+import windowSetManager from "../windowSetManager";
 // <nowiki>
 
 // Note: CSS overrides OOUI window manager preventing background scrolling/interaction
@@ -8,6 +9,12 @@ import { $, OO } from "../../globals";
  */
 function DraggableMixin(/* config */) {}
 OO.initClass( DraggableMixin );
+/**
+ * @private
+ * @static
+ * @prop {number} uid Integer for generating unique ids for each draggable window
+ */
+DraggableMixin.uid = 0;
 
 /**
  * Sets up the styles to enable dragability. Should be called at the
@@ -95,11 +102,13 @@ DraggableMixin.prototype.makeDraggable = function(xi, yi) {
 
 	// Use pointer events if available; otherwise use mouse events
 	const pointer = ("PointerEvent" in window) ? "pointer" : "mouse";
-	$handleEl.on(pointer+"enter.oouiDraggableWin", () => $frameEl.css("will-change", "transform") ); // Tell browser to optimise transform
-	$handleEl.on(pointer+"leave.oouiDraggableWin", () => { if (!pointerdown) $frameEl.css("will-change", ""); } ); // Remove optimisation if not dragging
-	$handleEl.on(pointer+"down.oouiDraggableWin", onDragStart);
-	$("body").on(pointer+"move.oouiDraggableWin", onDragMove);
-	$("body").on(pointer+"up.oouiDraggableWin", onDragEnd);
+	// Namespace for events
+	this.draggableMixinEventNs = ".oouiDraggableWin" + (++DraggableMixin.uid);
+	$handleEl.on(pointer+"enter"+this.draggableMixinEventNs, () => $frameEl.css("will-change", "transform") ); // Tell browser to optimise transform
+	$handleEl.on(pointer+"leave"+this.draggableMixinEventNs, () => { if (!pointerdown) $frameEl.css("will-change", ""); } ); // Remove optimisation if not dragging
+	$handleEl.on(pointer+"down"+this.draggableMixinEventNs, onDragStart);
+	$("body").on(pointer+"move"+this.draggableMixinEventNs, onDragMove);
+	$("body").on(pointer+"up"+this.draggableMixinEventNs, onDragEnd);
 };
 
 /**
@@ -107,11 +116,13 @@ DraggableMixin.prototype.makeDraggable = function(xi, yi) {
  * window is closing (i.e. during #getTeardownProcess) 
  */
 DraggableMixin.prototype.removeDraggability = function() {
-	$("body").removeClass("ooui-draggbleWindow-open");
+	if (!windowSetManager.hasOpenWindows()) {
+		$("body").removeClass("ooui-draggbleWindow-open");
+	}
 
 	this.$element.find(".oo-ui-window-frame").css("transform","");
-	this.$element.find(".oo-ui-processDialog-location").off(".oouiDraggableWin");
-	$("body").off(".oouiDraggableWin");
+	this.$element.find(".oo-ui-processDialog-location").off(this.draggableMixinEventNs);
+	$("body").off(this.draggableMixinEventNs);
 };
 
 export default DraggableMixin;
