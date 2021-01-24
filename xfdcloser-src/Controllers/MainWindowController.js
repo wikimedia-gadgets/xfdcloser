@@ -38,7 +38,9 @@ class MainWindowController {
 			throw new Error("Could not find panel with name: "+this.model.currentPanel);
 		}
 		this.stackLayout.setItem( currentPanel );
-		this.model.suggestCurrentPanelHeight(currentPanel.$element.get(0).scrollHeight + 1/* + 24 */);
+		const stackElement = this.stackLayout.$element.get(0);
+		const panelElement = currentPanel.$element.get(0);
+		this.model.suggestCurrentPanelHeight(stackElement.scrollHeight + panelElement.clientHeight/2 + 1);
 	}
 	getActionProcess(action) {
 		this.window.setErrorsLabels();
