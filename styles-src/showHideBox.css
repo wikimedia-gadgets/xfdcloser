@@ -1,0 +1,14 @@
+/* == Show/hide box == */
+#XFDcloser-showhide {
+	bottom: 0;
+	display: block;
+	position: fixed;
+	right: 0;
+	z-index: 100;
+	padding: 5px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	background-color: #fef9e6;
+	border: 1px solid #aaa;
+	border-radius: 5px;
+	font-size: 85%;
+}

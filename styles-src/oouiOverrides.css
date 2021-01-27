@@ -1,0 +1,22 @@
+/* == OOUI overrides == */
+
+/* Fix left padding when labelPosition:before is used on a TextInputWidget.
+ * Is otherwise set to 0px via inline style on the <input> element.
+ */
+.oo-ui-textInputWidget.oo-ui-textInputWidget-labelPosition-before.padLeft2em .oo-ui-inputWidget-input {
+	padding-left: 2em !important;
+}
+
+.oo-ui-textInputWidget.oo-ui-textInputWidget-labelPosition-before.padLeft4em .oo-ui-inputWidget-input {
+	padding-left: 4em !important;
+}
+
+/* Consistent padding for menu option widgets (is inexplicably different in skins using Apex theme instead of MediaWikiUi theme) */
+.xfdc-menuOptionWidget.oo-ui-decoratedOptionWidget {
+	padding: 7px 12px;
+}
+
+/* Force task notices, warnings, and errors to all be shown on their own line */
+.xfdc-taskItemWidget > .oo-ui-fieldLayout-messages {
+	clear: both;
+}

@@ -23,7 +23,7 @@
     "build:bundle": "browserify xfdcloser-src/App.js --debug -t babelify --outfile dist/core.js",
     "build:minify": "uglifyjs dist/core.js --compress -b ascii_only=true,beautify=false --output dist/core.min.js",
     "build:concat": "concat-cli -f \"core-comment-top.js\" dist/core.min.js \"core-comment-bottom.js\" -o dist/core-gadget.js",
-    "build:css": "concat-cli -f \"core-comment-top.js\" \"styles-src/styles.css\" \"core-comment-bottom.js\" -o dist/styles-gadget.css",
+    "build:css": "node bin/concatCss",
     "build": "npm run globals:window && npm run build:loader && npm run lint && npm run test:all && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
     "build:dev": "npm run globals:window && npm run build:loader:dev && npm run lint:dev && npm run test:all && npm run build:bundle ",
     "build:quickdev": "npm run globals:window && npm run build:loader:dev && npm run build:bundle "
@@ -45,6 +45,7 @@
     "babel-eslint": "^10.1.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
+    "concat": "^1.0.3",
     "concat-cli": "^4.0.0",
     "eslint": "^6.5.1",
     "jquery": "^3.5.1",

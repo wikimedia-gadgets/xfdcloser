@@ -1,0 +1,46 @@
+
+/* Inline links */
+.xfdc-status {
+	font-size: small;
+	margin-left: 13px;
+	font-weight: normal;
+}
+
+.skin-timeless .xfdc-status {
+	font-size: 0.98rem;
+}
+
+.skin-minerva .xfdc-status {
+	font-size: 0.98rem;
+	display: block;
+	margin: -1rem 0 1rem;
+}
+
+.xfdc-action {
+	font-weight: normal;
+}
+.xfdc-action a { cursor: pointer; }
+
+.xfdc-qc-cancel {
+	cursor: pointer;
+	border: 1px solid #777;
+	border-radius: 10px;
+	font-weight: bold;
+	font-size: 90%;
+	color: #777;
+	padding: 0;
+	margin: 0 1px;
+}
+
+/* Style actions based on detected age */
+.xfdc-old .xfdc-action { background-color: #c6ffc6; }
+.xfdc-notOld .xfdc-action { background-color: #ffc6c6; }
+.xfdc-unknownAge .xfdc-action { background-color: #ffffc6; }
+.xfdc-notOld.xfdc-relisted .xfdc-action { background-color: #ffe9c6; }
+
+/* Styles for actioned (closed/relisted) discussions */
+.xfdc-actioned-heading {
+	text-decoration: line-through double black;
+	opacity: 75%;
+}
+.xfdc-actioned-discussion { opacity: 50%; }
