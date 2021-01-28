@@ -4,7 +4,7 @@
 		0, // Article
 		6, // File
 		100 // Portal 
-	].includes(mw.config.get("wgNamespaceNumber"));
+	].indexOf(mw.config.get("wgNamespaceNumber")) !== -1;
 	var isUnlinkablePage = isNonexistentPage && isUnlinkableNamespace;
 	
 	// Check for edit, history, diff, or oldid mode
