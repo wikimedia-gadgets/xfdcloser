@@ -243,7 +243,7 @@ Venue.Rfd = () => {
 			closeTop:		"{{subst:Rfd top|'''__RESULT__'''}}__TO_TARGET____RATIONALE__ __SIG__",
 			closeBottom:	"{{subst:Rfd bottom}}",
 			oldXfd:			"{{Old RfD |date={{subst:date|__FIRSTDATE__}} |result='''__RESULT__'''"+
-				" |page=__DATE__#__SECTION__}}\n",
+				" |page=__DATE_YMD__#__SECTION__}}\n",
 			alreadyClosed:	"<!-- Template:Rfd top-->",
 			relistReplace:	"#invoke:RfD||2=__SECTION_HEADER__|"
 		},
