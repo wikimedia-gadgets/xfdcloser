@@ -333,7 +333,7 @@ const rcats = [
 			"R from portmanteau",
 			"R from short name",
 			"R from sort name",
-			"R from less specific name}",
+			"R from less specific name",
 			"R from more specific name",
 			"R from synonym",
 			"R from antonym",
