@@ -1,0 +1,13 @@
+{
+    "@metadata": {
+        "about": "This file provides documentation for translation messages. Each message key has a description of its puprpose and parameters (if any).",
+		"instructions": "Copy this file to [[MediaWiki:Gadget-XFDcloser-messages.json]]. Keep the message keys the same, provide a translated message in place of the description.",
+		"example": "See the accompanying 'messages-example.json' file, or https://test.wikipedia.org/wiki/MediaWiki:Gadget-XFDcloser-messages.json?action=raw",
+		"syntax": "The syntax for specifying plurals, gender, grammer, etc. is per https://github.com/wikimedia/jquery.i18n#message-format"
+    },
+    "xfdcloser-example-title": "Title of the application",
+    "xfdcloser-example-sub-title": "A short description of the application",
+    "xfdcloser-example-header-introduction": "Heading for the introduction section",
+    "xfdcloser-example-about": "Short heading for the 'About this application' page",
+    "xfdcloser-example-footer": "Text that goes in the footer"
+}

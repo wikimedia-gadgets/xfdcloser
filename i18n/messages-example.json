@@ -1,0 +1,10 @@
+{
+    "@metadata": {
+        "warning": "WARNING: GLOBAL GADGET FILE. Changes to this page affect many users. Please discuss changes on the talk page or on [[WT:Gadget]] before editing."
+    },
+    "xfdcloser-example-title": "Example Application",
+    "xfdcloser-example-sub-title": "An example application with jquery.i18n",
+    "xfdcloser-example-header-introduction": "Introduction",
+    "xfdcloser-example-about": "About this application",
+    "xfdcloser-example-footer": "Footer text"
+}

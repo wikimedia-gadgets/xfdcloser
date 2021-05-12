@@ -1,3 +1,4 @@
+import i18n, {loaded} from "./mocks/mockJqueryI18n";
 /* globals global, require */
 // <nowiki>
 
@@ -26,6 +27,8 @@ const mw  = {
 		escapeRegExp: function(str){return str.replace(/([\\{}()|.?*+\-^$\[\]])/g,'\\$1');}
 	}
 };
+// Pass through mock jquery-i18n instance, attaching the loaded promise
+i18n.loaded = loaded;
 
-export { $, OO, mw };
+export { $, OO, mw, i18n };
 // </nowiki>
