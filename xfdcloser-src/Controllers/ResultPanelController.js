@@ -82,6 +82,7 @@ class ResultPanelController {
 			format: "json",
 			formatversion: "2",
 			text: wikitext,
+			title: this.model.discussion.discussionPageName,
 			prop: "text",
 			pst: 1,
 			disablelimitreport: 1,
