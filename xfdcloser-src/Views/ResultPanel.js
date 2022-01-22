@@ -74,11 +74,11 @@ function ResultPanel( config, model ) {
 		this.rationaleTextbox.$element,
 		this.newSentenceOption.$element
 	);
-	this.rationaleFieldset.addItems(
+	this.rationaleFieldset.addItems([
 		new OO.ui.FieldLayout( this.rationaleWidget, {
 			align:"top"
 		} )
-	);
+	]);
 
 	// Preview
 	this.previewFieldset = new OO.ui.FieldsetLayout({label: "Preview"});
@@ -88,11 +88,11 @@ function ResultPanel( config, model ) {
 		"border-radius":"5px",
 		"padding":"5px"
 	});
-	this.previewFieldset.addItems(
+	this.previewFieldset.addItems([
 		new OO.ui.FieldLayout( this.preview, {
 			align: "top"
 		})
-	);
+	]);
 	
 	this.$element.append(
 		this.notesFieldset.$element,
