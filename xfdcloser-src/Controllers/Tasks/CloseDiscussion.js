@@ -28,7 +28,7 @@ export default class CloseDiscussion extends TaskItemController {
 			.replace(/\s{2,}/g, " ") // collapse multiple spaces into a single space
 			.trim()
 		);
-	}
+	};
 
 	transform(page) {
 		if ( this.model.aborted ) return rejection("aborted");

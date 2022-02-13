@@ -15,6 +15,7 @@
     },
     "parserOptions": {
         "ecmaVersion": 2018,
+        "requireConfigFile": false,
         "sourceType": "module"
     },
     "rules": {
@@ -35,5 +36,5 @@
             "always"
         ]
     },
-    "parser": "babel-eslint"
+    "parser": "@babel/eslint-parser"
 }
