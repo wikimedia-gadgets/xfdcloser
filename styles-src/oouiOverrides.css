@@ -11,7 +11,8 @@
 	padding-left: 4em !important;
 }
 
-/* Consistent padding for menu option widgets (is inexplicably different in skins using Apex theme instead of MediaWikiUi theme) */
+/* Consistent padding for menu option widgets (is inexplicably different in skins using Apex theme
+   instead of MediaWikiUi theme) */
 .xfdc-menuOptionWidget.oo-ui-decoratedOptionWidget {
 	padding: 7px 12px;
 }

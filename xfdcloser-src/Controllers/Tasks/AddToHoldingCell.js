@@ -39,7 +39,7 @@ export default class AddToHoldingCell extends TaskItemController {
 		default:
 			return "templates and modules";
 		}
-	}
+	};
 
 	transform(holdingCellPage) {
 		if ( this.model.aborted ) return rejection("aorted");

@@ -1,4 +1,3 @@
-
 /* Inline links */
 .xfdc-status {
 	font-size: small;
@@ -41,6 +40,6 @@
 /* Styles for actioned (closed/relisted) discussions */
 .xfdc-actioned-heading {
 	text-decoration: line-through double black;
-	opacity: 75%;
+	opacity: 0.75;
 }
-.xfdc-actioned-discussion { opacity: 50%; }
+.xfdc-actioned-discussion { opacity: 0.5; }

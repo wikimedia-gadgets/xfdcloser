@@ -36,10 +36,10 @@
 	const [op, version] = process.argv.slice(2);
 	let major, minor, patch;
 	if (!op) {
-		console.error(`Error: An option is required`);
+		console.error("Error: An option is required");
 		return;
 	} else if (op == "--set" && !version) {
-		console.error(`Error: Version number not provided`);
+		console.error("Error: Version number not provided");
 		return;
 	}
 	if (op == "--bump") {
@@ -72,8 +72,8 @@
 		return;
 	}
 
-	const newVersion = `${major}.${minor}.${patch}`
-	console.log("New version", newVersion)
+	const newVersion = `${major}.${minor}.${patch}`;
+	console.log("New version", newVersion);
 
 	// In package and package-lock, replace the version
 	const options = {
