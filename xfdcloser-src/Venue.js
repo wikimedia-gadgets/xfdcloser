@@ -63,8 +63,8 @@ Venue.Mfd = () => new Venue("mfd", {
 		closeBottom:	"{{subst:Mfd bottom}}",
 		oldXfd:			"{{Old MfD |date=__DATE__ |result='''__RESULT__''' |page=__SUBPAGE__}}"+
             "\n",
-		mergeFrom:		"{{mfd-mergefrom|__NOMINATED__|__DEBATE__|__DATE__}}\n",
-		mergeTo:		"{{mfd-mergeto|__TARGET__|__DEBATE__|__DATE__|__TARGETTALK__}}\n",
+		mergeFrom:		"{{mfd-merge from|__NOMINATED__|__DEBATE__|__DATE__}}\n",
+		mergeTo:		"{{mfd-merge to|__TARGET__|__DEBATE__|__DATE__|__TARGETTALK__}}\n",
 		alreadyClosed:	"{{#ifeq:{{FULLPAGENAME}}|Wikipedia:Miscellany for deletion|"+
             "{{collapse bottom}}|}}"
 	},
