@@ -166,7 +166,7 @@ Venue.Tfd = () => {
 		wikitext: {
 			closeTop:		"{{subst:Tfd top|'''__RESULT__'''}}__TO_TARGET____RATIONALE__ __SIG__",
 			closeBottom:	"{{subst:Tfd bottom}}",
-			oldXfd:			"{{oldtfdfull|date= __DATE__ |result=__RESULT__ |disc=__SECTION__}}\n",
+			oldXfd:			"{{old tfd|date= __DATE__ |result=__RESULT__ |disc=__SECTION__}}\n",
 			pagelinks:		"* {{tfd links|__PAGE__}}\n",
 			relistReplace:	"Wikipedia:Templates for discussion/Log/__TODAY__#",
 			alreadyClosed:	"<!-- Tfd top -->"
