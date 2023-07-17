@@ -270,7 +270,7 @@ const rcats = [
 			"R from fictional character",
 			"R from fictional element",
 			"R from fictional location",
-			"R to TV episode list entry"
+			"R from television episode"
 		]
 	},
 	{
