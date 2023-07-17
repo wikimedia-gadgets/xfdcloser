@@ -41,7 +41,7 @@ export default class AddOldXfdTask extends TaskItemController {
 		const titleObject = mw.Title.newFromText(pageTitle);
 		const PAGENAME = titleObject.getMain();
 		const SUBJECTPAGENAME = titleObject.getSubjectPage().getNamespacePrefix() +	PAGENAME; 
-		let oldafdmulti = "{{Old AfD multi";
+		let oldafdmulti = "{{Old XfD multi";
 		let count = 0;
 		let oldAfdTemplate;
 

@@ -63,8 +63,8 @@ Venue.Mfd = () => new Venue("mfd", {
 		closeBottom:	"{{subst:Mfd bottom}}",
 		oldXfd:			"{{Old MfD |date=__DATE__ |result='''__RESULT__''' |page=__SUBPAGE__}}"+
             "\n",
-		mergeFrom:		"{{mfd-mergefrom|__NOMINATED__|__DEBATE__|__DATE__}}\n",
-		mergeTo:		"{{mfd-mergeto|__TARGET__|__DEBATE__|__DATE__|__TARGETTALK__}}\n",
+		mergeFrom:		"{{mfd-merge from|__NOMINATED__|__DEBATE__|__DATE__}}\n",
+		mergeTo:		"{{mfd-merge to|__TARGET__|__DEBATE__|__DATE__|__TARGETTALK__}}\n",
 		alreadyClosed:	"{{#ifeq:{{FULLPAGENAME}}|Wikipedia:Miscellany for deletion|"+
             "{{collapse bottom}}|}}"
 	},
@@ -166,7 +166,7 @@ Venue.Tfd = () => {
 		wikitext: {
 			closeTop:		"{{subst:Tfd top|'''__RESULT__'''}}__TO_TARGET____RATIONALE__ __SIG__",
 			closeBottom:	"{{subst:Tfd bottom}}",
-			oldXfd:			"{{oldtfdfull|date= __DATE__ |result=__RESULT__ |disc=__SECTION__}}\n",
+			oldXfd:			"{{old tfd|date= __DATE__ |result=__RESULT__ |disc=__SECTION__}}\n",
 			pagelinks:		"* {{tfd links|__PAGE__}}\n",
 			relistReplace:	"Wikipedia:Templates for discussion/Log/__TODAY__#",
 			alreadyClosed:	"<!-- Tfd top -->"

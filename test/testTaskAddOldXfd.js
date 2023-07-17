@@ -83,7 +83,7 @@ describe("AddBeingDeleted", function() {
 	it("makes old xfd wikitext", function() {
 		assert.deepStrictEqual(
 			task.makeOldxfdWikitext(),
-			"{{oldtfdfull|date= 18 March 2020 |result=merge |disc=Foo and bar}}\n"
+			"{{old tfd|date= 18 March 2020 |result=merge |disc=Foo and bar}}\n"
 		);
 	});
 	it("makes new wikitext (no page content)", function() {
