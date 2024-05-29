@@ -70,7 +70,14 @@ import DiscussionView from "./Views/DiscussionView";
 		const showHide = $("#mw-content-text " + config.xfd.html.head).length > 1 && ShowHideTag.initialiseNewTag();
 		
 		// Set up discussion object for each discussion
-		$(config.xfd.html.head + " > span.mw-headline")
+		let headings;
+		if ( mw.config.get( "skin" ) === "monobook" ) {
+			headings = config.xfd.html.head;
+		} else {
+			// vector, vector-2022, minerva
+			headings = config.xfd.html.head + " > span.mw-headline";
+		}
+		$( headings )
 			.not(".XFDcloser-ignore")
 			.each(function(index) {
 				try {
