@@ -64,8 +64,8 @@ On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/
 
 3. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
 4. First time only: create the /dist/ folder so the build script doesn't throw an error.
-5. Run `npm run build`. (FIXME: Do not use `npm run build:dev` because it will not update the CSS file.)
-6. Run `node bin/server` in a terminal (in the directory where your local repistory is located)
+5. Run `npm run build:dev`.
+6. Run `node bin/server` in a terminal (in the directory where your local repistory is located).
 7. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
 
 ### Testing deployment
