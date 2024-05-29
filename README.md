@@ -2,7 +2,7 @@
 This is the source code for version 4 of the Wikipedia gadget [XFDcloser](https://en.wikipedia.org/wiki/Wikipedia:XFDcloser).
 
 ## Installation instructions and user guide
-Will be available at [https://en.wikipedia.org/wiki/Wikipedia:XFDcloser](https://en.wikipedia.org/wiki/Wikipedia:XFDcloser). Currently, that page is for version 3.
+Is available at [https://en.wikipedia.org/wiki/Wikipedia:XFDcloser](https://en.wikipedia.org/wiki/Wikipedia:XFDcloser).
 
 ## Repository structure
 - `bin\` contains scripts to run with node. To run, type `node bin\FILENAME` in the terminal (`.js` extensions are optional)
@@ -65,7 +65,7 @@ On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/
 4. Run `node bin/server` in a terminal (in the directory where your local repistory is located)
 5. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
 ### Testing deployment
-1. Comment out or remove the code that load the development version from [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js)
+1. Comment out or remove the code that loads the development version from [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js)
 2. Ensure the XFDcloser gadget is enabled in your preferences.
 3. Deploy to testwiki (see "Repository structure" section above for what goes where)
 4. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
