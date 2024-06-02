@@ -66,22 +66,16 @@ import DiscussionView from "./Views/DiscussionView";
 			});
 		});
 	} else {
-		// Initialise show/hide closed discussions tag, unless there is only one discussion on the page
-		const showHide = $("#mw-content-text " + config.xfd.html.head).length > 1 && ShowHideTag.initialiseNewTag();
-		
-		// Set up discussion object for each discussion
-		let headings;
-		switch ( mw.config.get( "skin" ) ) {
-		case "vector":
-		case "vector-2022":
-		case "minerva":
-			headings = config.xfd.html.head + " > span.mw-headline";
-			break;
-		default:
-			headings = config.xfd.html.head;
+		let heading = config.xfd.html.headlineinner.oldskin;
+		if ( [ "vector", "vector-2022", "minerva" ].includes ( mw.config.get( "skin" ) ) ) {
+			heading = config.xfd.html.headlineinner.newskin;
 		}
 
-		$( headings )
+		// Initialise show/hide closed discussions tag, unless there is only one discussion on the page
+		const showHide = $("#mw-content-text " + heading).length > 1 && ShowHideTag.initialiseNewTag();
+		
+		// Set up discussion object for each discussion
+		$( heading )
 			.not(".XFDcloser-ignore")
 			.each(function(index) {
 				try {
