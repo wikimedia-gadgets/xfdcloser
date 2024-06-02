@@ -70,13 +70,18 @@ import DiscussionView from "./Views/DiscussionView";
 		const showHide = $("#mw-content-text " + config.xfd.html.head).length > 1 && ShowHideTag.initialiseNewTag();
 		
 		// Set up discussion object for each discussion
+		const skin = mw.config.get( "skin" );
 		let headings;
-		if ( mw.config.get( "skin" ) === "monobook" ) {
-			headings = config.xfd.html.head;
-		} else {
-			// vector, vector-2022, minerva
+		switch ( skin ) {
+		case "vector":
+		case "vector-2022":
+		case "minerva":
 			headings = config.xfd.html.head + " > span.mw-headline";
+			break;
+		default:
+			headings = config.xfd.html.head;
 		}
+
 		$( headings )
 			.not(".XFDcloser-ignore")
 			.each(function(index) {
