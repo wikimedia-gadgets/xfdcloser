@@ -70,9 +70,8 @@ import DiscussionView from "./Views/DiscussionView";
 		const showHide = $("#mw-content-text " + config.xfd.html.head).length > 1 && ShowHideTag.initialiseNewTag();
 		
 		// Set up discussion object for each discussion
-		const skin = mw.config.get( "skin" );
 		let headings;
-		switch ( skin ) {
+		switch ( mw.config.get( "skin" ) ) {
 		case "vector":
 		case "vector-2022":
 		case "minerva":
