@@ -66,11 +66,16 @@ import DiscussionView from "./Views/DiscussionView";
 			});
 		});
 	} else {
+		let heading = config.xfd.html.headlineinner.oldskin;
+		if ( [ "vector", "vector-2022", "minerva" ].includes ( mw.config.get( "skin" ) ) ) {
+			heading = config.xfd.html.headlineinner.newskin;
+		}
+
 		// Initialise show/hide closed discussions tag, unless there is only one discussion on the page
-		const showHide = $("#mw-content-text " + config.xfd.html.head).length > 1 && ShowHideTag.initialiseNewTag();
+		const showHide = $("#mw-content-text " + heading).length > 1 && ShowHideTag.initialiseNewTag();
 		
 		// Set up discussion object for each discussion
-		$(config.xfd.html.head + " > span.mw-headline")
+		$( heading )
 			.not(".XFDcloser-ignore")
 			.each(function(index) {
 				try {
