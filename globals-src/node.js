@@ -11,7 +11,7 @@ const OO = require("oojs");
 OO.ui = {
 	HtmlSnippet: function(content) { this.content = content; },
 	MessageDialog: function(content) { this.content = content; }
-}
+};
 global.window = window;
 
 // Set up mock mw object (with just enough to get tests running without errors)
@@ -23,7 +23,7 @@ const mw  = {
 	},
 	Api: () => {},
 	util: {
-		escapeRegExp: function(str){return str.replace(/([\\{}()|.?*+\-^$\[\]])/g,'\\$1');}
+		escapeRegExp: function(str){return str.replace(/([\\{}()|.?*+\-^$[\]])/g,"\\$1");}
 	}
 };
 
