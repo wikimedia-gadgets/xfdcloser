@@ -105,7 +105,7 @@ describe("AddBeingDeleted", function() {
 				"|Wikipedia:Templates for discussion/Log/2019 June 18#Template:Foo}}";
 		assert.strictEqual(
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
-			"{{Old AfD multi |date1=18 June 2019 |result1='''Keep''' |page1=" +page1 +
+			"{{Old Xfd multi |date1=18 June 2019 |result1='''Keep''' |page1=" +page1 +
 				" |date2=18 March 2020 |result2='''Merge''' |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\n"
 		);
 	});
@@ -116,26 +116,26 @@ describe("AddBeingDeleted", function() {
 				"|Wikipedia:Templates for discussion/Log/2019 June 18#Template:Foo}}";
 		assert.strictEqual(
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
-			"{{Old AfD multi |date1=18 June 2019 |result1='''Keep''' |page1=" +page1 +
+			"{{Old Xfd multi |date1=18 June 2019 |result1='''Keep''' |page1=" +page1 +
 				" |date2=18 March 2020 |result2='''Merge''' |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\nLoremipsum"
 		);
 	});
-	it("makes new wikitext (Old Afd multi)", function() {
-		const wikitext = "{{Old AfD multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}}}";	
+	it("makes new wikitext (Old Xfd multi)", function() {
+		const wikitext = "{{Old Xfd multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}}}";	
 		assert.strictEqual(
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
-			"{{Old AfD multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}"+
+			"{{Old Xfd multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}"+
 				" |date2=18 March 2020 |result2='''Merge''' |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}"
 		);
 	});
-	it("makes new wikitext (Old Afd multi and old TFD banner)", function() {
-		const wikitext = "{{Old AfD multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}}}\n{{Old TfD|date=2019 June 18|result=keep}}\nLoremipsum";
+	it("makes new wikitext (Old Xfd multi and old TFD banner)", function() {
+		const wikitext = "{{Old Xfd multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}}}\n{{Old TfD|date=2019 June 18|result=keep}}\nLoremipsum";
 		const page2 = "{{subst:#ifexist:Wikipedia:Templates for deletion/Log/2019 June 18"+
 			"|Wikipedia:Templates for deletion/Log/2019 June 18#Template:Foo"+
 			"|Wikipedia:Templates for discussion/Log/2019 June 18#Template:Foo}}";
 		assert.strictEqual(
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
-			"{{Old AfD multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}"+
+			"{{Old Xfd multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}"+
 				" |date2=18 June 2019 |result2='''Keep''' |page2=" + page2 +
 				" |date3=18 March 2020 |result3='''Merge''' |page3=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\nLoremipsum"
 		);
