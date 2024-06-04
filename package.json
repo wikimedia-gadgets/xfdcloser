@@ -1,6 +1,6 @@
 {
   "name": "xfdcloser",
-  "version": "4.0.13",
+  "version": "4.0.14",
   "description": "Wikipedia userscript that helps assess pages for WikiProjects",
   "homepage": "https://github.com/wikimedia-gadgets/xfdcloser",
   "browser": "index.js",
@@ -29,7 +29,7 @@
     "build:concat": "concat-cli -f \"core-comment-top.js\" dist/core.min.js \"core-comment-bottom.js\" -o dist/core-gadget.js",
     "build:css": "node bin/concatCss",
     "build": "npm run globals:window && npm run build:loader && npm run lint && npm run test:all && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
-    "build:dev": "npm run globals:window && npm run build:loader:dev && npm run lint:dev && npm run test:all && npm run build:css && npm run build:bundle ",
+    "build:dev": "npm run globals:window && npm run build:loader:dev && npm run build:css && npm run build:bundle",
     "build:quickdev": "npm run globals:window && npm run build:loader:dev && npm run build:bundle "
   },
   "author": {
