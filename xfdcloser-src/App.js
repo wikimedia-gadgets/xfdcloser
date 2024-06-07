@@ -33,7 +33,7 @@ import DiscussionView from "./Views/DiscussionView";
 		});
 	});
 
-	// Unlink portlet link: non-existant pages only
+	// Unlink portlet link: non-existent pages only
 	if ( config.mw.wgArticleId === 0 ) {
 		mw.util.addPortletLink("p-cactions", "#", "XFDC Unlink", "p-xfdc-unlink", "Unlink backlinks using XFDcloser");
 		$("#p-xfdc-unlink").click(e => {
@@ -67,7 +67,7 @@ import DiscussionView from "./Views/DiscussionView";
 		});
 	} else {
 		let heading = config.xfd.html.headlineinner.oldskin;
-		if ( [ "vector", "vector-2022", "minerva" ].includes ( mw.config.get( "skin" ) ) ) {
+		if ( [ "vector-2022", "minerva" ].includes ( mw.config.get( "skin" ) ) ) {
 			heading = config.xfd.html.headlineinner.newskin;
 		}
 
