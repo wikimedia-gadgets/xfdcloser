@@ -182,7 +182,7 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 	// Find all nodes that are part of this discussion (i.e. excluding subsequent closed discussions)
 	$("table.mw-collapsible").has("div.xfd-closed").addClass("xfd-closed");	// Fix for closed discussion within a collapsed table (e.g. MfD)
 	let headlineouter = venue.html.headlineouter.oldskin;
-	if ( [ "vector", "vector-2022", "minerva" ].includes ( mw.config.get( "skin" ) ) ) {
+	if ( [ "vector-2022", "minerva" ].includes ( mw.config.get( "skin" ) ) ) {
 		headlineouter = venue.html.headlineouter.newskin;
 	}
 	const $discussionNodes = $heading.nextUntil(headlineouter + ", div.xfd-closed, table.xfd-closed");
