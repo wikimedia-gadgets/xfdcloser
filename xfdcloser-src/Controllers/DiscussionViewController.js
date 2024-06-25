@@ -27,21 +27,38 @@ class DiscussionViewController {
 		}
 	}
 	fetchInfoFromApi() {
-		const pagesExistencesPromise = API.get({
-			action: "query",
-			format: "json",
-			formatversion: 2,
-			titles: this.model.pagesNames,
-			prop: "info",
-			inprop: "talkid"
-		}).then(response => response.query.pages.forEach(page => {
-			const pageTitle = mw.Title.newFromText(page.title);
-			const talkpageTitle = pageTitle.getTalkPage();
-			mw.Title.exist.set(pageTitle.getPrefixedDb(), !page.missing);
-			if ( talkpageTitle ) {
-				mw.Title.exist.set(talkpageTitle.getPrefixedDb(), !!page.talkid);
-			}
-		}));
+		const pageNames = this.model.pagesNames;
+		const chunkSize = pageNames.length <= 100 ? 50 : (await mw.user.getRights()).indexOf( 'apihighlimits' ) >= 0 ? 500 : 50;
+
+		const chunks = [];
+		for (let i = 0; i < pageNames.length; i += chunkSize) {
+			chunks.push(pageNames.slice(i, i + chunkSize));
+		}
+
+		const fetchChunk = (chunk) => {
+			return API.get({
+				action: "query",
+				format: "json",
+				formatversion: 2,
+				titles: chunk.join('|'),
+				prop: "info",
+				inprop: "talkid"
+			}).then(response => {
+				if (response.query && response.query.pages) {
+					response.query.pages.forEach(page => {
+						const pageTitle = mw.Title.newFromText(page.title);
+						const talkpageTitle = pageTitle.getTalkPage();
+						mw.Title.exist.set(pageTitle.getPrefixedDb(), !page.missing);
+						if (talkpageTitle) {
+							mw.Title.exist.set(talkpageTitle.getPrefixedDb(), !!page.talkid);
+						}
+					});
+				}
+			})
+		};
+
+		const fetchPromises = chunks.map(chunk => fetchChunk(chunk));
+		const pagesExistencesPromise = Promise.all(fetchPromises);
 		const nominationDatePromise = ( this.model.venue.type !== "afd" && this.model.venue.type !== "mfd" )
 			? $.Deferred().resolve( dateFromSubpageName(this.model.discussionSubpageName) )
 			: API.get({
