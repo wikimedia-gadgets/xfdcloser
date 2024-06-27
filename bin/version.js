@@ -5,7 +5,7 @@
  *  - bug fixes and very small changes increment the patch number
  *  - new features and other changes increment the minor number and reset the
  *    patch number to 0
- *  - significant changes, such as shifting coding paradyms or completely
+ *  - significant changes, such as shifting coding paradigms or completely
  *    redesigning the UI, increment the major number and reset both the minor
  *    and patch numbers to 0
  * 
