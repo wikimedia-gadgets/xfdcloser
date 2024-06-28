@@ -23,13 +23,13 @@ class DiscussionViewController {
 		this.quickCloseMenu.connect(this, {choose: "onQuickCloseChoose"});
 
 		if ( this.model.pages.length ) {
-			this.fetchInfoFromApi();
+			this.fetchInfoFromApi(); 
 		}
 	}
 	fetchInfoFromApi() {
 		const pageNames = this.model.pagesNames;
 		mw.user.getRights().then(rights =>  {
-			const chunkSize = rights.indexOf( 'apihighlimits' ) >= 0 ? 500 : 50;
+			const chunkSize = rights.indexOf( "apihighlimits" ) >= 0 ? 500 : 50;
 		
 			const chunks = [];
 			for (let i = 0; i < pageNames.length; i += chunkSize) {
@@ -41,7 +41,7 @@ class DiscussionViewController {
 					action: "query",
 					format: "json",
 					formatversion: 2,
-					titles: chunk.join('|'),
+					titles: chunk.join("|"),
 					prop: "info",
 					inprop: "talkid"
 				}).then(response => {
@@ -55,7 +55,7 @@ class DiscussionViewController {
 							}
 						});
 					}
-				})
+				});
 			};
 	
 			const fetchPromises = chunks.map(chunk => fetchChunk(chunk));
