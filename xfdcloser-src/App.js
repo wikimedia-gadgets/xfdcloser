@@ -66,10 +66,7 @@ import DiscussionView from "./Views/DiscussionView";
 			});
 		});
 	} else {
-		let heading = config.xfd.html.headlineinner.oldskin;
-		if ( [ "vector-2022", "minerva" ].includes ( mw.config.get( "skin" ) ) ) {
-			heading = config.xfd.html.headlineinner.newskin;
-		}
+		const heading = config.xfd.html.headlineinner;
 
 		// Initialise show/hide closed discussions tag, unless there is only one discussion on the page
 		const showHide = $("#mw-content-text " + heading).length > 1 && ShowHideTag.initialiseNewTag();
