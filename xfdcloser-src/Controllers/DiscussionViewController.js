@@ -23,7 +23,7 @@ class DiscussionViewController {
 		this.quickCloseMenu.connect(this, {choose: "onQuickCloseChoose"});
 
 		if ( this.model.pages.length ) {
-			this.fetchInfoFromApi(); 
+			this.fetchInfoFromApi();
 		}
 	}
 	fetchInfoFromApi() {
