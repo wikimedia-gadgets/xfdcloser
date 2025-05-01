@@ -63,10 +63,12 @@ describe("RemoveNomTemplates", function() {
 	it("transforms a page with a nom templatge", function() {
 		const transformed = RemoveNomTemplates.transform(task, {
 			title: "Foo",
-			content: `<!-- Please do not remove or change this AfD message until the discussion has been closed. -->
+			content: `<noinclude>
+<!-- Please do not remove or change this AfD message until the discussion has been closed. -->
 {{Article for deletion/dated|page=Foo|timestamp=20200617061910|year=2020|month=June|day=17|substed=yes|help=off}}
 <!-- Once discussion is closed, please place on talk page: {{Old AfD multi|page=Foo|date=17 June 2020|result='''keep'''}} -->
 <!-- End of AfD message, feel free to edit beyond this point -->
+</noinclude>
 Lorem impsum`
 		});
 		if ( transformed.then ) {
