@@ -13,6 +13,16 @@
         "importScript": "readonly",
         "importStylesheet": "readonly"
     },
+    "overrides": [
+        {
+            "files": [
+                "bin/*.js"
+            ],
+            "env": {
+                "node": true
+            }
+        }
+    ],
     "parserOptions": {
         "ecmaVersion": 2018,
         "requireConfigFile": false,
