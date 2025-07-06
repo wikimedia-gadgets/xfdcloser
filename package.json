@@ -29,6 +29,7 @@
     "lint:es6": "eslint \"xfdcloser-src/**/*.js\" \"test/*\"",
     "lint:fix": "npm run lint:es6:fix && npm run lint:bin:fix && npm run lint:css:fix",
     "lint": "npm run lint:es6 && npm run lint:es5 && npm run lint:css",
+    "start": "npm run build:dev && node bin/server",
     "test:all": "node bin/testall && npm run test",
     "test:delay": "mocha --delay --require @babel/register --reporter list",
     "test": "npm run globals:node && mocha --require @babel/register --reporter list && npm run globals:window"
