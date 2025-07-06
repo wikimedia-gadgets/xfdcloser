@@ -15,7 +15,7 @@
     "build:minify": "uglifyjs dist/core.js --compress -b ascii_only=true,beautify=false --output dist/core.min.js",
     "build:quickdev": "npm run globals:window && npm run build:loader:dev && npm run build:bundle ",
     "build": "npm run globals:window && npm run build:loader && npm run lint && npm run test:all && npm run build:css && npm run build:bundle && npm run build:minify && npm run build:concat",
-    "deploy": "node bin/deploy.js --quick",
+    "deploy": "npm run build && node bin/deploy.js --quick",
     "globals:node": "concat-cli -f \"globals-src/comment.js\" \"globals-src/node.js\" -o \"globals.js\"",
     "globals:window": "concat-cli -f \"globals-src/comment.js\" \"globals-src/window.js\" -o \"globals.js\"",
     "lint:bin:fix": "eslint \"bin/*.js\" --fix --env node",
