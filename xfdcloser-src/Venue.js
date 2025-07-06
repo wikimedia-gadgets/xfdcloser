@@ -54,14 +54,8 @@ Venue.Mfd = () => new Venue("mfd", {
 	hasIndividualSubpages: true,
 	ns_number:	 null,
 	html: {
-		headlineouter: {
-			newskin:	"h4",
-			oldskin:	".mw-heading.mw-heading4"
-		},
-		headlineinner: {
-			newskin:	"h4 > .mw-headline",
-			oldskin:	"h4"
-		},
+		headlineouter:	".mw-heading.mw-heading4",
+		headlineinner:	"h4",
 		list:			"dl",
 		listitem:		"dd"
 	},
@@ -87,14 +81,8 @@ Venue.Cfd = () => {
 		path:		 "Wikipedia:Categories for discussion/Log/",
 		ns_number:	 [14],
 		html: {
-			headlineouter: {
-				newskin:	"h4",
-				oldskin:	".mw-heading.mw-heading4"
-			},
-			headlineinner: {
-				newskin:	"h4 > .mw-headline",
-				oldskin:	"h4"
-			},
+			headlineouter:	".mw-heading.mw-heading4",
+			headlineinner:	"h4",
 			list:			"ul",
 			listitem:		"li",
 			nthSpan:		"2"
@@ -144,14 +132,8 @@ Venue.Ffd = () => new Venue("ffd", {
 	ns_number:	 [6],
 	ns_unlink:   ["0", "10", "100", "118"], // main, Template, Portal, Draft
 	html: {
-		headlineouter: {
-			newskin:	"h4",
-			oldskin:	".mw-heading.mw-heading4"
-		},
-		headlineinner: {
-			newskin:	"h4 > .mw-headline",
-			oldskin:	"h4"
-		},
+		headlineouter:	".mw-heading.mw-heading4",
+		headlineinner:	"h4",
 		list:			"dl",
 		listitem:		"dd",
 		nthSpan:		"1"
@@ -179,14 +161,8 @@ Venue.Tfd = () => {
 		subpagePath: "Wikipedia:Templates for discussion/",
 		ns_number:	 [10, 828],
 		html: {
-			headlineouter: {
-				newskin:	"h4",
-				oldskin:	".mw-heading.mw-heading4"
-			},
-			headlineinner: {
-				newskin:	"h4 > .mw-headline",
-				oldskin:	"h4"
-			},
+			headlineouter:	".mw-heading.mw-heading4",
+			headlineinner:	"h4",
 			list:			"ul",
 			listitem:		"li",
 			nthSpan:		"1"
@@ -263,14 +239,8 @@ Venue.Rfd = () => {
 		path:		 "Wikipedia:Redirects for discussion/Log/",
 		ns_number:	 null,
 		html: {
-			headlineouter: {
-				newskin:	"h4",
-				oldskin:	".mw-heading.mw-heading4"
-			},
-			headlineinner: {
-				newskin:	"h4 > .mw-headline",
-				oldskin:	"h4"
-			},
+			headlineouter:	".mw-heading.mw-heading4",
+			headlineinner:	"h4",
 			list:			"ul",
 			listitem:		"li"
 		},
@@ -309,14 +279,8 @@ Venue.Afd = transcludedOnly => new Venue("afd", {
 	ns_logpages: 4, // Wikipedia
 	ns_unlink:   ["0", "10", "100", "118"], // main, Template, Portal, Draft
 	html: {
-		headlineouter: {
-			newskin:	"h3",
-			oldskin:	".mw-heading.mw-heading3"
-		},
-		headlineinner: {
-			newskin:	"h3 > .mw-headline",
-			oldskin:	"h3"
-		},
+		headlineouter:	".mw-heading.mw-heading3",
+		headlineinner:	"h3",
 		list:			"dl",
 		listitem:		"dd",
 		nthSpan:		"2"
