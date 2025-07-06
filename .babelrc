@@ -4,14 +4,13 @@
       "useBuiltIns": "usage", // or "entry"
       "corejs": 3,
       "targets": {
-        // Grade A browsers per https://github.com/wikimedia/mediawiki/blob/2aed14b686/resources/src/startup/startup.js#L10
-        "chrome": "13",
-        "opera": "15",
-        "firefox": "4",
-        "safari": "5",
-        "ie": "11",
-        "ios": "6",
-        "android": "4.1"
+        // Grade A browsers per https://www.mediawiki.org/wiki/Template:Compatibility_browser
+        "chrome": "103", // https://bestim.org/chrome-versions
+        "edge": "103", // https://video2.skills-academy.com/en-us/DeployEdge/microsoft-edge-release-schedule
+        "firefox": "102", // https://whattrainisitnow.com/calendar/
+        "safari": "11.1",
+        "ios": "11.3",
+        "android": "6"
       }
     }]
   ],
