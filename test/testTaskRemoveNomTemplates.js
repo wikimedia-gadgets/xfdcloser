@@ -60,7 +60,7 @@ describe("RemoveNomTemplates", function() {
 		});
 		task = new RemoveNomTemplates(model, widgets);
 	});
-	it("transforms a page with a nom templatge", function() {
+	it("transforms a page with a nom template", function() {
 		const transformed = RemoveNomTemplates.transform(task, {
 			title: "Foo",
 			content: `<!-- Please do not remove or change this AfD message until the discussion has been closed. -->
@@ -76,7 +76,25 @@ Lorem impsum`
 		assert.deepStrictEqual(Object.keys(transformed), ["text", "summary"]);
 		assert.strictEqual(transformed.text, "Lorem impsum");
 	});
-	it("does not transform a page without a nom templatge", function() {
+	it("transforms a page with a nom template in noinclude tags", function() {
+		const transformed = RemoveNomTemplates.transform(task, {
+			title: "Foo",
+			content: `<noinclude>
+<!-- Please do not remove or change this AfD message until the discussion has been closed. -->
+{{Article for deletion/dated|page=Foo|timestamp=20200617061910|year=2020|month=June|day=17|substed=yes|help=off}}
+<!-- Once discussion is closed, please place on talk page: {{Old AfD multi|page=Foo|date=17 June 2020|result='''keep'''}} -->
+<!-- End of AfD message, feel free to edit beyond this point -->
+</noinclude>
+Lorem impsum`
+		});
+		if ( transformed.then ) {
+			transformed.always(console.log);
+			throw new Error("Transformation resulted in a promise");
+		}
+		assert.deepStrictEqual(Object.keys(transformed), ["text", "summary"]);
+		assert.strictEqual(transformed.text, "Lorem impsum");
+	});
+	it("does not transform a page without a nom template", function() {
 		const transformed = RemoveNomTemplates.transform(task, {
 			title: "Foo",
 			content: "Lorem impsum"
