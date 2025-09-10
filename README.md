@@ -64,26 +64,23 @@ On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/
 
 3. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
 4. First time only: create the /dist/ folder so the build script doesn't throw an error.
-5. Run `npm run build:dev`.
-6. Run `node bin/server` in a terminal (in the directory where your local repistory is located).
-7. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
+5. Run `npm start` in a terminal (in the directory where your local repistory is located).
+6. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
 
-### Testing deployment
+### Deploying to testwiki
 1. Comment out or remove the code that loads the development version from [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js)
 2. Ensure the XFDcloser gadget is enabled in your preferences.
 3. Deploy to testwiki (see "Repository structure" section above for what goes where)
 4. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
 5. Now when you visit the XFD log/discussion pages, the testwiki gadget with the files you deployed will be loaded.
 
-## Deployment
+## Deploying to enwiki
 As XFDcloser is a gadget, you must have interface-admin rights to deploy to the wiki.
 1. Ensure:
    - changes are committed and merged to master branch of the GitHub repo
    - you are currently on the master branch, and synced with GitHub repo
-2. Bump the version number. See the comments in the `bin\version.js` file for how to do this from the terminal.
-3. Commit the version change, and push/sync to GitHub repo
-4. Run a full build: run `npm run build` in terminal
-5. You are now ready to deploy: see the comments in the `bin\deploy.js` file for how to do this from the terminal.
+2. Create a bin/credentials.json file, following the format specified in bin/credentials.example.json
+3. `npm run deploy`. This will deploy both the beta version and the non-beta version, ensuring that both users of the gadget receive the latest updates.
 
 ## Planned features
 A general overview of planned features:

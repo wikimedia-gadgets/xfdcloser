@@ -34,8 +34,8 @@ let config = {
 		advert: `([[WP:XFDC#${scriptVersion}|XFDcloser]])`,
 		version: scriptVersion
 	},
-	// Mobile site detection, as that requires some special handling
-	isMobileSite: window.location.host.includes(".m.") || window.location.search.includes("useformat=mobile"),
+	// MobileFrontend detection, which renders discussion pages differently
+	isMobileSite: !!mw.config.get("wgMFMode"),
 	// MediaWiki configuration values
 	mw: mwConfig,
 	// Static values
