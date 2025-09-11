@@ -19,5 +19,6 @@ const server = http.createServer((request, response) => {
 });
 
 server.listen(port, hostname, () => {
+	console.log("Note: If you make code changes, you need to restart the server.");
 	console.log(`Server running at http://${hostname}:${port}/`);
 });
