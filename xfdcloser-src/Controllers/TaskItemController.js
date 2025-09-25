@@ -132,7 +132,7 @@ class TaskItemController {
 			this.model.addWarning(`${makeLink(title)} skipped (no direct links)`);
 			this.model.trackStep("skipped");
 			break;
-    case "noDiscussionPageLink":
+		case "noDiscussionPageLink":
 			this.model.addError(`No discussion page link found on page ${makeLink(title)}`);
 			this.model.trackStep("skipped");
 			break;

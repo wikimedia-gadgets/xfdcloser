@@ -146,9 +146,9 @@ export default class  UnlinkBacklinks extends TaskItemController {
 		if ( newWikitext === page.content ) {
 			return rejection("skippedNoLinks");
 		}
-    if ( !this.model.discussion.discussionPageLink ) {
-      return rejection("noDiscussionPageLink");
-    }
+		if ( !this.model.discussion.discussionPageLink ) {
+			return rejection("noDiscussionPageLink");
+		}
 		return this.processListItems(page.title, newWikitext)
 			.then((updatedWikitext, isMajorEdit) => {
 				const prefix = "Removing link(s)" +
