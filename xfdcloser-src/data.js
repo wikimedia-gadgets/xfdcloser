@@ -31,7 +31,6 @@ const resultsData = [
 		title: "Close discussion as \"delete\"",
 		allowSpeedy: true,
 		allowSoft: true,
-		sysopOnly: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
 	},
