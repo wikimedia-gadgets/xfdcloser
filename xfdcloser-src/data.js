@@ -218,7 +218,7 @@ const resultsData = [
 		title: "Close discussion with a custom result",
 		sysopOnly: true,
 		venues: ["cfd"],
-		actions: ["updatePages", "noActions"]
+		actions: ["noActions", "updatePages"]
 	},
 	// Custom (non-sysop)
 	{
@@ -227,7 +227,7 @@ const resultsData = [
 		title: "Close discussion with a custom result",
 		nonSysopOnly: true,
 		venues: ["afd", "cfd", "ffd", "mfd", "rfd", "tfd"],
-		actions: ["updatePages", "noActions"]
+		actions: ["noActions", "updatePages"]
 	}
 ];
 
