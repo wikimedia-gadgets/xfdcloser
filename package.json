@@ -5,7 +5,6 @@
   "homepage": "https://github.com/wikimedia-gadgets/xfdcloser",
   "browser": "index.js",
   "scripts": {
-    "mkdir-dist": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\"",
     "build:bundle": "npm run mkdir-dist && browserify xfdcloser-src/App.js --debug -t babelify --outfile dist/core.js",
     "build:concat": "npm run mkdir-dist && concat-cli -f \"core-comment-top.js\" dist/core.min.js \"core-comment-bottom.js\" -o dist/core-gadget.js",
     "build:css": "npm run mkdir-dist && node bin/concatCss",
@@ -30,6 +29,7 @@
     "lint:es6": "eslint \"xfdcloser-src/**/*.js\" \"test/*\"",
     "lint:fix": "npm run lint:es6:fix && npm run lint:bin:fix && npm run lint:css:fix",
     "lint": "npm run lint:es6 && npm run lint:es5 && npm run lint:css",
+    "mkdir-dist": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\"",
     "start": "npm run build:dev && node bin/server",
     "test:all": "node bin/testall && npm run test",
     "test:delay": "mocha --delay --require @babel/register --reporter list",
