@@ -63,8 +63,7 @@ On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/
    ```
 
 3. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
-4. First time only: create the /dist/ folder so the build script doesn't throw an error.
-5. Run `npm start` in a terminal (in the directory where your local repistory is located).
+4. Run `npm start` in a terminal (in the directory where your local repistory is located).
 Note: You need to do `npm start` every time you update and save a file. Changes will not automatically make it into the current build.
 
 ### Deploying to testwiki
