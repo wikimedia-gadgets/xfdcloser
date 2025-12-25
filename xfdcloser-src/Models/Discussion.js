@@ -87,12 +87,8 @@ class Discussion {
 	}
 
 	setStatusReady() {
-		if ( !this.userIsSysop && this.pages.length > 50 ) {
-			this.status = "[XFDcloser: Too many pages for non-admin]";
-		} else {
-			this.status = "";
-			this.showStatus = false;
-		}
+		this.status = "";
+		this.showStatus = false;
 		this.emit("update");
 	}
 
