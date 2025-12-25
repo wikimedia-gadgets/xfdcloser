@@ -177,7 +177,7 @@ class Result {
 	 */
 	get previewWikitext() {
 		if (this.type === "relist") {
-			return `{{Relist|1=${this.getRelistComment()}}}`;
+			return `{{XfD relist|1=${this.getRelistComment()}}}`;
 		} else { 
 			const resultText = this.isMultimode ? this.resultSummary.trim() : this.singleModeResult.getResultText();
 			const resultWikitext = resultText ? `'''${resultText}'''` : "";
