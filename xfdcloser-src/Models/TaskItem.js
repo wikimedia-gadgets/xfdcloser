@@ -109,9 +109,22 @@ class TaskItem {
 	getEditSummary(options) {
 		options = options || {};
 		const prefix = options.prefix ? options.prefix + " " : "";
-		const main = this.summary || options.short
-			? `[[${this.discussion.discussionPageLink}]]`
-			: `[[${this.discussion.discussionPageLink}]] closed as ${this.result.getResultText()}`;
+
+		// If a custom summary is provided use it directly
+		if ( typeof this.summary === "string" && this.summary.trim() ) {
+			return prefix + this.summary + " " + appConfig.script.advert;
+		}
+
+		// Fall back to linking the discussion page, if that exists from an XfD close
+		const link = this.discussion && this.discussion.discussionPageLink;
+		if ( !link ) {
+			// If link is not link available, do not force a link.
+			return (prefix + appConfig.script.advert).trim();
+		}
+
+		const main = options.short
+			? `[[${link}]]`
+			: `[[${link}]] closed as ${this.result.getResultText()}`;
 		return prefix + main + " " + appConfig.script.advert;
 	}
 

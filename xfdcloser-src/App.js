@@ -56,9 +56,11 @@ import DiscussionView from "./Views/DiscussionView";
 						comment += child.nodeValue;
 					}
 				}
-				comment = comment
-					.replace(/ \(\[\[Wikipedia:XFDC(#[\d.]+)?|XFDcloser]]\)/, "")
-					.slice(1,-1);
+				// Removes XFDcloser advert from the end of the comment
+				comment = comment.replace(/ \(\[\[(?:Wikipedia:XFDC(?:#[\d.]+)?)\|XFDcloser\]\]\)/, "");
+				if (comment.startsWith("(") && comment.endsWith(")")) {
+					comment = comment.slice(1, -1);
+				}
 			}
 			windowSetManager.openWindow("unlink", {
 				summary: comment,
