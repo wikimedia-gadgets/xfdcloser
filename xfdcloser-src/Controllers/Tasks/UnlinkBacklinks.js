@@ -148,9 +148,9 @@ export default class  UnlinkBacklinks extends TaskItemController {
 		}
 		return this.processListItems(page.title, newWikitext)
 			.then((updatedWikitext, isMajorEdit) => {
-				const prefix = "Removing link(s) because" +
+				const prefix = "Removing link(s)" +
 					(isMajorEdit ? " / list item(s)" : "") +
-					(isFile(page.title) ? " / file usage(s)" : "");
+					(isFile(page.title) ? " / file usage(s)" : "") + " because";
 				const req = {
 					text: cleanupVoidTemplates(updatedWikitext),
 					summary: this.model.getEditSummary({prefix}),
