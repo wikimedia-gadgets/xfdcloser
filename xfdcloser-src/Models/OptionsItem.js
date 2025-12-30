@@ -23,6 +23,9 @@ class OptionsItem {
 		if ( config.venueType === "tfd" && config.result === "delete" ) {
 			this.selectedActionName = prefs.get("tfdDeleteAction");
 		}
+		if (config.venueType === "cfd" && config.result === "custom") {
+			this.selectedActionName = "noActions";
+		}
 		const unlinkOptionIndex = this._options.findIndex(option => option.name === "unlink");
 		if ( unlinkOptionIndex !== -1 ) {
 			this._options[unlinkOptionIndex].value = prefs.get("unlinkBacklinks");

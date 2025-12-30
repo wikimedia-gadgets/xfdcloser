@@ -124,19 +124,19 @@ describe("Result", function() {
 			assert.strictEqual(model.showNewSentenceOption, false);
 		});
 		it("correctly generates preview wikitext", function() {
-			assert.strictEqual(model.previewWikitext, "{{Relist|1=}}", "Empty rationale");
+			assert.strictEqual(model.previewWikitext, "{{XfD relist|1=}}", "Empty rationale");
 			model.setRationale("   ");
-			assert.strictEqual(model.previewWikitext, "{{Relist|1=}}", "Whitespace-only rationale");
+			assert.strictEqual(model.previewWikitext, "{{XfD relist|1=}}", "Whitespace-only rationale");
 			model.setRationale("Foo");
-			assert.strictEqual(model.previewWikitext, "{{Relist|1=Foo}}", "Regular rationale");
+			assert.strictEqual(model.previewWikitext, "{{XfD relist|1=Foo}}", "Regular rationale");
 			model.setRationale("Foo  ");
-			assert.strictEqual(model.previewWikitext, "{{Relist|1=Foo}}", "Regular rationale with trailing whitespace");
+			assert.strictEqual(model.previewWikitext, "{{XfD relist|1=Foo}}", "Regular rationale with trailing whitespace");
 			model.setRationale("[[Foo|Foobar]]");
-			assert.strictEqual(model.previewWikitext, "{{Relist|1=[[Foo|Foobar]]}}", "Rationale with piped wikilink");
+			assert.strictEqual(model.previewWikitext, "{{XfD relist|1=[[Foo|Foobar]]}}", "Rationale with piped wikilink");
 			model.setRationale("{{tl|foo}}");
-			assert.strictEqual(model.previewWikitext, "{{Relist|1={{tl|foo}}}}", "Rationale with template containing pipe");
+			assert.strictEqual(model.previewWikitext, "{{XfD relist|1={{tl|foo}}}}", "Rationale with template containing pipe");
 			model.setRationale("some|reason");
-			assert.strictEqual(model.previewWikitext, "{{Relist|1=some&#124;reason}}", "Rationale with loose pipe");
+			assert.strictEqual(model.previewWikitext, "{{XfD relist|1=some&#124;reason}}", "Rationale with loose pipe");
 		});
 		it("only emits update if updated rationale is the same as the current rationale", function() {
 			const emittedUpdate1 = model.setRationale("Foo") !== false;

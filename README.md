@@ -63,9 +63,8 @@ On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/
    ```
 
 3. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
-4. First time only: create the /dist/ folder so the build script doesn't throw an error.
-5. Run `npm start` in a terminal (in the directory where your local repistory is located).
-6. Now when you visit the XFD log/discussion pages, the most recently built version of the script will be loaded.
+4. Run `npm start` in a terminal (in the directory where your local repistory is located).
+Note: You need to do `npm start` every time you update and save a file. Changes will not automatically make it into the current build.
 
 ### Deploying to testwiki
 1. Comment out or remove the code that loads the development version from [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js)
@@ -84,8 +83,8 @@ As XFDcloser is a gadget, you must have interface-admin rights to deploy to the 
 
 ## Planned features
 A general overview of planned features:
-- [ ] Redo interface using OOUI, similar to Rater
-- [ ] Preferences, similar to Rater
+- [x] Redo interface using OOUI, similar to Rater
+- [x] Preferences, similar to Rater
 - [ ] Rename option for CfD, and possibly some other feature requests on WT:XFDC
 - [ ] Possibly add handling for closing requested moves
 
@@ -93,3 +92,4 @@ A general overview of planned features:
 - [ ] Complete the v4 rewrite
 - [ ] Get beta testers to try out the new version. Fix/adjust things as they get reported.
 - [ ] Release the new version generally.
+

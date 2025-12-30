@@ -42,7 +42,7 @@ export default class RelistInfo extends TaskItemController {
 			/\[\[Wikipedia:Deletion process#Relisting discussions\|Relisted\]\]/g
 		);
 		const relistNumber = relists ? relists.length + 1 : 1;
-		return `{{subst:Relist|1=${this.model.result.getRelistComment()}|2=${relistNumber}}}`;	
+		return `{{subst:XfD relist|1=${this.model.result.getRelistComment()}|2=${relistNumber}}}`;	
 	}
 
 	/**

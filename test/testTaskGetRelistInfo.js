@@ -64,12 +64,12 @@ describe("GetRelistInfo", function() {
 	it("gets relist template for first relist", function() {
 		const content = "Lorem ipsum dorem sum";
 		const relistTemplate = task.getRelistTemplate(content);
-		assert.strictEqual(relistTemplate, "{{subst:Relist|1=|2=1}}");
+		assert.strictEqual(relistTemplate, "{{subst:XfD relist|1=|2=1}}");
 	});
 	it("gets relist template for second relist", function() {
 		const content = "Lorem ipsum dorem sum\n[[Wikipedia:Deletion process#Relisting discussions|Relisted]] bla blah<!-- from Template:Relist --><noinclude>[[Category:Relisted AfD debates|24 Mani Neram]]</noinclude></div><!-- Please add new comments below this line -->";
 		const relistTemplate = task.getRelistTemplate(content);
-		assert.strictEqual(relistTemplate, "{{subst:Relist|1=|2=2}}");
+		assert.strictEqual(relistTemplate, "{{subst:XfD relist|1=|2=2}}");
 	});
 	it("gets relist template for third relist", function() {
 		const content = `Lorem ipsum dorem sum
@@ -77,18 +77,18 @@ describe("GetRelistInfo", function() {
 Foo bar baz qux
 [[Wikipedia:Deletion process#Relisting discussions|Relisted]] bla blah<!-- from Template:Relist --><noinclude>[[Category:Relisted AfD debates|24 Mani Neram]]</noinclude></div><!-- Please add new comments below this line -->`;
 		const relistTemplate = task.getRelistTemplate(content);
-		assert.strictEqual(relistTemplate, "{{subst:Relist|1=|2=3}}");
+		assert.strictEqual(relistTemplate, "{{subst:XfD relist|1=|2=3}}");
 	});
 	it("gets relist template with relist comment", function() {
 		result.setRationale("Some reasoning here");
 		const relistTemplate = task.getRelistTemplate("");
-		assert.strictEqual(relistTemplate, "{{subst:Relist|1=Some reasoning here|2=1}}");
+		assert.strictEqual(relistTemplate, "{{subst:XfD relist|1=Some reasoning here|2=1}}");
 	});
 	it("gets relist wikitexts for RfD", function() {
 		const content = "====Foobar====\n*<span id='id1'>Page</span>";
 		const result = task.getRelistWikitext(content);
 		assert.deepStrictEqual(Object.keys(result), ["newWikitext", "oldLogWikitext"]);
-		assert.strictEqual(result.newWikitext, "====Foobar====\n*<span id='id1'>Page</span>\n{{subst:Relist|1=|2=1}}\n");
+		assert.strictEqual(result.newWikitext, "====Foobar====\n*<span id='id1'>Page</span>\n{{subst:XfD relist|1=|2=1}}\n");
 		assert.strictEqual(result.oldLogWikitext, `====Foobar====\n{{subst:rfd relisted|page=${GetRelistInfo.today}|Foobar}}`);
 	});
 	it("gets relist wikitexts for RfD, multiple pages", function() {
@@ -102,7 +102,7 @@ Foo bar baz qux
 		const content = "====Foobar====\n*<span id='id1'>Page</span>";
 		const result = task.getRelistWikitext(content);
 		assert.deepStrictEqual(Object.keys(result), ["newWikitext", "oldLogWikitext"]);
-		assert.strictEqual(result.newWikitext, "====Foobar====\n*<span id='id1'>Page</span>\n{{subst:Relist|1=|2=1}}\n");
+		assert.strictEqual(result.newWikitext, "====Foobar====\n*<span id='id1'>Page</span>\n{{subst:XfD relist|1=|2=1}}\n");
 		assert.strictEqual(result.oldLogWikitext, "====Foobar====\n{{subst:cfd relisted|Foobar}}");
 	});
 	it("gets relist wikitexts for MfD", function() {
@@ -110,7 +110,7 @@ Foo bar baz qux
 		const content = "====Foobar====\n:{{pagelinks}}\nLorem ipsum";
 		const result = task.getRelistWikitext(content);
 		assert.deepStrictEqual(Object.keys(result), ["newWikitext", "oldLogWikitext"]);
-		assert.strictEqual(result.newWikitext, "====Foobar====\n:{{pagelinks}}\n{{subst:mfdr}}\nLorem ipsum\n{{subst:Relist|1=|2=1}}");
+		assert.strictEqual(result.newWikitext, "====Foobar====\n:{{pagelinks}}\n{{subst:mfdr}}\nLorem ipsum\n{{subst:XfD relist|1=|2=1}}");
 		assert.strictEqual(result.oldLogWikitext, "");
 	});
 	it("gets relist wikitexts for TfD", function() {
@@ -122,7 +122,7 @@ Foo bar baz qux
 		const content = "====Foobar====\nLorem ipsum";
 		const result = task.getRelistWikitext(content);
 		assert.deepStrictEqual(Object.keys(result), ["newWikitext", "oldLogWikitext"]);
-		assert.strictEqual(result.newWikitext, "====Foobar====\nLorem ipsum\n{{subst:Relist|1=|2=1}}\n");
+		assert.strictEqual(result.newWikitext, "====Foobar====\nLorem ipsum\n{{subst:XfD relist|1=|2=1}}\n");
 		assert.strictEqual(result.oldLogWikitext, `====Foobar====
 {{subst:Tfd top|'''relisted'''}} on [[${task.todaysLogpage}#Foobar|${GetRelistInfo.today}]]. <small>[[Wikipedia:NACD|(non-admin closure)]]</small> ~~~~
 * {{tfd links|Foobar}}
@@ -138,7 +138,7 @@ Foo bar baz qux
 		const content = "====Foobar====\nLorem ipsum";
 		const result = task.getRelistWikitext(content);
 		assert.deepStrictEqual(Object.keys(result), ["newWikitext", "oldLogWikitext"]);
-		assert.strictEqual(result.newWikitext, "====Foobar====\nLorem ipsum\n{{subst:Relist|1=|2=1}}\n");
+		assert.strictEqual(result.newWikitext, "====Foobar====\nLorem ipsum\n{{subst:XfD relist|1=|2=1}}\n");
 		assert.strictEqual(result.oldLogWikitext, `====Foobar====
 {{subst:Tfd top|'''relisted'''}} on [[${task.todaysLogpage}#Foobar|${GetRelistInfo.today}]]. <small>[[Wikipedia:NACD|(non-admin closure)]]</small> ~~~~
 * {{tfd links|Foobar}}
@@ -151,7 +151,7 @@ Foo bar baz qux
 		const content = "====Foobar====\nLorem ipsum <noinclude>[[Wikipedia:Articles for deletion/Log/2020 October 8#{{anchorencode:Foobar}}|View log]]</noinclude>)\nBax qux etc";
 		const result = task.getRelistWikitext(content);
 		assert.deepStrictEqual(Object.keys(result), ["newWikitext", "oldLogWikitext"]);
-		assert.strictEqual(result.newWikitext, `====Foobar====\nLorem ipsum <noinclude>[[${task.todaysLogpage}#{{anchorencode:Foobar}}|View log]]</noinclude>)\nBax qux etc\n{{subst:Relist|1=|2=1}}\n`);
+		assert.strictEqual(result.newWikitext, `====Foobar====\nLorem ipsum <noinclude>[[${task.todaysLogpage}#{{anchorencode:Foobar}}|View log]]</noinclude>)\nBax qux etc\n{{subst:XfD relist|1=|2=1}}\n`);
 		assert.strictEqual(result.oldLogWikitext, "");
 	});
 });
