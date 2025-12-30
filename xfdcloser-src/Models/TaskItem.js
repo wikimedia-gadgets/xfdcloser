@@ -110,20 +110,20 @@ class TaskItem {
 		options = options || {};
 		const prefix = options.prefix ? options.prefix + " " : "";
 
-		// If a custom summary is provided use it directly
+		// XFDC Unlinker
 		if ( typeof this.summary === "string" && this.summary.trim() ) {
 			return prefix + this.summary + " " + appConfig.script.advert;
 		}
 
-		// Fall back to linking the discussion page, if that exists from an XfD close
 		const link = this.discussion && this.discussion.discussionPageLink;
 		if ( !link ) {
-			// If link is not link available, do not force a link.
 			return (prefix + appConfig.script.advert).trim();
 		}
 
 		const main = options.short
+			// Deleting talk pages using CSD G8
 			? `[[${link}]]`
+			// Closing XFDs
 			: `[[${link}]] closed as ${this.result.getResultText()}`;
 		return prefix + main + " " + appConfig.script.advert;
 	}
