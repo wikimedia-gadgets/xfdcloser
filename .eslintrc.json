@@ -29,6 +29,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "eol-last": "error",
         "indent": [
             "error",
             "tab"
