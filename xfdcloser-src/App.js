@@ -25,7 +25,7 @@ import DiscussionView from "./Views/DiscussionView";
 	});
 
 	// Preferences portlet link
-	mw.util.addPortletLink("p-cactions", "#", "XFDC prefs", "p-xfdc-prefs", "XFDcloser preferences");
+	mw.util.addPortletLink("p-cactions", "#", "XFDC Prefs", "p-xfdc-prefs", "XFDcloser preferences");
 	$("#p-xfdc-prefs").click(e => {
 		e.preventDefault();
 		windowSetManager.openWindow("prefs", {
