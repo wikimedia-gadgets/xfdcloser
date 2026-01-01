@@ -37,10 +37,22 @@
  * - Changes to gadget definitions need to be done manually
  */
 const fs = require("fs");
+const path = require("path");
 const {mwn} = require("mwn");
 const {execSync} = require("child_process");
 const prompt = require("prompt-sync")({sigint: true});
-const {username, password} = require("./credentials.json");
+const credentials = (() => {
+	const filePath = path.join(__dirname, "credentials.json");
+	if (fs.existsSync(filePath)) {
+		try {
+			return JSON.parse(fs.readFileSync(filePath, "utf8"));
+		} catch (e) {
+			console.error("Failed to parse bin/credentials.json:", e);
+			process.exit(1);
+		}
+	}
+	return {};
+})();
 
 function logError(error) {
 	error = error || {};
@@ -50,19 +62,34 @@ function logError(error) {
 	);
 }
 
-// Check for --quick parameter. Quick mode deploys to both enwiki and enwiki-beta, without prompting for any info
+// Check for --quick parameter. Quick mode deploys to both enwiki and enwiki-beta, without prompting for any info. Also used in gadget-deploy.
 const quick = process.argv.includes("--quick");
 const config = [];
 
 if (quick) {
+	if (credentials.site) {
+		config.push({
+			apiUrl: apiUrl,
+			beta: "y",
+			userComment: "",
+			consoleMessage: "QUICK MODE: Using defaults (site from credentials.json, beta, blank edit summary, auto-continue)"
+		});
+		config.push({
+			apiUrl: apiUrl,
+			beta: "n",
+			userComment: "",
+			consoleMessage: "QUICK MODE: Using defaults (site from credentials.json, main, blank edit summary, auto-continue)"
+		});
+		}
+	}
 	config.push({
-		wiki: "en",
+		apiUrl: "https://en.wikipedia.org/w/api.php",
 		beta: "y",
 		userComment: "",
 		consoleMessage: "QUICK MODE: Using defaults (en, beta, blank edit summary, auto-continue)"
 	});
 	config.push({
-		wiki: "en",
+		apiUrl: "https://en.wikipedia.org/w/api.php",
 		beta: "n",
 		userComment: "",
 		consoleMessage: "QUICK MODE: Using defaults (en, main, blank edit summary, auto-continue)"
@@ -73,7 +100,7 @@ if (quick) {
 	beta = prompt("> Beta deployment [Y/n]: ");
 	userComment = prompt("> Edit summary message (optional): ");
 	config.push({
-		wiki: wiki,
+		apiUrl: `https://${wiki}.wikipedia.org/w/api.php`,
 		beta: beta,
 		userComment: userComment,
 		consoleMessage: null
@@ -83,7 +110,7 @@ if (quick) {
 
 async function deploy(config) {
 	for (let i = 0; i < config.length; i++) {
-		const wiki = config[i].wiki;
+		const apiUrl = config[i].apiUrl;
 		const beta = config[i].beta;
 		const userComment = config[i].userComment;
 		const consoleMessage = config[i].consoleMessage;
@@ -106,12 +133,13 @@ async function deploy(config) {
 		];
 
 		const api = new mwn({
-			apiUrl: `https://${wiki}.wikipedia.org/w/api.php`,
-			username: username,
-			password: password
+			apiUrl: apiUrl,
+			username: credentials.username,
+			password: credentials.password,
+			OAuth2AccessToken: credentials.accessToken
 		});
 
-		console.log(`... logging in as ${username}  ...`);
+		console.log(`... logging in as ${credentials.username}  ...`);
 		try {
 			await api.loginGetToken();
 			if (!quick) {
