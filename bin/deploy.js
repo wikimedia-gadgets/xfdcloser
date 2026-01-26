@@ -37,10 +37,22 @@
  * - Changes to gadget definitions need to be done manually
  */
 const fs = require("fs");
+const path = require("path");
 const {mwn} = require("mwn");
 const {execSync} = require("child_process");
 const prompt = require("prompt-sync")({sigint: true});
-const {username, password} = require("./credentials.json");
+const credentials = (() => {
+	const filePath = path.join(__dirname, "credentials.json");
+	if (fs.existsSync(filePath)) {
+		try {
+			return JSON.parse(fs.readFileSync(filePath, "utf8"));
+		} catch (e) {
+			console.error("Failed to parse bin/credentials.json:", e);
+			process.exit(1);
+		}
+	}
+	return {};
+})();
 
 function logError(error) {
 	error = error || {};
@@ -50,30 +62,45 @@ function logError(error) {
 	);
 }
 
-// Check for --quick parameter. Quick mode deploys to both enwiki and enwiki-beta, without prompting for any info
+// Check for --quick parameter. Quick mode deploys to both enwiki and enwiki-beta, without prompting for any info. Also used in gadget-deploy.
 const quick = process.argv.includes("--quick");
 const config = [];
 
 if (quick) {
-	config.push({
-		wiki: "en",
-		beta: "y",
-		userComment: "",
-		consoleMessage: "QUICK MODE: Using defaults (en, beta, blank edit summary, auto-continue)"
-	});
-	config.push({
-		wiki: "en",
-		beta: "n",
-		userComment: "",
-		consoleMessage: "QUICK MODE: Using defaults (en, main, blank edit summary, auto-continue)"
-	});
+	if (credentials.site) {
+		config.push({
+			apiUrl: credentials.site,
+			beta: "y",
+			userComment: "",
+			consoleMessage: "QUICK MODE: Using defaults (site from credentials.json, beta, blank edit summary, auto-continue)"
+		});
+		config.push({
+			apiUrl: credentials.site,
+			beta: "n",
+			userComment: "",
+			consoleMessage: "QUICK MODE: Using defaults (site from credentials.json, main, blank edit summary, auto-continue)"
+		});
+	} else {
+		config.push({
+			apiUrl: "https://en.wikipedia.org/w/api.php",
+			beta: "y",
+			userComment: "",
+			consoleMessage: "QUICK MODE: Using defaults (en, beta, blank edit summary, auto-continue)"
+		});
+		config.push({
+			apiUrl: "https://en.wikipedia.org/w/api.php",
+			beta: "n",
+			userComment: "",
+			consoleMessage: "QUICK MODE: Using defaults (en, main, blank edit summary, auto-continue)"
+		});
+	}
 } else {
 	// Prompt user for info
-	wiki = prompt("> Wikipedia subdomain: ");
-	beta = prompt("> Beta deployment [Y/n]: ");
-	userComment = prompt("> Edit summary message (optional): ");
+	const wiki = prompt("> Wikipedia subdomain: ");
+	const beta = prompt("> Beta deployment [Y/n]: ");
+	const userComment = prompt("> Edit summary message (optional): ");
 	config.push({
-		wiki: wiki,
+		apiUrl: `https://${wiki}.wikipedia.org/w/api.php`,
 		beta: beta,
 		userComment: userComment,
 		consoleMessage: null
@@ -83,7 +110,7 @@ if (quick) {
 
 async function deploy(config) {
 	for (let i = 0; i < config.length; i++) {
-		const wiki = config[i].wiki;
+		const apiUrl = config[i].apiUrl;
 		const beta = config[i].beta;
 		const userComment = config[i].userComment;
 		const consoleMessage = config[i].consoleMessage;
@@ -106,12 +133,13 @@ async function deploy(config) {
 		];
 
 		const api = new mwn({
-			apiUrl: `https://${wiki}.wikipedia.org/w/api.php`,
-			username: username,
-			password: password
+			apiUrl: apiUrl,
+			username: credentials.username,
+			password: credentials.password,
+			OAuth2AccessToken: credentials.accessToken
 		});
 
-		console.log(`... logging in as ${username}  ...`);
+		console.log(`... logging in as ${credentials.username}  ...`);
 		try {
 			await api.loginGetToken();
 			if (!quick) {
@@ -125,9 +153,9 @@ async function deploy(config) {
 					const status = response && response.nochange
 						? "━ No change saving"
 						: "✔ Successfully saved";
-					console.log(`${status} ${deployment.file} to ${wiki}:${deployment.target}`);
+					console.log(`${status} ${deployment.file} to ${deployment.target}`);
 				} catch (error) {
-					console.log(`✘ Failed to save ${deployment.file} to ${wiki}:${deployment.target}`);
+					console.log(`✘ Failed to save ${deployment.file} to ${deployment.target}`);
 					logError(error);
 				}
 			}
