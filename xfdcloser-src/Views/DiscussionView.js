@@ -193,7 +193,9 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 		pages = $discussionNodes
 			.find("dd > ul > li")
 			.has("b:first-child:contains(\"Propose \")")
-			.find("a:first-of-type")
+			.find("span")
+			.not(".lx")
+			.children("a:first-of-type")
 			.not(".external")
 			.map(function () { return mw.Title.newFromText($(this).text()); })
 			.get();
