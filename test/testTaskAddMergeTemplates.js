@@ -137,7 +137,7 @@ Lorem impsum`
 			throw new Error("Transformation resulted in a promise");
 		}
 		assert.deepStrictEqual(transformed, {
-			prependtext: `{{Afd-merge from|Foo|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n{{Afd-merge from|Bar|discussionName|${dmyDateString(dateNow)}}}\n`,
+			prependtext: `{{Afd-merge from|Foo|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n{{Afd-merge from|Bar|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n`,
 			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
 		});
 	});
