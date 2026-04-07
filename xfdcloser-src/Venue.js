@@ -288,8 +288,8 @@ Venue.Afd = transcludedOnly => new Venue("afd", {
 	wikitext: {
 		closeTop:		"{{subst:Afd top|'''__RESULT__'''}}__TO_TARGET____RATIONALE__ __SIG__",
 		closeBottom:	"{{subst:Afd bottom}}",
-		mergeFrom:		"{{Afd-merge from|__NOMINATED__|__DEBATE__|__DATE__}}\n",
-		mergeTo:		"{{Afd-merge to|__TARGET__|__DEBATE__|__DATE__}}\n",
+		mergeFrom:		"{{Afd-merge from|__NOMINATED__|discussion=__DEBATE__|date=__DATE__}}\n",
+		mergeTo:		"{{Afd-merge to|__TARGET__|discussion=__DEBATE__|date=__DATE__}}\n",
 		alreadyClosed:	"<!--Template:Afd bottom-->"		
 	},
 	regex: {
