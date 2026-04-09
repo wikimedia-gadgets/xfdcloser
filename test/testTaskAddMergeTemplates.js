@@ -75,7 +75,7 @@ describe("AddMergeTemplates", function() {
 			throw new Error("Transformation resulted in a promise");
 		}
 		assert.deepStrictEqual(transformed, {
-			text: `{{Afd-merge to|Qux|discussionName|${dmyDateString(dateNow)}}}\nLorem impsum`,
+			text: `{{Afd-merge to|Qux|discussion=discussionName|date=${dmyDateString(dateNow)}}}\nLorem impsum`,
 			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
 		});
 	});
@@ -93,7 +93,7 @@ Lorem impsum`
 			throw new Error("Transformation resulted in a promise");
 		}
 		assert.deepStrictEqual(transformed, {
-			text: `{{Afd-merge to|Qux|discussionName|${dmyDateString(dateNow)}}}\nLorem impsum`,
+			text: `{{Afd-merge to|Qux|discussion=discussionName|date=${dmyDateString(dateNow)}}}\nLorem impsum`,
 			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
 		});
 	});
@@ -137,7 +137,7 @@ Lorem impsum`
 			throw new Error("Transformation resulted in a promise");
 		}
 		assert.deepStrictEqual(transformed, {
-			prependtext: `{{Afd-merge from|Foo|discussionName|${dmyDateString(dateNow)}}}\n{{Afd-merge from|Bar|discussionName|${dmyDateString(dateNow)}}}\n`,
+			prependtext: `{{Afd-merge from|Foo|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n{{Afd-merge from|Bar|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n`,
 			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
 		});
 	});
