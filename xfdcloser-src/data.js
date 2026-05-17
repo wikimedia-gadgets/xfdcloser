@@ -164,13 +164,24 @@ const resultsData = [
 		actions: ["disambiguateAndUpdate", "noActions"]
 	},
 
-	// Merge (AFD/MFD)
+	// Merge (AFD)
 	{
 		name: "merge",
 		label: "Merge",
 		title: "Close discussion as \"merge\"",
 		requireTarget: true,
-		venues: ["afd", "mfd"],
+		allowSoft: true,
+		allowSelectively: true,
+		venues: ["afd"],
+		actions: ["mergeAndUpdate", "noActions"]
+	},
+	// Merge (MFD)
+	{
+		name: "merge",
+		label: "Merge",
+		title: "Close discussion as \"merge\"",
+		requireTarget: true,
+		venues: ["mfd"],
 		actions: ["mergeAndUpdate", "noActions"]
 	},
 	// Merge (CFD)
@@ -675,7 +686,6 @@ const getRelevantOptions = function(venueType, userIsSysop, actions) {
 };
 
 /**
- * 
  * @param {Boolean} userIsSysop
  * @returns {Object[]} relevant prefs
  */
@@ -685,7 +695,6 @@ const getRelevantPrefs = function(userIsSysop) {
 
 const softDeletionRationaleTemplate = "Wikipedia:XFDcloser/Soft deletion rationale";
 /**
- * 
  * @param {string} pageName 
  * @param {string} nomLink 
  * @param {boolean} [isMulti]
@@ -696,7 +705,17 @@ const makeSoftDeleteRationale = function(pageName, nomLink, isMulti) {
 	return `{{subst:${softDeletionRationaleTemplate}|1=${pageName}|2=${nomLink}${multiParam}}}`;
 };
 
-export { getRelevantResults, getRelevantActions, getRelevantOptions, getRelevantPrefs, makeSoftDeleteRationale };
+const softMergeRationaleTemplate = "Wikipedia:XFDcloser/Soft merge rationale";
+/**
+ * @returns {string} Wikitext of soft merge rationale template
+ */
+const makeSoftMergeRationale = function() {
+	return `{{subst:${softMergeRationaleTemplate}}}`;
+};
 
-export { resultsData, actions, options, prefs, defaultPrefValues, softDeletionRationaleTemplate };
+const softRationaleTemplateRegEx = /\{\{subst:Wikipedia:XFDcloser\/Soft (deletion|merge) rationale[^}]*\}\} ?/;
+
+export { getRelevantResults, getRelevantActions, getRelevantOptions, getRelevantPrefs, makeSoftDeleteRationale, makeSoftMergeRationale };
+
+export { resultsData, actions, options, prefs, defaultPrefValues, softDeletionRationaleTemplate, softMergeRationaleTemplate, softRationaleTemplateRegEx };
 // </nowiki>

@@ -14,6 +14,7 @@ class ResultItem {
 	 *  @param {String} [config.pageName] 
 	 *  @param {String} [config.selectedResultName] 
 	 *  @param {Boolean} [config.softResult] 
+	 *  @param {Boolean} [config.selectivelyResult] 
 	 *  @param {Boolean} [config.speedyResult] 
 	 *  @param {Boolean} [config.deleteFirstResult] 
 	 *  @param {String} [config.targetPageName] 
@@ -28,6 +29,7 @@ class ResultItem {
 		this.availableResults = config.availableResults,
 		this.selectedResultName = config.selectedResultName || "";
 		this.softResult = config.softResult || false;
+		this.selectivelyResult = config.selectivelyResult || false;
 		this.speedyResult = config.speedyResult || false;
 		this.deleteFirstResult = config.deleteFirstResult || false;
 		this.targetPageName = config.targetPageName || "";
@@ -71,10 +73,17 @@ class ResultItem {
 	}
 
 	/**
+	 * @param {Boolean} showSelectivelyResult
+	 */
+	get showSelectivelyResult() {
+		return !!this.selectedResult && !!this.selectedResult.allowSelectively;
+	}
+
+	/**
 	 * @param {Boolean} showResultOptions
 	 */
 	get showResultOptions() {
-		return this.showSpeedyResult || this.showSoftResult || this.showDeleteFirstResult;
+		return this.showSpeedyResult || this.showSoftResult || this.showDeleteFirstResult || this.showSelectivelyResult;
 	}
 
 	/**
@@ -119,7 +128,8 @@ class ResultItem {
 			( this.isSoft() && "soft " ) ||
 			( this.isDeleteFirst() && "delete and ")
 		);
-		return ( prefix || "" ) + this.selectedResultName;
+		const suffix = this.isSelectively() ? " selectively" : "";
+		return ( prefix || "" ) + this.selectedResultName + suffix;
 	}
 
 	/**
@@ -173,17 +183,17 @@ class ResultItem {
 	}
 
 	/**
-	 * @returns {boolean}
-	 */
-	isSoftDelete() {
-		return this.isSoft() && this.selectedResultName === "delete";
-	}
-	
-	/**
 	 * @returns {Boolean}
 	 */
 	isDeleteFirst() {
 		return this.showDeleteFirstResult && this.deleteFirstResult;
+	}
+
+	/**
+	 * @returns {Boolean}
+	 */
+	isSelectively() {
+		return this.showSelectivelyResult && this.selectivelyResult;
 	}
 
 	setPageName(pageName) {
@@ -197,14 +207,17 @@ class ResultItem {
 	}
 
 	setSoftResult(isSoft) {
+		const wasSoftResult = this.softResult;
 		this.softResult = !!isSoft;
 		if ( this.softResult ) {
 			this.speedyResult = false;
 			this.deleteFirstResult = false;
 		}
 		this.emit("update");
-		if (this.isSoftDelete()) {
-			this.emit("softDeleteSelect");
+		if ( this.isSoft() ) {
+			this.emit("softSelect");
+		} else if ( wasSoftResult ) {
+			this.emit("softUnselect");
 		}
 	}
 
@@ -223,6 +236,11 @@ class ResultItem {
 			this.softResult = false;
 			this.speedyResult = false;
 		}
+		this.emit("update");
+	}
+
+	setSelectivelyResult(isSelectively) {
+		this.selectivelyResult = !!isSelectively;
 		this.emit("update");
 	}
 
