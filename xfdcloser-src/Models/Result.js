@@ -1,6 +1,6 @@
 import { $, mw, OO } from "../../globals";
 import ResultItem from "./ResultItem";
-import { getRelevantResults, makeSoftDeleteRationale, softDeletionRationaleTemplate, makeSoftMergeRationale, softMergeRationaleTemplate } from "../data";
+import { getRelevantResults, makeSoftDeleteRationale, softDeletionRationaleTemplate, makeSoftMergeRationale, softMergeRationaleTemplate, softRationaleTemplateRegEx } from "../data";
 import ResultList from "./ResultList";
 // <nowiki>
 
@@ -51,7 +51,7 @@ class Result {
 		this.singleModeResult = new ResultItem({availableResults});
 		this.singleModeResult.connect(this, {
 			update: ["emit", "update"],
-			softDeleteSelect: "onSoftDeleteSelect"
+			softSelect: "onSoftSelect"
 		});
 
 		this.multimodeResults = new ResultList({availableResults, pageNames: this.discussion.pagesNames});
@@ -304,8 +304,14 @@ class Result {
 		this.emit("update");
 	}
 
-	onSoftDeleteSelect() {
-		debugger;
+	onSoftSelect() {
+		// Wipe soft merge templates so we start fresh. Prevents adding one soft delete and one soft merge template when the user switches between results, if the user hasn't typed anything else yet.
+		const rationaleHasSoftMergeTemplateAndNothingElse = this.rationale.match( softRationaleTemplateRegEx );
+		if ( rationaleHasSoftMergeTemplateAndNothingElse ) {
+			this.setRationale("");
+		}
+
+		// Now check if we need to add a soft delete or soft merge template.
 		switch ( this.singleModeResult.selectedResult.name ) {
 		case "delete":
 			if (!this.rationale.includes(softDeletionRationaleTemplate)) {

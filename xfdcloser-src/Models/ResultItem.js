@@ -173,13 +173,6 @@ class ResultItem {
 	}
 
 	/**
-	 * @returns {boolean}
-	 */
-	isSoftDelete() {
-		return this.isSoft() && this.selectedResultName === "delete";
-	}
-	
-	/**
 	 * @returns {Boolean}
 	 */
 	isDeleteFirst() {
@@ -203,8 +196,8 @@ class ResultItem {
 			this.deleteFirstResult = false;
 		}
 		this.emit("update");
-		if (this.isSoftDelete()) {
-			this.emit("softDeleteSelect");
+		if ( this.isSoft() ) {
+			this.emit("softSelect");
 		}
 	}
 

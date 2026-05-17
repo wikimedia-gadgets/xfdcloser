@@ -712,7 +712,9 @@ const makeSoftMergeRationale = function() {
 	return `{{subst:${softMergeRationaleTemplate}}}`;
 };
 
+const softRationaleTemplateRegEx = /\{\{subst:Wikipedia:XFDcloser\/Soft (deletion|merge) rationale[^}]*\}\} ?/;
+
 export { getRelevantResults, getRelevantActions, getRelevantOptions, getRelevantPrefs, makeSoftDeleteRationale, makeSoftMergeRationale };
 
-export { resultsData, actions, options, prefs, defaultPrefValues, softDeletionRationaleTemplate };
+export { resultsData, actions, options, prefs, defaultPrefValues, softDeletionRationaleTemplate, softMergeRationaleTemplate, softRationaleTemplateRegEx };
 // </nowiki>
