@@ -1,6 +1,6 @@
 import { $, mw, OO } from "../../globals";
 import ResultItem from "./ResultItem";
-import { getRelevantResults, makeSoftDeleteRationale, softDeletionRationaleTemplate } from "../data";
+import { getRelevantResults, makeSoftDeleteRationale, softDeletionRationaleTemplate, makeSoftMergeRationale, softMergeRationaleTemplate } from "../data";
 import ResultList from "./ResultList";
 // <nowiki>
 
@@ -305,13 +305,25 @@ class Result {
 	}
 
 	onSoftDeleteSelect() {
-		if (!this.rationale.includes(softDeletionRationaleTemplate)) {
-			const pageName = this.discussion.pages[0].getPrefixedText();
-			const nomLink = this.discussion.discussionPageLink;
-			const isMulti = this.discussion.pages.length > 1;
-			this.prependToRationale(
-				makeSoftDeleteRationale(pageName, nomLink, isMulti)
-			);
+		debugger;
+		switch ( this.singleModeResult.selectedResult.name ) {
+		case "delete":
+			if (!this.rationale.includes(softDeletionRationaleTemplate)) {
+				const pageName = this.discussion.pages[0].getPrefixedText();
+				const nomLink = this.discussion.discussionPageLink;
+				const isMulti = this.discussion.pages.length > 1;
+				this.prependToRationale(
+					makeSoftDeleteRationale(pageName, nomLink, isMulti)
+				);
+			}
+			break;
+		case "merge":
+			if (!this.rationale.includes(softMergeRationaleTemplate)) {
+				this.prependToRationale(
+					makeSoftMergeRationale()
+				);
+			}
+			break;
 		}
 	}
 }
