@@ -224,6 +224,11 @@ describe("Result", function() {
 			model.singleModeResult.setTargetPageName("Foobar");
 			assert.strictEqual(model.previewWikitext, "The result of the discussion was '''redirect''' to [[Foobar]].", "Result with target");
 
+			model.singleModeResult.setSelectedResultName("merge");
+			model.singleModeResult.setTargetPageName("");
+			model.singleModeResult.setSelectivelyResult(true);
+			assert.strictEqual(model.previewWikitext, "The result of the discussion was '''merge selectively'''.", "Selectively merge result");
+
 			model.singleModeResult.setSelectedResultName("custom");
 			model.singleModeResult.setCustomResultText("baz qux");
 			assert.strictEqual(model.previewWikitext, "The result of the discussion was '''baz qux'''.", "Custom result");

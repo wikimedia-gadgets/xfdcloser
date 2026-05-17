@@ -171,6 +171,7 @@ const resultsData = [
 		title: "Close discussion as \"merge\"",
 		requireTarget: true,
 		allowSoft: true,
+		allowSelectively: true,
 		venues: ["afd"],
 		actions: ["mergeAndUpdate", "noActions"]
 	},
