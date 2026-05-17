@@ -133,6 +133,21 @@ describe("ResultItem", function() {
 		assert.strictEqual(model.softResult, false);
 		assert.strictEqual(model.deleteFirstResult, false);
 	});
+	it("emits softSelect and softUnselect when toggling soft", function() {
+		let softSelectCalls = 0;
+		let softUnselectCalls = 0;
+		model.connect(null, {
+			softSelect: () => { softSelectCalls++; },
+			softUnselect: () => { softUnselectCalls++; }
+		});
+
+		model.setSelectedResultName("delete");
+		model.setSoftResult(true);
+		model.setSoftResult(false);
+
+		assert.strictEqual(softSelectCalls, 1);
+		assert.strictEqual(softUnselectCalls, 1);
+	});
 	it("formats result text", function() {
 		assert.strictEqual(model.getResultText(), "", "Empty initially");
 

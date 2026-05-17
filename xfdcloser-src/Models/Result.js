@@ -51,7 +51,8 @@ class Result {
 		this.singleModeResult = new ResultItem({availableResults});
 		this.singleModeResult.connect(this, {
 			update: ["emit", "update"],
-			softSelect: "onSoftSelect"
+			softSelect: "onSoftSelect",
+			softUnselect: "onSoftUnselect"
 		});
 
 		this.multimodeResults = new ResultList({availableResults, pageNames: this.discussion.pagesNames});
@@ -305,13 +306,12 @@ class Result {
 	}
 
 	onSoftSelect() {
-		// Wipe soft merge templates so we start fresh. Prevents adding one soft delete and one soft merge template when the user switches between results, if the user hasn't typed anything else yet.
+		// Prevents doing weird things when toggling back and forth between Soft Delete and Soft Merge
 		const rationaleHasSoftMergeTemplateAndNothingElse = this.rationale.match( softRationaleTemplateRegEx );
 		if ( rationaleHasSoftMergeTemplateAndNothingElse ) {
 			this.setRationale("");
 		}
 
-		// Now check if we need to add a soft delete or soft merge template.
 		switch ( this.singleModeResult.selectedResult.name ) {
 		case "delete":
 			if (!this.rationale.includes(softDeletionRationaleTemplate)) {
@@ -330,6 +330,13 @@ class Result {
 				);
 			}
 			break;
+		}
+	}
+
+	onSoftUnselect() {
+		const rationaleHasSoftMergeTemplateAndNothingElse = this.rationale.match( softRationaleTemplateRegEx );
+		if ( rationaleHasSoftMergeTemplateAndNothingElse ) {
+			this.setRationale("");
 		}
 	}
 }

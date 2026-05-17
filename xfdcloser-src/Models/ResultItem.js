@@ -190,6 +190,7 @@ class ResultItem {
 	}
 
 	setSoftResult(isSoft) {
+		const wasSoftResult = this.softResult;
 		this.softResult = !!isSoft;
 		if ( this.softResult ) {
 			this.speedyResult = false;
@@ -198,6 +199,8 @@ class ResultItem {
 		this.emit("update");
 		if ( this.isSoft() ) {
 			this.emit("softSelect");
+		} else if ( wasSoftResult ) {
+			this.emit("softUnselect");
 		}
 	}
 
