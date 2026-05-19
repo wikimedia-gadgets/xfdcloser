@@ -134,15 +134,15 @@ describe("Discussion", function() {
 			assert.strictEqual(discussion.status, "Loading...", "initial status is loading");
 		});
 
-		it("Shows too many pages status when ready", function() {
+		it("blanks and hides status when ready", function() {
 			discussion.setStatusReady();
-			assert.strictEqual(discussion.showStatus, true, "does show status");
-			assert.strictEqual(discussion.status, "[XFDcloser: Too many pages for non-admin]", "too many pages status");
+			assert.strictEqual(discussion.showStatus, false, "does not show status");
+			assert.strictEqual(discussion.status, "", "status is blank");
 		});
 
-		it("does not show buttons when ready", function() {
+		it("shows buttons when ready", function() {
 			discussion.setStatusReady();
-			assert.strictEqual(discussion.showButtons, false);
+			assert.strictEqual(discussion.showButtons, true);
 		});
 	});
 	describe("with over 50 pages for admin:", function() {
