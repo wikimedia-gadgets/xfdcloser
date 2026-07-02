@@ -32,12 +32,20 @@
 		"dateOfClosure": "April 2026",
 		"expectedWikicode": "{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\nTest"
 	},
-	"contains 2 {{Merge from}}-ish templates (should delete the top one, leave the bottom one)": {
-		"oldWikicode": "{{distinguish|Edo language|Ibo language}}\n{{Merge from |1=Adjuvilo |target=Ido |afd=Adjuvilo |date =June 2026 }}{{Use dmy dates|date=March 2021}}\n\nLead\n\n==Section==\n{{Merge from |1=Adjuvilo |target=Ido |afd=Adjuvilo |date =June 2026 }}{{Use dmy dates|date=March 2021}}\nBody",
+	"contains 1 {{Merge from}}-ish templates (should change the template)": {
+		"oldWikicode": "{{distinguish|Edo language|Ibo language}}\n{{Merge from |1=Adjuvilo |target=Ido |afd=Adjuvilo |date =June 2026 }}{{Use dmy dates|date=March 2021}}\n\nLead",
 		"sourcePage": "Asian relations with Northeast India",
 		"targetPage": "Foreign relations of India",
 		"nominationName": "Asian relations with Northeast India (2nd nomination)",
 		"dateOfClosure": "April 2026",
-		"expectedWikicode": "{{distinguish|Edo language|Ibo language}}\n{{Use dmy dates|date=March 2021}}\n\nLead\n\n==Section==\n{{Merge from |1=Adjuvilo |target=Ido |afd=Adjuvilo |date =June 2026 }}{{Use dmy dates|date=March 2021}}\nBody"
+		"expectedWikicode": "{{distinguish|Edo language|Ibo language}}\n{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\n{{Use dmy dates|date=March 2021}}\n\nLead"
+	},
+	"contains 2 {{Merge from}}-ish templates (should delete the top one, change the bottom one)": {
+		"oldWikicode": "{{distinguish|Edo language|Ibo language}}\n{{Merge from |1=Adjuvilo |target=Ido |afd=Adjuvilo |date =June 2026 }}{{Use dmy dates|date=March 2021}}\n\nLead\n\n==Section==\n{{Merge from |1=Adjuvilo |target=Ido |afd=Adjuvilo |date =June 2026 }}\nBody",
+		"sourcePage": "Asian relations with Northeast India",
+		"targetPage": "Foreign relations of India",
+		"nominationName": "Asian relations with Northeast India (2nd nomination)",
+		"dateOfClosure": "April 2026",
+		"expectedWikicode": "{{distinguish|Edo language|Ibo language}}\n{{Use dmy dates|date=March 2021}}\n\nLead\n\n==Section==\n{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\nBody"
 	}
 }

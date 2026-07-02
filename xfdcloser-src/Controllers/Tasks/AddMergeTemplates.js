@@ -136,34 +136,33 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 			newWikicode = newWikicode.replace(/<!-- Once discussion is closed, please place on talk page: {{[^}]+}} -->\n/g, "");
 			newWikicode = newWikicode.replace(/<!-- End of AfD message, feel free to edit beyond this point -->\n/g, "");
 		} else {
+			const mergeFromRegex = new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}][^}]*}}`, "gi");
+
 			if ( mergeFromTemplatesCount > 1 ) {
 				// remove all {{Merge from}}-ish templates except the last/bottom one
-				const mergeFromRegex = new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}][^}]*}}`, "gi");
-				const lastMatchIndex = this.getIndexOfLastRegExMatch(mergeFromRegex, newWikicode);
+				const lastMatchIndex = this.getStartingIndexOfLastRegExMatch(mergeFromRegex, newWikicode);
 				const textBeforeLastMatch = newWikicode.substring(0, lastMatchIndex);
 				const textAfterLastMatch = newWikicode.substring(lastMatchIndex);
 				newWikicode = this.deleteTemplatesIfPresent(mergeFromTemplates, textBeforeLastMatch) + textAfterLastMatch;
 			}
-			const sourceArticleMatches = /* TODO */ false; // check whether the existing |1="Source article" matches the article that was nominated. missing parameter = mismatch.
-			const nominationNameMatches = /* TODO */ false; // check whether the |afd= parameter (or one of its aliases: discuss, discussion, talk) contains the correct NominationName (e.g., Earth (8th nomination)). missing parameter = mismatch.
-			if ( sourceArticleMatches && nominationNameMatches ) {
-				// replace template with {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} on the exact same line
-			} else {
-				// remove template
-				// add {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} at the top of the article, but below hatnotes
-			}
+
+			const templateIndex = this.getStartingIndexOfLastRegExMatch(mergeFromRegex, newWikicode);
+			const textBeforeLastMatch2 = newWikicode.substring(0, templateIndex);
+			let textAfterLastMatch2 = newWikicode.substring(templateIndex);
+			textAfterLastMatch2 = this.deleteTemplatesIfPresent(mergeFromTemplates, textAfterLastMatch2);
+			newWikicode = textBeforeLastMatch2 + `{{Being merged from|${sourcePage}|afd=${nominationName}|date=${dateOfClosure}}}\n` + textAfterLastMatch2;
 		}
 
 		return newWikicode;
 	}
 
 	/**
-	 * Searches a haystack using RegEx. When multiple matches, finds the last match, then returns the char index of the start of the last match. If no match is found, returns -1.
+	 * Searches a haystack using RegEx. When multiple matches, finds the last match, then returns the index of the start of the last match. If no match is found, returns -1.
 	 * @param {RegExp} regEx The regular expression to search with.
 	 * @param {string} haystack The string to search within.
 	 * @return {number} The character index of the start of the last match, or -1 if no match is found.
 	 */
-	getIndexOfLastRegExMatch(regEx, haystack) {
+	getStartingIndexOfLastRegExMatch(regEx, haystack) {
 		const globalRegEx = regEx.global ? regEx : new RegExp(regEx.source, `${regEx.flags}g`);
 		let match;
 		let lastMatchIndex = -1;
