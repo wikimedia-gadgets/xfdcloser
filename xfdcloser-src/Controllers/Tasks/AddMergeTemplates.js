@@ -126,26 +126,29 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		];
 		const mergeFromTemplatesCount = oldWikicode.match(new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}]`, "gi"))?.length || 0;
 
-		if ( !mergeFromTemplatesCount ) {
+		if ( !mergeFromTemplatesCount ) { // {{Merge from}}-ish templates absent
+			// Add {{Merge from}}-ish template at the top
 			newWikicode = `{{Being merged from|${sourcePage}|afd=${nominationName}|date=${dateOfClosure}}}\n` + newWikicode;
 
+			// Delete {{Merge to}}-ish templates
 			newWikicode = this.deleteTemplatesIfPresent(mergeToTemplates, newWikicode);
 
-			// Delete hidden HTML comments from {{Articles for deletion/dated}}
+			// Delete hidden HTML comments from the {{Merge to}}-ish template {{Articles for deletion/dated}}
 			newWikicode = newWikicode.replace(/<!-- Please do not remove or change this AfD message until the discussion has been closed. -->\n/g, "");
 			newWikicode = newWikicode.replace(/<!-- Once discussion is closed, please place on talk page: {{[^}]+}} -->\n/g, "");
 			newWikicode = newWikicode.replace(/<!-- End of AfD message, feel free to edit beyond this point -->\n/g, "");
-		} else {
+		} else { // {{Merge from}}-ish templates present
 			const mergeFromRegex = new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}][^}]*}}`, "gi");
 
+			// Remove all {{Merge from}}-ish templates except the last/bottom one. Marking a specific section takes priority over marking the entire article.
 			if ( mergeFromTemplatesCount > 1 ) {
-				// remove all {{Merge from}}-ish templates except the last/bottom one
 				const lastMatchIndex = this.getStartingIndexOfLastRegExMatch(mergeFromRegex, newWikicode);
 				const textBeforeLastMatch = newWikicode.substring(0, lastMatchIndex);
 				const textAfterLastMatch = newWikicode.substring(lastMatchIndex);
 				newWikicode = this.deleteTemplatesIfPresent(mergeFromTemplates, textBeforeLastMatch) + textAfterLastMatch;
 			}
 
+			// Replace the {{Merge from}}-ish template with an updated one, in the same location
 			const templateIndex = this.getStartingIndexOfLastRegExMatch(mergeFromRegex, newWikicode);
 			const textBeforeLastMatch2 = newWikicode.substring(0, templateIndex);
 			let textAfterLastMatch2 = newWikicode.substring(templateIndex);
