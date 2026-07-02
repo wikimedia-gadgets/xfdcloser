@@ -1,0 +1,27 @@
+
+{
+	"does not contain {{Merge}}, {{Merge from}}, {{Being merged}}, {{Being merged from}}, {{Merge portions from}}, and does not contain {{Merge to}}, {{Being merged to}}, {{Articles for deletion/dated}}": {
+		"oldWikicode": "Test",
+		"sourcePage": "Asian relations with Northeast India",
+		"targetPage": "Foreign relations of India",
+		"nominationName": "Asian relations with Northeast India (2nd nomination)",
+		"dateOfClosure": "April 2026",
+		"expectedWikicode": "{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\nTest"
+	},
+	"does not contain {{Merge}}, {{Merge from}}, {{Being merged}}, {{Being merged from}}, {{Merge portions from}}, contains 1 {{Merge to}}, {{Being merged to}}, {{Articles for deletion/dated}}": {
+		"oldWikicode": "{{Merging to|Average|discuss=Talk:Average#Merge proposal|date=February 2026}}\nTest",
+		"sourcePage": "Asian relations with Northeast India",
+		"targetPage": "Foreign relations of India",
+		"nominationName": "Asian relations with Northeast India (2nd nomination)",
+		"dateOfClosure": "April 2026",
+		"expectedWikicode": "{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\nTest"
+	},
+	"does not contain {{Merge}}, {{Merge from}}, {{Being merged}}, {{Being merged from}}, {{Merge portions from}}, contains 2 {{Merge to}}, {{Being merged to}}, {{Articles for deletion/dated}}": {
+		"oldWikicode": "{{Merging to|Average|discuss=Talk:Average#Merge proposal|date=February 2026}}\n{{Merging to|Average|discuss=Talk:Average#Merge proposal|date=February 2026}}\nTest",
+		"sourcePage": "Asian relations with Northeast India",
+		"targetPage": "Foreign relations of India",
+		"nominationName": "Asian relations with Northeast India (2nd nomination)",
+		"dateOfClosure": "April 2026",
+		"expectedWikicode": "{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\nTest"
+	}
+}

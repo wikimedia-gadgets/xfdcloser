@@ -99,6 +99,33 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		return RemoveNomTemplates.transform(this, page, merger.mergeToTemplate);
 	}
 
+	// TODO: nothing calls this function yet. look at Trialpear's patch to see what needs to call this.
+	// TODO: figure out how I'm going to do things to templates. RegEx? Does XFDcloser have a class to help with this? (see Trialpear's patch) Should I just use the Bhsd template helper library?
+	transformTargetPage(oldWikicode, sourcePage, targetPage, nominationName, dateOfClosure) {
+		let newWikicode = oldWikicode;
+
+		// TODO: add common aliases (and add test)
+		// TODO: case insensitive (and add test)
+		const mergeFromTemplates = ["Merge", "Merge from", "Being merged", "Being merged from", "Merge portions from"];
+		const mergeFromTemplatesCount = oldWikicode.match(new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*`, "gi"))?.length || 0;
+		if ( !mergeFromTemplatesCount ) {
+			newWikicode = `{{Being merged from|${sourcePage}|afd=${nominationName}|date=${dateOfClosure}}}\n` + newWikicode;
+			// if present, delete {{Merge to}}, {{being merged to}}, {{Article for deletion/dated}}, or one of their redirects. When removing {{Article for deletion/dated}} or its redirects, also remove the <! -- hidden comments -- > around it -- > (XFDcloser already does this, but only on the source article)
+		} else {
+			if ( mergeFromTemplatesCount > 1 ) {
+				// remove all of them except the last one (when removing {{Article for deletion/dated}}, also remove the hidden comments as above).
+			}
+			const sourceArticleMatches = /* TODO */ false; // check whether the existing |1="Source article" matches the article that was nominated 
+			const nominationNameMatches = /* TODO */ false; // check whether the |afd= parameter (or one of its aliases: discuss, discussion, talk) contains the correct NominationName (e.g., Earth (8th nomination))
+			if ( sourceArticleMatches && nominationNameMatches ) {
+				// replace template with {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} on the exact same line
+			} else {
+				// replace template with {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} at the top of the article, but below hatnotes
+			}
+		}
+		return newWikicode;
+	}
+
 	doTask() {
 		const mergers = this.getMergers();
 		if ( mergers.length === 0 ) {
