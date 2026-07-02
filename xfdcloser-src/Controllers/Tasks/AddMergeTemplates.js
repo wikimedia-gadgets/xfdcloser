@@ -121,7 +121,8 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 			"Merge to", /* aliases: */ "Merge-to", "Mergeinto", "MergePartial", "MergetoCat", "Mergelist", "Mergeto-disputed", "Mergeto-multiple", "Multiplemergeinto", "Multiplemergeto", "Multiple-merge-to", "Merge into", "MergeTo", "Mergeto", "Merge to article", "Merge2", "Merge-into",
 
 			"Being merged to", /* aliases: */ "Merging to", "Being Merge to", "Being merge to", "Merging into", "Merginginto", "Mergingto", "Merging-to",
-
+		];
+		const afdNoticeTemplates = [
 			"Article for deletion/dated", /* aliases: */ "AfDM", "Afd/dated", "AfD/dated", "Afdm",
 		];
 		const mergeFromTemplatesCount = oldWikicode.match(new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}]`, "gi"))?.length || 0;
@@ -133,7 +134,8 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 			// Delete {{Merge to}}-ish templates
 			newWikicode = this.deleteTemplatesIfPresent(mergeToTemplates, newWikicode);
 
-			// Delete hidden HTML comments from the {{Merge to}}-ish template {{Articles for deletion/dated}}
+			// Delete {{Articles for deletion/dated}} templates and their associated comments
+			newWikicode = this.deleteTemplatesIfPresent(afdNoticeTemplates, newWikicode);
 			newWikicode = newWikicode.replace(/<!-- Please do not remove or change this AfD message until the discussion has been closed. -->\n/g, "");
 			newWikicode = newWikicode.replace(/<!-- Once discussion is closed, please place on talk page: {{[^}]+}} -->\n/g, "");
 			newWikicode = newWikicode.replace(/<!-- End of AfD message, feel free to edit beyond this point -->\n/g, "");
