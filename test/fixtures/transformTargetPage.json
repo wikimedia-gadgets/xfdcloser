@@ -16,6 +16,14 @@
 		"dateOfClosure": "April 2026",
 		"expectedWikicode": "{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\nTest"
 	},
+	"contains 0 {{Merge from}}-ish templates, and contains 1 {{Merge to}}-ish templates. special case: {{Article for deletion/dated}} and associated hidden HTML comments": {
+		"oldWikicode": "{{Short description|Christian Science denomination}}\n{{distinguish|text=the [[Church of Scientology]]}}\n<!-- Please do not remove or change this AfD message until the discussion has been closed. -->\n{{Article for deletion/dated|page=Church of Christ, Scientist|timestamp=20260613054504|year=2026|month=June|day=13|substed=yes|help=off|outcome=merging|target=Christian Science}}\n<!-- Once discussion is closed, please place on talk page: {{Old AfD multi|page=Church of Christ, Scientist|date=13 June 2026|result='''keep'''}} -->\n<!-- End of AfD message, feel free to edit beyond this point -->\nTest",
+		"sourcePage": "Asian relations with Northeast India",
+		"targetPage": "Foreign relations of India",
+		"nominationName": "Asian relations with Northeast India (2nd nomination)",
+		"dateOfClosure": "April 2026",
+		"expectedWikicode": "{{Being merged from|Asian relations with Northeast India|afd=Asian relations with Northeast India (2nd nomination)|date=April 2026}}\n{{Short description|Christian Science denomination}}\n{{distinguish|text=the [[Church of Scientology]]}}\nTest"
+	},
 	"contains 0 {{Merge from}}-ish templates, and contains 2 {{Merge to}}-ish templates": {
 		"oldWikicode": "{{Merging to|Average|discuss=Talk:Average#Merge proposal|date=February 2026}}\n{{Merging to|Average|discuss=Talk:Average#Merge proposal|date=February 2026}}\nTest",
 		"sourcePage": "Asian relations with Northeast India",

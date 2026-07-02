@@ -124,12 +124,12 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		];
 		const mergeFromTemplatesCount = oldWikicode.match(new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}]`, "gi"))?.length || 0;
 		if ( !mergeFromTemplatesCount ) {
-			// Add {{Being merged from}} template
 			newWikicode = `{{Being merged from|${sourcePage}|afd=${nominationName}|date=${dateOfClosure}}}\n` + newWikicode;
-			// Delete "Merge to" templates
 			newWikicode = this.deleteTemplatesIfPresent(mergeToTemplates, newWikicode);
 			// Delete hidden HTML comments from {{Articles for deletion/dated}}
-			// newWikicode = newWikicode.replace(/<!--[\s\S]*?-->/gi, "");
+			newWikicode = newWikicode.replace(/<!-- Please do not remove or change this AfD message until the discussion has been closed. -->\n/g, "");
+			newWikicode = newWikicode.replace(/<!-- Once discussion is closed, please place on talk page: {{[^}]+}} -->\n/g, "");
+			newWikicode = newWikicode.replace(/<!-- End of AfD message, feel free to edit beyond this point -->\n/g, "");
 		} else {
 			if ( mergeFromTemplatesCount > 1 ) {
 				// remove all of them except the last one
