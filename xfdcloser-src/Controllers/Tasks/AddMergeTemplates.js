@@ -104,26 +104,62 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 	transformTargetPage(oldWikicode, sourcePage, targetPage, nominationName, dateOfClosure) {
 		let newWikicode = oldWikicode;
 
-		// TODO: add common aliases (and add test)
-		// TODO: case insensitive (and add test)
-		const mergeFromTemplates = ["Merge", "Merge from", "Being merged", "Being merged from", "Merge portions from"];
-		const mergeFromTemplatesCount = oldWikicode.match(new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*`, "gi"))?.length || 0;
+		const mergeFromTemplates = [
+			"Merge", /* aliases: */ "Mergedisputed", "Mergewith", "MergeDisputed", "MergeVfD", "Merge-disputed", "Merge disputed", "Merge-multiple", "Mergesplit", "MergeSplit", "Mergemulti", "Mergetomultiple-with", "Multimerge", "Proposed merge", "Merge with",
+
+			"Merge from", /* aliases: */ "Merge-from", "Include", "Mergefrom-multiple", "Multiplemergefrom", "Mergefrommulti", "Mergefrommultiple", "Multimergefrom", "Mergefrom-category", "MergeFrom", "Mergefrom", "Merge from draft", "Merge from AfD",
+
+			"Being merged", /* aliases: */ "Merging", "Mergingsectionto",
+
+			"Being merged from", /* aliases: */ "Merging from", "Mergingfrom", "Being Merge from", "Being merge from", "Merging-from",
+
+			"Merge portions from", /* aliases: */ "Move section portions from", "Move portions from", "Merge section portions from",
+		];
+		const mergeToTemplates = [
+			"Merge to", /* aliases: */ "Merge-to", "Mergeinto", "MergePartial", "MergetoCat", "Mergelist", "Mergeto-disputed", "Mergeto-multiple", "Multiplemergeinto", "Multiplemergeto", "Multiple-merge-to", "Merge into", "MergeTo", "Mergeto", "Merge to article", "Merge2", "Merge-into",
+
+			"Being merged to", /* aliases: */ "Merging to", "Being Merge to", "Being merge to", "Merging into", "Merginginto", "Mergingto", "Merging-to",
+
+			"Article for deletion/dated", /* aliases: */ "AfDM", "Afd/dated", "AfD/dated", "Afdm",
+		];
+		const mergeFromTemplatesCount = oldWikicode.match(new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}]`, "gi"))?.length || 0;
 		if ( !mergeFromTemplatesCount ) {
+			// Add {{Being merged from}} template
 			newWikicode = `{{Being merged from|${sourcePage}|afd=${nominationName}|date=${dateOfClosure}}}\n` + newWikicode;
-			// if present, delete {{Merge to}}, {{being merged to}}, {{Article for deletion/dated}}, or one of their redirects. When removing {{Article for deletion/dated}} or its redirects, also remove the <! -- hidden comments -- > around it -- > (XFDcloser already does this, but only on the source article)
+			// Delete "Merge to" templates
+			newWikicode = this.deleteTemplatesIfPresent(mergeToTemplates, newWikicode);
+			// Delete hidden HTML comments from {{Articles for deletion/dated}}
+			// newWikicode = newWikicode.replace(/<!--[\s\S]*?-->/gi, "");
 		} else {
 			if ( mergeFromTemplatesCount > 1 ) {
-				// remove all of them except the last one (when removing {{Article for deletion/dated}}, also remove the hidden comments as above).
+				// remove all of them except the last one
 			}
-			const sourceArticleMatches = /* TODO */ false; // check whether the existing |1="Source article" matches the article that was nominated 
-			const nominationNameMatches = /* TODO */ false; // check whether the |afd= parameter (or one of its aliases: discuss, discussion, talk) contains the correct NominationName (e.g., Earth (8th nomination))
+			const sourceArticleMatches = /* TODO */ false; // check whether the existing |1="Source article" matches the article that was nominated. missing parameter = mismatch.
+			const nominationNameMatches = /* TODO */ false; // check whether the |afd= parameter (or one of its aliases: discuss, discussion, talk) contains the correct NominationName (e.g., Earth (8th nomination)). missing parameter = mismatch.
 			if ( sourceArticleMatches && nominationNameMatches ) {
 				// replace template with {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} on the exact same line
 			} else {
-				// replace template with {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} at the top of the article, but below hatnotes
+				// remove template
+				// add {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} at the top of the article, but below hatnotes
 			}
 		}
 		return newWikicode;
+	}
+
+	/**
+	 * @param {string|array} templateNames
+	 */
+	deleteTemplatesIfPresent(templateNames, wikicode) {
+		if ( typeof templateNames === "string" ) {
+			templateNames = [templateNames];
+		}
+		for ( const templateName of templateNames ) {
+			// if it's on its own line, also delete the line break at the end
+			wikicode = wikicode.replace(new RegExp(`^\\s*{{\\s*${templateName}\\s*[^}]*}}\\s*\\n`, "gim"), "");
+			// if it's not on its own line, don't delete any line breaks
+			wikicode = wikicode.replace(new RegExp(`{{\\s*${templateName}\\s*[^}]*}}`, "gi"), "");
+		}
+		return wikicode;
 	}
 
 	doTask() {

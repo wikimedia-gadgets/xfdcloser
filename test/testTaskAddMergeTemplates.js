@@ -170,32 +170,6 @@ Lorem impsum`
 				fixture.dateOfClosure
 			);
 			assert.strictEqual(output, fixture.expectedWikicode);
-
-			// TO ADD TO JSON FIXTURES FILE:
-
-			// test: does not contain any of {{Merge}}, {{Merge from}}, {{Being merged}}, {{Being merged from}}, {{Merge portions from}}
-				// place {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} at top
-				// remove all of {{Merge to}}, {{Being merged to}}, {{Articles for deletion/dated}}, and {{Articles for deletion/dated}}'s hidden comments
-				
-			// case sensitive version of the above
-			// various parameter counts for the above (0, 1, 2)
-			// test for some common redirects of the above templates
-			// test for no "remove all of"'s being present
-			// first nomination (blank), second nomination (not blank)
-
-			// test: contains 2 or more of {{Merge}}, {{Merge from}}, {{Being merged}}, {{Being merged from}}, {{Merge portions from}}
-				// remove all but the bottom one
-				// then perform the steps in the next test
-
-			// test: contains exactly 1 of {{Merge}}, {{Merge from}}, {{Being merged}}, {{Being merged from}}, {{Merge portions from}}, and has the correct |1= and |afd= parameters
-				// remove template
-				// replace with {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} in the same spot
-
-			// test: contains exactly 1 of {{Merge}}, {{Merge from}}, {{Being merged}}, {{Being merged from}}, {{Merge portions from}}, and has a mismatch of any of the following parameters: |1= and |afd= parameters
-				// remove template (including hidden comments around {{Articles for deletion/dated}})
-				// place {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} at the top of the article, but below hatnotes
-				
-			// aliases of the parameter afd (discuss, discussion, talk)
 		});
 	});
 });
