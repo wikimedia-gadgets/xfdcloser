@@ -101,9 +101,11 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 
 	// TODO: nothing calls this function yet. look at Trialpear's patch to see what needs to call this.
 	// TODO: figure out how I'm going to do things to templates. RegEx? Does XFDcloser have a class to help with this? (see Trialpear's patch) Should I just use the Bhsd template helper library?
+	/**
+	 * Note: This function is RegEx-based, so does not support transforming nested templates.
+	 */
 	transformTargetPage(oldWikicode, sourcePage, targetPage, nominationName, dateOfClosure) {
 		let newWikicode = oldWikicode;
-
 		const mergeFromTemplates = [
 			"Merge", /* aliases: */ "Mergedisputed", "Mergewith", "MergeDisputed", "MergeVfD", "Merge-disputed", "Merge disputed", "Merge-multiple", "Mergesplit", "MergeSplit", "Mergemulti", "Mergetomultiple-with", "Multimerge", "Proposed merge", "Merge with",
 
@@ -123,16 +125,24 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 			"Article for deletion/dated", /* aliases: */ "AfDM", "Afd/dated", "AfD/dated", "Afdm",
 		];
 		const mergeFromTemplatesCount = oldWikicode.match(new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}]`, "gi"))?.length || 0;
+
 		if ( !mergeFromTemplatesCount ) {
 			newWikicode = `{{Being merged from|${sourcePage}|afd=${nominationName}|date=${dateOfClosure}}}\n` + newWikicode;
+
 			newWikicode = this.deleteTemplatesIfPresent(mergeToTemplates, newWikicode);
+
 			// Delete hidden HTML comments from {{Articles for deletion/dated}}
 			newWikicode = newWikicode.replace(/<!-- Please do not remove or change this AfD message until the discussion has been closed. -->\n/g, "");
 			newWikicode = newWikicode.replace(/<!-- Once discussion is closed, please place on talk page: {{[^}]+}} -->\n/g, "");
 			newWikicode = newWikicode.replace(/<!-- End of AfD message, feel free to edit beyond this point -->\n/g, "");
 		} else {
 			if ( mergeFromTemplatesCount > 1 ) {
-				// remove all of them except the last one
+				// remove all {{Merge from}}-ish templates except the last/bottom one
+				const mergeFromRegex = new RegExp(`{{\\s*(${mergeFromTemplates.join("|")})\\s*[|}][^}]*}}`, "gi");
+				const lastMatchIndex = this.getIndexOfLastRegExMatch(mergeFromRegex, newWikicode);
+				const textBeforeLastMatch = newWikicode.substring(0, lastMatchIndex);
+				const textAfterLastMatch = newWikicode.substring(lastMatchIndex);
+				newWikicode = this.deleteTemplatesIfPresent(mergeFromTemplates, textBeforeLastMatch) + textAfterLastMatch;
 			}
 			const sourceArticleMatches = /* TODO */ false; // check whether the existing |1="Source article" matches the article that was nominated. missing parameter = mismatch.
 			const nominationNameMatches = /* TODO */ false; // check whether the |afd= parameter (or one of its aliases: discuss, discussion, talk) contains the correct NominationName (e.g., Earth (8th nomination)). missing parameter = mismatch.
@@ -143,7 +153,24 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 				// add {{Being merged from|Source article|afd=NominationName|date=Date of the closure}} at the top of the article, but below hatnotes
 			}
 		}
+
 		return newWikicode;
+	}
+
+	/**
+	 * Searches a haystack using RegEx. When multiple matches, finds the last match, then returns the char index of the start of the last match. If no match is found, returns -1.
+	 * @param {RegExp} regEx The regular expression to search with.
+	 * @param {string} haystack The string to search within.
+	 * @return {number} The character index of the start of the last match, or -1 if no match is found.
+	 */
+	getIndexOfLastRegExMatch(regEx, haystack) {
+		const globalRegEx = regEx.global ? regEx : new RegExp(regEx.source, `${regEx.flags}g`);
+		let match;
+		let lastMatchIndex = -1;
+		while ( (match = globalRegEx.exec(haystack)) !== null ) {
+			lastMatchIndex = match.index;
+		}
+		return lastMatchIndex;
 	}
 
 	/**
