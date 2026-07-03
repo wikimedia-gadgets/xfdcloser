@@ -102,7 +102,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 	// TODO: nothing calls this function yet. look at Trialpear's patch to see what needs to call this.
 	// TODO: figure out how I'm going to do things to templates. RegEx? Does XFDcloser have a class to help with this? (see Trialpear's patch) Should I just use the Bhsd template helper library?
 	/**
-	 * Note: This function is RegEx-based, so does not support transforming nested templates.
+	 * Note: This method is RegEx-based, so does not support transforming nested templates.
 	 */
 	transformTargetPage(oldWikicode, sourcePage, targetPage, nominationName, dateOfClosure) {
 		let newWikicode = oldWikicode;
