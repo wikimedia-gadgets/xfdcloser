@@ -551,7 +551,6 @@ const options = [
 			{label: "Merge (Infoboxes)", data:"merge-infobox"},
 			{label: "Merge (Navigation templates)", data:"merge-navigation"},
 			{label: "Merge (Link templates)", data:"merge-link"},
-			{label: "Merge (Sports)", data:"merge-sports"},
 			{label: "Merge (Other)", data:"merge-other"},
 			{label: "Merge (Meta)", data:"merge-meta"}
 		]
