@@ -192,24 +192,22 @@ DiscussionView.newFromHeadline = function({headingIndex, context, venue, current
 		//CFDs: Nominated pages are the first link of an <li> item in a <ul> list, within a <dl> list
 		pages = $discussionNodes
 			.find("dd > ul > li")
-			.has("b:first-child:contains(\"Propose \")")
-			.find("span")
-			.not(".lx")
-			.children("a:first-of-type")
+			.has("b:first-child")
+			.children("a:nth-child(2)")
+			.not(":has(span)")
 			.not(".external")
 			.map(function () { return mw.Title.newFromText($(this).text()); })
 			.get();
 		if (pages.length === 0) {
-			// Sometimes nominated pages are instead just in a <ul> list, e.g.
-			// Wikipedia:Categories_for_discussion/Log/2019_February_5#Foo_in_fiction
-			pages = $heading
-				.next("ul")
-				.find("li")
-				.find("a:first-of-type")
+			pages = $discussionNodes
+				.find("dd > ul > li")
+				.has("b:first-child")
+				.children("span:nth-child(2)") // If using {{Lc}} there's an extra span
+				.children("a:first-of-type")
 				.not(".external")
 				.map(function () { return mw.Title.newFromText($(this).text()); })
 				.get();
-		}
+		} 
 		// Try to find the proposed action
 		const $action = $heading
 			.next()
