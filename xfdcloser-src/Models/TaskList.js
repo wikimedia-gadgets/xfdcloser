@@ -200,6 +200,21 @@ class TaskList {
 					})
 				);
 			}
+			const deleteSubpagesPageResults = deletePageResults.filter(result => {
+				const optionValues = this.options.getOptionValues(result.selectedResultName);
+				return optionValues && optionValues.deleteSubpages;
+			});
+			if ( deleteSubpagesPageResults.length )  {
+				tasks.push(
+					new TaskItem({
+						taskName: "DeleteSubpages",
+						relaventPageNames: deleteSubpagesPageResults.map(result => result.pageName),
+						discussion: this.discussion,
+						result: this.result,
+						options: this.options
+					})
+				);
+			}
 			const unlinkPageResults = deletePageResults.filter(result => {
 				const optionValues = this.options.getOptionValues(result.selectedResultName);
 				return optionValues && optionValues.unlink;

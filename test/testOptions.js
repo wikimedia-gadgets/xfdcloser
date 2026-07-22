@@ -148,7 +148,8 @@ describe("Options", function() {
 			assert.deepStrictEqual(model.items[2].values, {
 				action: "deletePages",
 				deleteTalk: true,
-				deleteRedir: true
+				deleteRedir: true,
+				deleteSubpages: true,
 			});
 		});
 		it("can set boolean option values", function() {
@@ -157,21 +158,32 @@ describe("Options", function() {
 			assert.deepStrictEqual(model.items[2].values, {
 				action: "deletePages",
 				deleteTalk: false,
-				deleteRedir: true
+				deleteRedir: true,
+				deleteSubpages: true,
 			});
 			
 			model.items[2].setOptionValue("deleteRedir", false);
 			assert.deepStrictEqual(model.items[2].values, {
 				action: "deletePages",
 				deleteTalk: false,
-				deleteRedir: false
+				deleteRedir: false,
+				deleteSubpages: true,
 			});
 			
 			model.items[2].setOptionValue("deleteTalk", true);
 			assert.deepStrictEqual(model.items[2].values, {
 				action: "deletePages",
 				deleteTalk: true,
-				deleteRedir: false
+				deleteRedir: false,
+				deleteSubpages: true,
+			});
+
+			model.items[2].setOptionValue("deleteSubpages", false);
+			assert.deepStrictEqual(model.items[2].values, {
+				action: "deletePages",
+				deleteTalk: true,
+				deleteRedir: false,
+				deleteSubpages: false,
 			});
 		});
 		it("can set menu option value", function() {

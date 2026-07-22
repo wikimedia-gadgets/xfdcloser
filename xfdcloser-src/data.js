@@ -465,7 +465,7 @@ const actions = [
 	{
 		label: "Delete pages",
 		name: "deletePages",
-		options: ["deleteTalk", "deleteRedir", "unlink"]
+		options: ["deleteTalk", "deleteRedir", "deleteSubpages", "unlink"]
 	},
 	{
 		label: "List pages at holding cell",
@@ -510,6 +510,13 @@ const options = [
 		label: "Delete redirects",
 		type: "toggleSwitch",
 		venues: ["afd", "cfd", "ffd", "mfd", "tfd"],
+		value: true // initial value
+	},
+	{
+		name: "deleteSubpages",
+		label: "Delete subpages",
+		type: "toggleSwitch",
+		venues: ["tfd"],
 		value: true // initial value
 	},
 	{

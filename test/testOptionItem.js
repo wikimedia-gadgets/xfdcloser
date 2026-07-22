@@ -73,7 +73,7 @@ describe("OptionsItem", function() {
 			assert.strictEqual(model.selectedAction.name, "deletePages");
 		});
 		it("deletePages action has two options", function() {
-			assert.deepStrictEqual(model.options.length, 2);
+			assert.deepStrictEqual(model.options.length, 3);
 		});
 		it("is valid with options in default values", function() {
 			assert.strictEqual(model.isValid, true);
@@ -85,6 +85,7 @@ describe("OptionsItem", function() {
 					action: "deletePages",
 					deleteTalk: true,
 					deleteRedir: true,
+					deleteSubpages: true,
 				}
 			);
 		});
@@ -96,6 +97,7 @@ describe("OptionsItem", function() {
 					action: "deletePages",
 					deleteTalk: false,
 					deleteRedir: true,
+					deleteSubpages: true,
 				}
 			);
 			
@@ -106,6 +108,7 @@ describe("OptionsItem", function() {
 					action: "deletePages",
 					deleteTalk: true,
 					deleteRedir: true,
+					deleteSubpages: true,
 				}
 			);
 
@@ -116,6 +119,7 @@ describe("OptionsItem", function() {
 					action: "deletePages",
 					deleteTalk: true,
 					deleteRedir: false,
+					deleteSubpages: true,
 				}
 			);
 
@@ -126,6 +130,18 @@ describe("OptionsItem", function() {
 					action: "deletePages",
 					deleteTalk: false,
 					deleteRedir: false,
+					deleteSubpages: true,
+				}
+			);
+			
+			model.setOptionValue("deleteSubpages", false);
+			assert.deepStrictEqual(
+				model.values,
+				{
+					action: "deletePages",
+					deleteTalk: false,
+					deleteRedir: false,
+					deleteSubpages: false,
 				}
 			);
 			
