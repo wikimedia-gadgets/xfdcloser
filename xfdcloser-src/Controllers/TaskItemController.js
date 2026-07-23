@@ -140,6 +140,10 @@ class TaskItemController {
 			this.model.addError(`Nomination template not found on page ${makeLink(title)}`);
 			this.model.trackStep("skipped");
 			break;
+		case "alreadyRedirect":
+			this.model.addError(`Nominated article ${makeLink(title)} is currently a redirect. Has the article already been merged?`);
+			this.model.trackStep("skipped");
+			break;
 		case "abort":
 			this.model.setAborted();
 			this.model.trackStep("failed");

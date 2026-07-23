@@ -184,8 +184,8 @@ export default class AddOldXfdTask extends TaskItemController {
 				prependtext: this.makeOldxfdWikitext(pageTitle.getPrefixedText()),
 				redirect: true
 			};
-		case page.redirect && this.model.venue.type !== "afd":
-			// Redirect at other venues, except afd: append rather than prepend old xfd template
+		case page.redirect:
+			// Redirect at other venues: append rather than prepend old xfd template
 			return {
 				...baseEditParams,
 				appendtext: "\n" + this.makeOldxfdWikitext(),
