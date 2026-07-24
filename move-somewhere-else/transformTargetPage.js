@@ -30,3 +30,5 @@ function removeTagsFromTargetPage(oldWikicode, sourcePage, nominationName) {
 
 	return newWikicode;
 }
+
+module.exports = removeTagsFromTargetPage;
