@@ -22,7 +22,11 @@ function removeTagsFromTargetPage(oldWikicode, sourcePage, nominationName) {
 		"Merge portions from", /* aliases: */ "Move section portions from", "Move portions from", "Merge section portions from",
 	];
 
-	// TODO: do things
+	// Now that you have that list of pages, look at every instance of {{Merge}}, {{merge from}}, {{Merge to}}, {{Article for deletion/dated}}, {{being merged to}}, {{being merged}}, {{being merged from}}, {{Merge portions from}}, or one of their redirects, and remove every one where the Source page or the NominationName appear {{inside it}}. Don't check the parameter names at all, just their values.
+	// When removing {{Article for deletion/dated}} or one of its redirects, also remove the <! -- hidden comments -- > around it.
+	// This is not able to handle nested templates. Hopefully that never happens, else a more complicated solution will be needed.
+
+	// TODO
 
 	return newWikicode;
 }

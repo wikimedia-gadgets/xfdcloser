@@ -1,0 +1,81 @@
+
+{
+	"delete template when sourcePage is inside of it": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|Slovakia during World War II|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"delete template when nominationName is inside of it": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|ABC123|date=March 2026|discuss=Wikipedia:Articles for deletion/Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"handle a template that is surrounded by 0 line breaks": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}{{Merge|ABC123|date=March 2026|discuss=Wikipedia:Articles for deletion/Slovak Republic (1939–1945)}}Test\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"handle a template that is surrounded by 1 line break (left side)": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|ABC123|date=March 2026|discuss=Wikipedia:Articles for deletion/Slovak Republic (1939–1945)}}Test\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"handle a template that is surrounded by 1 line break (right side)": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}{{Merge|ABC123|date=March 2026|discuss=Wikipedia:Articles for deletion/Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"merge template - case insensitive detection": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{MeRgE|Slovakia during World War II|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"merge template - spaces instead of underscores": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Being merged|Slovakia during World War II|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"merge template - underscores instead of spaces": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Being_merged|Slovakia during World War II|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"parameter value - case insensitive detection": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|slovakia during world war ii|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"parameter value - underscores instead of spaces": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|Slovakia_during_World_War_II|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"leave templates that don't have sourcePage or nominationName inside of them alone": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|Slovakia during World War II|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\n{{Merge|ABC123|date=March 2026|discuss=Wikipedia:Articles for deletion/Slovak Republic (1939–1945)}}\n{{Merge|ABC123|date=March 2026|discuss=DEF456}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|ABC123|date=March 2026|discuss=DEF456}}\nTest\n"
+	},
+	"detect and delete lots of merge-ish templates": {
+		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{Merge|Slovakia during World War II}}\n{{Merge disputed|Slovakia during World War II}}\n{{Merge from|Slovakia during World War II}}\n{{MergeTo|Slovakia during World War II}}\n{{Being merged to|Slovakia during World War II}}\n{{Merging|Slovakia during World War II}}\n{{Merge portions from|Slovakia during World War II}}\n{{Being merged from|Slovakia during World War II}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
+	"remove the hidden HTML comments that surround {{Article for deletion/dated}}": {
+		"oldWikicode": "{{Short description|Computer-readable phonetic script}}{{Other uses|Sampa (disambiguation){{!}}Sampa}}\n<!-- Please do not remove or change this AfD message until the discussion has been closed. -->\n{{Article for deletion/dated|page=SAMPA|timestamp=20260721163412|year=2026|month=July|day=21|substed=yes|help=off|outcome=merging|target=X-SAMPA#History}}\n<!-- Once discussion is closed, please place on talk page: {{Old AfD multi|page=SAMPA|date=21 July 2026|result='''keep'''}} -->\n<!-- End of AfD message, feel free to edit beyond this point -->\n{{No footnotes|date=May 2018}}\n",
+		"sourcePage": "SAMPA",
+		"nominationName": "Wikipedia:Articles for deletion/SAMPA",
+		"expectedWikicode": "{{Short description|Computer-readable phonetic script}}{{Other uses|Sampa (disambiguation){{!}}Sampa}}\n{{No footnotes|date=May 2018}}\n"
+	}
+}
