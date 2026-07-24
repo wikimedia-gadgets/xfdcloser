@@ -75,7 +75,7 @@ describe("AddBeingDeleted", function() {
 			options
 		});
 		task = new AddOldXfd(model, widgets);
-		summary = "[[Wikipedia:Templates for discussion/2020 March 18#Foo and bar]] closed as merge " + config.script.advert;
+		summary = "[[Wikipedia:Templates for discussion/2020 March 18#Foo and bar]] closed as merge into [[Template:Qux]] " + config.script.advert;
 	});
 	it("beforeEach is ok", function() {
 		assert.ok(true);
@@ -83,7 +83,7 @@ describe("AddBeingDeleted", function() {
 	it("makes old xfd wikitext", function() {
 		assert.deepStrictEqual(
 			task.makeOldxfdWikitext(),
-			"{{oldtfdfull|date= 18 March 2020 |result=merge |disc=Foo and bar}}\n"
+			"{{oldtfdfull|date= 18 March 2020 |result='''merge''' into [[Template:Qux]] |disc=Foo and bar}}\n"
 		);
 	});
 	it("makes new wikitext (no page content)", function() {
@@ -106,7 +106,7 @@ describe("AddBeingDeleted", function() {
 		assert.strictEqual(
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
 			"{{Old AfD multi |date1=18 June 2019 |result1='''Keep''' |page1=" +page1 +
-				" |date2=18 March 2020 |result2='''Merge''' |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\n"
+				" |date2=18 March 2020 |result2='''Merge''' into [[Template:Qux]] |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\n"
 		);
 	});
 	it("makes new wikitext (1 old TFD banner and other content)", function() {
@@ -117,7 +117,7 @@ describe("AddBeingDeleted", function() {
 		assert.strictEqual(
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
 			"{{Old AfD multi |date1=18 June 2019 |result1='''Keep''' |page1=" +page1 +
-				" |date2=18 March 2020 |result2='''Merge''' |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\nLoremipsum"
+				" |date2=18 March 2020 |result2='''Merge''' into [[Template:Qux]] |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\nLoremipsum"
 		);
 	});
 	it("makes new wikitext (Old Afd multi)", function() {
@@ -125,7 +125,7 @@ describe("AddBeingDeleted", function() {
 		assert.strictEqual(
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
 			"{{Old AfD multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}"+
-				" |date2=18 March 2020 |result2='''Merge''' |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}"
+				" |date2=18 March 2020 |result2='''Merge''' into [[Template:Qux]] |page2=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}"
 		);
 	});
 	it("makes new wikitext (Old Afd multi and old TFD banner)", function() {
@@ -137,7 +137,7 @@ describe("AddBeingDeleted", function() {
 			task.makeNewWikitext(wikitext, "Template talk:Foo"),
 			"{{Old AfD multi |date1=2010 February 26 |result1='''Redirect to [[Template:Abbr]]''' |link1={{canonicalurl:Wikipedia:Templates for discussion/Log/2010 February 26#Template:Tooltip}}"+
 				" |date2=18 June 2019 |result2='''Keep''' |page2=" + page2 +
-				" |date3=18 March 2020 |result3='''Merge''' |page3=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\nLoremipsum"
+				" |date3=18 March 2020 |result3='''Merge''' into [[Template:Qux]] |page3=Wikipedia:Templates for discussion/2020 March 18#Foo and bar}}\nLoremipsum"
 		);
 	});
 	it("transforms a page with content", function() {

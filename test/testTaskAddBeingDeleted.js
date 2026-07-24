@@ -127,7 +127,7 @@ describe("AddBeingDeleted", function() {
 			transformed,
 			{
 				text: "blah blah blah",
-				summary: "[[WP:TFD/discussionPageName#Foo and bar]] closed as merge " + config.script.advert
+				summary: "[[WP:TFD/discussionPageName#Foo and bar]] closed as merge into [[Template:Foo]] " + config.script.advert
 			}
 		);
 	});

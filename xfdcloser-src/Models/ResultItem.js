@@ -132,6 +132,17 @@ class ResultItem {
 		return ( prefix || "" ) + this.selectedResultName + suffix;
 	}
 
+	getFormattedTargetWithPreposition() {
+		if ( !this.selectedResult ) {
+			return "";
+		} else if ( this.selectedResult.name === "custom") {
+			return this.customResultText.trim();
+		}
+		const destination = ((this.selectedResult.name === "merge") && ("into [[" + this.targetPageName.charAt(0).toUpperCase() + this.targetPageName.slice(1) + "]]")) ||
+							((this.selectedResult.name === "redirect") && ("to [[" + this.targetPageName.charAt(0).toUpperCase() + this.targetPageName.slice(1) + "]]"));
+		return (destination || ""); 
+	}
+
 	/**
 	 * Target page formatted as a wikilink (default), or for "raw" format just
 	 * the page name and fragment (transformed by mw.Title's text function).

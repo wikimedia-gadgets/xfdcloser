@@ -225,11 +225,20 @@ class Result {
 	// Alias
 	getResultText() { return this.getFormattedResult(); }
 
+
 	/**
 	 * @inheritdoc ResultItem.getFormattedTarget
 	 */
 	getFormattedTarget(format) {
 		return this.isMultimode ? "" : this.singleModeResult.getFormattedTarget(format);
+	}
+
+	getFormattedTargetWithPreposition() {
+		if ( this.isMultimode ) {
+			return "";
+		} else {
+			return this.singleModeResult.getFormattedTargetWithPreposition();
+		}
 	}
 
 	getResultsByPage() {

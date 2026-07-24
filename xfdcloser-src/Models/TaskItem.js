@@ -124,7 +124,7 @@ class TaskItem {
 			// Deleting talk pages using CSD G8
 			? `[[${link}]]`
 			// Closing XFDs
-			: `[[${link}]] closed as ${this.result.getResultText()}`;
+			: `[[${link}]] closed as ${this.result.getResultText() + " " + this.result.getFormattedTargetWithPreposition()}`.trim();
 		return prefix + main + " " + appConfig.script.advert;
 	}
 
