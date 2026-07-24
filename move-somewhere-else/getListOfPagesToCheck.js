@@ -1,6 +1,6 @@
 // TODO: rename and move this file
 
-function getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage, xfdType) {
+function getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage) {
 	const pagesToCheck = [];
 	
 	// If the discussion was closed as merge or redirect, add the Target page to the list, unless it is currently a redirect or it doesn't exist, in which case leave it out. (If it is a redirect, checking if it contains any merge templates is useless because it's just a redirect...)
@@ -18,10 +18,9 @@ function getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage, xfdType
 	}
 	
 	// In addition, add to the list every page in the (Article) or Draft namespaces in the "What links here" of the AfD discussion subpage, excluding the Source page and the Target page themselves.
-	let listOfWhatLinksHerePages = [];
-	if ( xfdType === "afd" ) {
-		listOfWhatLinksHerePages = getWhatLinksHerePagesFilteredByNamespace(afdPage, [NS_MAIN, NS_DRAFT]);
-	}
+	const NS_MAIN = 0;
+	const NS_DRAFT = 118;
+	let listOfWhatLinksHerePages = getWhatLinksHerePagesFilteredByNamespace(afdPage, [NS_MAIN, NS_DRAFT]);
 	listOfWhatLinksHerePages = removeValuesFromArrayCaseInsensitive( listOfWhatLinksHerePages, [sourcePage, targetPage]);
 	pagesToCheck.push(...listOfWhatLinksHerePages);
 	
