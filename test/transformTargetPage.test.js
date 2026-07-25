@@ -10,7 +10,6 @@ describe("removeTagsFromTargetPage", function() {
 	for (const [testName, testCase] of Object.entries(fixtures)) {
 		it(testName, function() {
 			const { oldWikicode, sourcePage, nominationName, expectedWikicode } = testCase;
-
 			assert.strictEqual(
 				removeTagsFromTargetPage(oldWikicode, sourcePage, nominationName),
 				expectedWikicode
