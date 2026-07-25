@@ -7,12 +7,14 @@ const removeTagsFromTargetPage = require("../move-somewhere-else/transformTarget
 const fixtures = require("./fixtures/transformTargetPage.json");
 
 describe("removeTagsFromTargetPage", function() {
-	it("removes a merge tag when the source page is inside it", function() {
-		const { oldWikicode, sourcePage, nominationName, expectedWikicode } = fixtures["delete template when sourcePage is inside of it"];
+	for (const [testName, testCase] of Object.entries(fixtures)) {
+		it(testName, function() {
+			const { oldWikicode, sourcePage, nominationName, expectedWikicode } = testCase;
 
-		assert.strictEqual(
-			removeTagsFromTargetPage(oldWikicode, sourcePage, nominationName),
-			expectedWikicode
-		);
-	});
+			assert.strictEqual(
+				removeTagsFromTargetPage(oldWikicode, sourcePage, nominationName),
+				expectedWikicode
+			);
+		});
+	}
 });
