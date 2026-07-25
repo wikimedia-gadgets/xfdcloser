@@ -92,7 +92,7 @@ function spacesToUnderscores(str) {
 	return str.replace(/ /g, "_").toLowerCase();
 }
 
-// Function to extract template content between {{ and }}
+/** Function to extract template content between {{ and }} */
 function extractTemplateContent(wikicode, startIndex) {
 	let braceCount = 0;
 	let i = startIndex;
