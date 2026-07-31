@@ -7,7 +7,7 @@
  *
  * This is not able to handle nested templates. Hopefully that never happens, else a more complicated solution will be needed.
  */
-function removeTagsFromTargetPage(oldWikicode, sourcePage, nominationName) {
+function removeMergeAndAfdTemplates(oldWikicode, sourcePage, nominationName) {
 	let newWikicode = oldWikicode;
 	// {{Merge}}, {{merge from}}, {{Merge to}}, {{Article for deletion/dated}}, {{being merged to}}, {{being merged}}, {{being merged from}}, {{Merge portions from}}
 	const mergeTemplates = [
@@ -113,4 +113,4 @@ function extractTemplateContent(wikicode, startIndex) {
 	return null;
 }
 
-module.exports = removeTagsFromTargetPage;
+module.exports = removeMergeAndAfdTemplates;
