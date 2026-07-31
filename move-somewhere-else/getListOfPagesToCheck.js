@@ -1,5 +1,16 @@
 // TODO: rename and move this file
 
+function execute() {
+	const listOfPagesToCheck = getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage, xfdType);
+	for ( const page of listOfPagesToCheck ) {
+		const oldWikicode = getOldWikicode(page);
+		const newWikicode = removeTagsFromTargetPage(oldWikicode, sourcePage, targetPage, nominationName, dateOfClosure);
+		if ( newWikicode !== oldWikicode ) {
+			saveNewWikicode(page, newWikicode);
+		}
+	}
+}
+
 function getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage) {
 	const pagesToCheck = [];
 	
@@ -17,16 +28,19 @@ function getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage) {
 		}
 	}
 	
+	/*
 	// In addition, add to the list every page in the (Article) or Draft namespaces in the "What links here" of the AfD discussion subpage, excluding the Source page and the Target page themselves.
 	const NS_MAIN = 0;
 	const NS_DRAFT = 118;
 	let listOfWhatLinksHerePages = getWhatLinksHerePagesFilteredByNamespace(afdPage, [NS_MAIN, NS_DRAFT]);
 	listOfWhatLinksHerePages = removeValuesFromArrayCaseInsensitive( listOfWhatLinksHerePages, [sourcePage, targetPage]);
 	pagesToCheck.push(...listOfWhatLinksHerePages);
+	*/
 	
 	return pagesToCheck;
 }
 
+/*
 function removeValuesFromArrayCaseInsensitive( haystack, needles ) {
 	// TODO: remove the needles from the haystack, case insensitive, and treating space and underscore as the same character
 }
@@ -34,6 +48,7 @@ function removeValuesFromArrayCaseInsensitive( haystack, needles ) {
 function getWhatLinksHerePagesFilteredByNamespace(pageBeingLinkedTo, allowedNamespaces) {
 	// TODO. requires API call.
 }
+*/
 
 function pageIsRedirect(page) {
 	// TODO
