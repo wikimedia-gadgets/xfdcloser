@@ -1,6 +1,6 @@
-import { $, mw, OO } from "../../../globals";
+import { $, mw} from "../../../globals";
 import TaskItemController from "../TaskItemController";
-import { rejection, dmyDateString, dateFromUserInput, uppercaseFirst, ymdDateString } from "../../util";
+import { rejection, dmyDateString, dateFromUserInput, uppercaseFirst, ymdDateString, multiButtonConfirm } from "../../util";
 import Template from "../../Template";
 // <nowiki>
 
@@ -166,17 +166,24 @@ export default class AddOldXfdTask extends TaskItemController {
 		switch(true) {
 		case page.redirect && this.model.venue.type === "rfd":
 			// Redirect at RfD: ask what to to do
-			return OO.ui.confirm(`"${page.title}" is currently a redirect. Okay to replace with Old RFD template?`)
-				.then( confirmed => {
-					if (!confirmed) {
-						return $.Deferred().reject("skipped");
-					}
-					return {
-						...baseEditParams,
-						text: this.makeOldxfdWikitext(),
-						redirect: false
-					};
-				} );
+			return multiButtonConfirm({title: "Warning",
+				message: `"${page.title}" is currently a redirect. Okay to replace with Old RFD template?`,
+				actions: [
+					{ label:"Do nothing", flags:"safe" },
+					{ label:"Overwrite redirect", action:"accept", flags:"progressive" }
+				],
+				size: "medium",
+				scrolled: true
+			}).then( confirmed => {
+				if (!confirmed) {
+					return $.Deferred().reject("skipped");
+				}
+				return {
+					...baseEditParams,
+					text: this.makeOldxfdWikitext(),
+					redirect: false
+				};
+			} );
 		case page.redirect && this.model.venue.type === "mfd":
 			// Redirect at MfD: edit the redirect's target page, using the altpage parameter
 			return {
