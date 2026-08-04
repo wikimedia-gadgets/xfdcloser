@@ -18,8 +18,7 @@
  * ---------------------------------------------------------------------------
  * 1) Changes committed and merged to master branch on GitHub repo
  * 2) Currently on master branch, and synced with GitHub repo
- * 3) Version bumped, and that change commited and synced to GitHub repo 
- * 3) Run a full build using "npm run build"
+ * 3) If you are not using the `npm run deploy` command, run a full build using "npm run build"
  * When all of the above are done ==> you are ready to proceed with deployment
  * 
  * --------------------------------------------------------------------------
@@ -32,8 +31,6 @@
  * and supply the requested details.
  * Notes:
  * - The default summary if not specified is "Updated from repository"
- * - Edit summaries will be prepended with the version number from
- *   the package.json file
  * - Changes to gadget definitions need to be done manually
  */
 const fs = require("fs");
@@ -93,9 +90,8 @@ async function deploy(config) {
 		}
 
 		// Extract info for edit summary.
-		const version = require("../package.json").version;
 		const sha = execSync("git rev-parse --short HEAD").toString("utf8").trim();
-		const editSummary = `v${version} at ${sha}: ${userComment || "Updated from repository"}`;
+		const editSummary = `${sha}: ${userComment || "Updated from repository"}`;
 		console.log(`Edit summary is: "${editSummary}"`);
 
 		const isBeta = beta.trim().toUpperCase() !== "N";
