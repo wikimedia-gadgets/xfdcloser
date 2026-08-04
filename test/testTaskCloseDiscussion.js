@@ -81,7 +81,7 @@ describe("CloseDiscussion", function() {
 			"Plain sub",
 			"Spacing",
 			"Uneven spacing",
-			"Multiple spaces",
+			"Multiple  spaces",
 			"Linked",
 			"Piped link",
 			"{{Linked template}}",

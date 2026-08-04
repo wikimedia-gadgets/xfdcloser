@@ -25,7 +25,7 @@ export default class CloseDiscussion extends TaskItemController {
 			.replace(/\[\[:?(?:[^\]]+\|)?([^\]]+)\]\]/g, "$1") // replace link markup with link text
 			.replace(/{{\s*[Tt]l[a-z]?\s*\|\s*([^}]+)}}/g, "{{$1}}") // replace tl templates
 			.replace(/s*}}/, "}}") // remove any extra spaces after replacing tl templates
-			.replace(/\s{2,}/g, " ") // collapse multiple spaces into a single space
+			.replace(/'''?/g, "") // Remove italics and bold
 			.trim()
 		);
 	};
