@@ -24,15 +24,27 @@ const resultsData = [
 		venues: ["afd", "ffd", "mfd", "rfd"],
 		actions: ["deletePages", "noActions"]
 	},
-	// Delete (CFD)
+	// Delete (non-sysop CFD)
 	{
 		name: "delete",
 		label: "Delete",
 		title: "Close discussion as \"delete\"",
 		allowSpeedy: true,
 		allowSoft: true,
+		nonSysopOnly: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
+	},
+	// Delete (sysop CFD)
+	{
+		name: "delete",
+		label: "Delete",
+		title: "Close discussion as \"delete\"",
+		allowSpeedy: true,
+		allowSoft: true,
+		sysopOnly: true,
+		venues: ["cfd"],
+		actions: ["cfdw", "noActions"]
 	},
 	// Delete (sysop, TFD)
 	{
@@ -80,14 +92,25 @@ const resultsData = [
 		venues: ["afd", "mfd"],
 		actions: ["redirectAndUpdate", "noActions"]
 	},
-	// Redirect (CFD)
+	// Redirect (non-sysop CFD)
 	{
 		name: "redirect",
 		label: "Redirect",
 		title: "Close discussion as \"redirect\"",
 		requireTarget: true,
+		nonSysopOnly: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
+	},
+	// Redirect (sysop CFD)
+	{
+		name: "redirect",
+		label: "Redirect",
+		title: "Close discussion as \"redirect\"",
+		requireTarget: true,
+		sysopOnly: true,
+		venues: ["cfd"],
+		actions: ["cfdwRedirect", "noActions"]
 	},
 	// Redirect (sysop, TFD)
 	{
@@ -111,14 +134,26 @@ const resultsData = [
 		actions: ["redirectAndUpdate", "noActions"]
 	},
 
-	// Rename (CFD)
+	// Rename (non-sysop CFD)
 	{
 		name: "rename",
 		label: "Rename",
 		title: "Close discussion as \"rename\"",
 		requireTarget: true,
+		nonSysopOnly: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
+	},
+
+	// Rename (non-sysop CFD)
+	{
+		name: "rename",
+		label: "Rename",
+		title: "Close discussion as \"rename\"",
+		requireTarget: true,
+		sysopOnly: true,
+		venues: ["cfd"],
+		actions: ["cfdw", "noActions"]
 	},
 
 	// Retarget (sysop, RFD)
@@ -184,14 +219,25 @@ const resultsData = [
 		venues: ["mfd"],
 		actions: ["mergeAndUpdate", "noActions"]
 	},
-	// Merge (CFD)
+	// Merge (non-sysop CFD)
 	{
 		name: "merge",
 		label: "Merge",
 		title: "Close discussion as \"merge\"",
 		requireTarget: true,
+		nonSysopOnly: true,
 		venues: ["cfd"],
 		actions: ["noActions"]
+	},	
+	// Merge (sysop CFD)
+	{
+		name: "merge",
+		label: "Merge",
+		title: "Close discussion as \"merge\"",
+		requireTarget: true,
+		sysopOnly: true,
+		venues: ["cfd"],
+		actions: ["cfdw", "noActions"]
 	},
 	// Merge (TFD)
 	{
@@ -491,6 +537,15 @@ const actions = [
 		name: "mergeAndUpdate"
 	},
 	{
+		label: "List at working page",
+		name: "cfdw",
+		options: ["leaveRedirect"]
+	},
+	{
+		label: "List at working page",
+		name: "cfdwRedirect"
+	},
+	{
 		label: "No automated actions",
 		name: "noActions",
 	}
@@ -570,6 +625,14 @@ const options = [
 		venues: ["afd"],
 		items: rcats,
 		value: ["{{R to related topic}}"]
+	},
+	{
+		name: "leaveRedirect",
+		label: "Leave redirect",
+		type: "toggleSwitch",
+		for: "cfdw",
+		venues: ["cfd"],
+		value: false // initial value
 	}
 ];
 

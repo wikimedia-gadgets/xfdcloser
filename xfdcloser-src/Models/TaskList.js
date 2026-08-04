@@ -263,6 +263,25 @@ class TaskList {
 			}
 		}
 
+		// CFDW
+		const cfdwPageResults = resultsbyPage.filter(result => {
+			const optionValues = this.options.getOptionValues(result.selectedResultName);
+			const action = optionValues && optionValues.action;
+			return action === "cfdw" || action === "cfdwRedirect";
+		});
+		if (cfdwPageResults.length) {
+			tasks.push(
+				new TaskItem({
+					taskName: "AddToCfdw",
+					relaventPageNames: cfdwPageResults.map(result => result.pageName),
+					discussion: this.discussion,
+					result: this.result,
+					options: this.options
+				})
+			);
+		}
+		
+
 		tasks.slice(1).forEach(task => {
 			if ( !task.precedingTask ) {
 				task.setPrecedingTask(closeDiscussionTask, "done");
