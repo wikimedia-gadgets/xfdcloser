@@ -1,6 +1,5 @@
 import TaskItemController from "../TaskItemController";
 import { rejection } from "../../util";
-import config from "../../config";
 // <nowiki>
 
 export default class UpdateDiscussion extends TaskItemController {
@@ -15,7 +14,8 @@ export default class UpdateDiscussion extends TaskItemController {
 			action: "edit",
 			title: this.model.discussion.discussionPageName,
 			text: newWikitext,
-			summary: `Relisting discussion ${config.script.advert}`,
+			summary: "Relisting discussion",
+			tags: "XFDC",
 			// Protect against errors and conflicts
 			assert: "user",
 			basetimestamp: discussionPageTimestamps.base,

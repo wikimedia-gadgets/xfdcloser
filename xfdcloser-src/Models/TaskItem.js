@@ -1,5 +1,4 @@
 import { OO } from "../../globals";
-import appConfig from "../config";
 // <nowiki>
 
 // Value for indtertimate progress per https://doc.wikimedia.org/oojs-ui/master/js/#!/api/OO.ui.ProgressBarWidget
@@ -112,12 +111,12 @@ class TaskItem {
 
 		// XFDC Unlinker
 		if ( typeof this.summary === "string" && this.summary.trim() ) {
-			return prefix + this.summary + " " + appConfig.script.advert;
+			return prefix + this.summary;
 		}
 
 		const link = this.discussion && this.discussion.discussionPageLink;
 		if ( !link ) {
-			return (prefix + appConfig.script.advert).trim();
+			return prefix.trim();
 		}
 
 		const main = options.short
@@ -125,7 +124,7 @@ class TaskItem {
 			? `[[${link}]]`
 			// Closing XFDs
 			: `[[${link}]] closed as ${this.result.getResultText()}`;
-		return prefix + main + " " + appConfig.script.advert;
+		return prefix + main;
 	}
 
 	/**

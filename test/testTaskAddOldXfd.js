@@ -7,7 +7,6 @@ import Discussion from "../xfdcloser-src/Models/Discussion";
 import Venue from "../xfdcloser-src/Venue";
 import Result from "../xfdcloser-src/Models/Result";
 import Options from "../xfdcloser-src/Models/Options";
-import config from "../xfdcloser-src/config";
 import { dateFromUserInput } from "../xfdcloser-src/util";
 
 // Mock widgets
@@ -75,7 +74,7 @@ describe("AddBeingDeleted", function() {
 			options
 		});
 		task = new AddOldXfd(model, widgets);
-		summary = "[[Wikipedia:Templates for discussion/2020 March 18#Foo and bar]] closed as merge " + config.script.advert;
+		summary = "[[Wikipedia:Templates for discussion/2020 March 18#Foo and bar]] closed as merge";
 	});
 	it("beforeEach is ok", function() {
 		assert.ok(true);

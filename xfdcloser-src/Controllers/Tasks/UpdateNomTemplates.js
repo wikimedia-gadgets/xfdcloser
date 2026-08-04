@@ -1,6 +1,5 @@
 import TaskItemController from "../TaskItemController";
 import { rejection, moduleToDoc, docToModule } from "../../util";
-import config from "../../config";
 // <nowiki>
 
 export default class UpdateNewLogPage extends TaskItemController {
@@ -37,7 +36,7 @@ export default class UpdateNewLogPage extends TaskItemController {
 		
 		return {
 			text: updatedWikitext,
-			summary: `Updating ${this.model.venue.type.toUpperCase()} template: discussion was relisted ${config.script.advert}`
+			summary: `Updating ${this.model.venue.type.toUpperCase()} template: discussion was relisted`
 		};
 	}
 

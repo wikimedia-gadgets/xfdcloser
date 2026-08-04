@@ -39,6 +39,7 @@ class API extends mw.Api {
 					const baseQuery = {
 						action: "edit",
 						title: page.title,
+						tags: "XFDC",
 						watchlist,
 						// Protect against errors and conflicts
 						assert: "user",
@@ -148,7 +149,7 @@ class API extends mw.Api {
 	 */
 	deleteWithRetry(pages, options, onEachSuccess, onEachFail) {
 		const deletePage = (titleOrId, isRetry) => {
-			const baseQuery = {action: "delete"};
+			const baseQuery = {action: "delete", tags:"XFDC"};
 			if (typeof titleOrId === "number") {
 				baseQuery.pageid = titleOrId;
 			} else {

@@ -69,7 +69,7 @@ export default class CloseDiscussion extends TaskItemController {
 		return {
 			section: this.model.discussion.sectionNumber,
 			text: updated_section,
-			summary: `/* ${this.model.discussion.sectionHeader} */ Closed as ${this.model.result.getResultText()} ${config.script.advert}`
+			summary: `/* ${this.model.discussion.sectionHeader} */ Closed as ${this.model.result.getResultText()}`
 		};
 	}
 

@@ -1,6 +1,5 @@
 import { $, OO } from "../../globals";
 import API from "../api";
-import appConfig from "../config";
 import { timeout } from "../util";
 // <nowiki>
 
@@ -46,7 +45,8 @@ class UnlinkSummaryPanelController {
 			API.get({
 				action: "parse",
 				contentmodel: "wikitext",
-				summary: `Removing link(s) because ${this.model.summary} ${appConfig.script.advert}`,
+				summary: `Removing link(s) because ${this.model.summary}`,
+				tags: "XFDC",
 				prop: "text",
 				disablelimitreport: 1,
 				format: "json",
