@@ -188,7 +188,9 @@ export default class RelistInfo extends TaskItemController {
 		const [newLogpage, oldLogpage] = pages[0].title === this.todaysLogpage
 			? pages
 			: pages.slice().reverse();
-
+		if ( newLogpage.revisions == undefined ) {
+			return rejection("abort", "Today's log page does not exist");
+		}
 		const newLogContent = newLogpage.revisions[0].slots.main.content;
 		const oldLogContent = oldLogpage.revisions[0].slots.main.content;
 		const newLogTimestamps = {
