@@ -627,6 +627,11 @@ const prefs = [{
 	type: "number",
 	min: 2,
 	default: 5
+}, {
+	name: "userspaceLogging",
+	label: "Log all closes in userspace",
+	type: "toggle",
+	default: true
 }];
 
 const defaultPrefValues = prefs.reduce((accumulated, currentPref) => {

@@ -1,5 +1,6 @@
 import { OO } from "../../globals";
 import TaskItem from "./TaskItem";
+import * as prefs from "../prefs";
 // <nowiki>
 
 class TaskList {
@@ -88,6 +89,18 @@ class TaskList {
 					discussion: this.discussion,
 					result: this.result,
 					options: this.options
+				})
+			);
+		}
+
+		// Log nomination to user space log
+		const loggingEnabled = prefs.get("userspaceLogging");
+		if (loggingEnabled) {
+			tasks.push(
+				new TaskItem({
+					taskName: "UserspaceLogging",
+					discussion: this.discussion,
+					result: this.result
 				})
 			);
 		}

@@ -18,13 +18,14 @@ import UpdateDiscussion from "../Controllers/Tasks/UpdateDiscussion";
 import UpdateNewLogPage from "../Controllers/Tasks/UpdateNewLogPage";
 import UpdateNomTemplates from "../Controllers/Tasks/UpdateNomTemplates";
 import UpdateOldLogPage from "../Controllers/Tasks/UpdateOldLogPage";
+import UserspaceLogging from "../Controllers/Tasks/UserspaceLogging";
 // <nowiki>
 
 const controllers = {
 	AddBeingDeleted, AddMergeTemplates, AddOldXfd, AddToHoldingCell, CloseDiscussion, DeletePages,
 	DeleteRedirects, DeleteTalkpages, Disambiguate, GetRelistInfo, Redirect, RemoveCircularLinks,
 	RemoveNomTemplates,	TagTalkWithSpeedy, UnlinkBacklinks, UpdateDiscussion, UpdateNewLogPage,
-	UpdateNomTemplates, UpdateOldLogPage
+	UpdateNomTemplates, UpdateOldLogPage, UserspaceLogging
 };
 
 /**
