@@ -30,6 +30,12 @@
 		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
 		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
 	},
+	"handle a template that is at the top of an article": {
+		"oldWikicode": "{{Merge|ABC123|date=March 2026|discuss=Wikipedia:Articles for deletion/Slovak Republic (1939–1945)}}\n{{Short description|Client state of Nazi Germany}}\nTest\n",
+		"sourcePage": "Slovakia during World War II",
+		"nominationName": "Wikipedia:Articles for deletion/Slovak Republic (1939–1945)",
+		"expectedWikicode": "{{Short description|Client state of Nazi Germany}}\nTest\n"
+	},
 	"merge template - case insensitive detection": {
 		"oldWikicode": "{{Short description|Client state of Nazi Germany}}\n{{MeRgE|Slovakia during World War II|date=March 2026|discuss=Talk:Slovakia during World War II#Merge with Slovak Republic (1939–1945)}}\nTest\n",
 		"sourcePage": "Slovakia during World War II",

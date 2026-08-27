@@ -158,18 +158,21 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 						if (this.spacesToUnderscores(fullTemplate).includes(normalizedSourcePage) || this.spacesToUnderscores(fullTemplate).includes(normalizedNominationName)) {
 							const templateEnd = i + fullTemplate.length;
 							
-							// Check for preceding newline to also remove
+							// Check for preceding or trailing newline to also remove
 							let removeStart = i;
+							let removeEnd = templateEnd;
 							if (i > 0 && newWikicode[i - 1] === "\n") {
 								removeStart = i - 1;
+							} else if (i === 0 && templateEnd < newWikicode.length && newWikicode[templateEnd] === "\n") {
+								removeEnd = templateEnd + 1;
 							}
 							
 							// Get characters around the removal point
 							const charBefore = removeStart > 0 ? newWikicode[removeStart - 1] : "";
-							const charAfter = templateEnd < newWikicode.length ? newWikicode[templateEnd] : "";
+							const charAfter = removeEnd < newWikicode.length ? newWikicode[removeEnd] : "";
 							
 							// Remove the template
-							newWikicode = newWikicode.slice(0, removeStart) + newWikicode.slice(templateEnd);
+							newWikicode = newWikicode.slice(0, removeStart) + newWikicode.slice(removeEnd);
 							
 							// Add newline if needed to separate non-newline content
 							if (charBefore && charAfter && charBefore !== "\n" && charAfter !== "\n") {
