@@ -169,11 +169,11 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 							const charAfter = templateEnd < newWikicode.length ? newWikicode[templateEnd] : "";
 							
 							// Remove the template
-							newWikicode = newWikicode.substring(0, removeStart) + newWikicode.substring(templateEnd);
+							newWikicode = newWikicode.slice(0, removeStart) + newWikicode.slice(templateEnd);
 							
 							// Add newline if needed to separate non-newline content
 							if (charBefore && charAfter && charBefore !== "\n" && charAfter !== "\n") {
-								newWikicode = newWikicode.substring(0, removeStart) + "\n" + newWikicode.substring(removeStart);
+								newWikicode = newWikicode.slice(0, removeStart) + "\n" + newWikicode.slice(removeStart);
 							}
 							
 							changed = true;
@@ -203,7 +203,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 				braceCount--;
 				i += 2;
 				if (braceCount === 0) {
-					return wikicode.substring(startIndex, i);
+					return wikicode.slice(startIndex, i);
 				}
 			} else {
 				i++;
