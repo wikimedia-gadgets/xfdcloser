@@ -103,8 +103,6 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 	* Look at every instance of {{Merge}}, {{merge from}}, {{Merge to}}, {{Article for deletion/dated}}, {{being merged to}}, {{being merged}}, {{being merged from}}, {{Merge portions from}}, or one of their aliases, and remove every one where the Source page or the NominationName appear {{inside it}}. Don't check the parameter names at all, just their values.
 	*
 	* When removing {{Article for deletion/dated}} or one of its aliases, also remove the <!-- hidden comments --> around it.
-	*
-	* This is not able to handle nested templates. Hopefully that never happens, else a more complicated solution will be needed.
 	*/
 	removeMergeAndAfdTemplates(oldWikicode, sourcePage, nominationName) {
 		let newWikicode = oldWikicode;
