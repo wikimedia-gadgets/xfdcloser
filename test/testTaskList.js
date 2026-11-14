@@ -45,5 +45,14 @@ describe("TaskListModel", function() {
 	it("can be instantiated", function() {
 		assert.ok(model);
 	});
+	it("adds merge-tag cleanup when closing an AfD", function() {
+		const taskNames = model.makeItemsForClose().map(task => task.taskName);
+		assert.ok(taskNames.includes("AddMergeTemplates"));
+	});
+	it("does not add AfD merge-tag cleanup for other XfD venues", function() {
+		discussion.venue = Venue.Mfd();
+		const taskNames = model.makeItemsForClose().map(task => task.taskName);
+		assert.ok(!taskNames.includes("AddMergeTemplates"));
+	});
 	// TODO: replace above with more useful tests 
 });
