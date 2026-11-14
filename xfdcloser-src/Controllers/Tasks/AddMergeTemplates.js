@@ -99,6 +99,71 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		return RemoveNomTemplates.transform(this, page, merger.mergeToTemplate);
 	}
 
+	addAndRemoveMergeTags(outcome, sourcePage, targetPage, afdPage, nominationName) {
+		// Remove merge and AFD templates from multiple pages
+		const listOfPagesToCheck = getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage);
+		for ( const page of listOfPagesToCheck ) {
+			const oldWikicode = getOldWikicode(page);
+			const newWikicode = removeMergeAndAfdTemplates(oldWikicode, sourcePage, nominationName);
+			if ( newWikicode !== oldWikicode ) {
+				saveNewWikicode(page, newWikicode);
+			}
+		}
+
+		/*
+		// If and only if the discussion was closed as merge, place {{Being merged from|Source article|afd=NominationName|date=Date of the closure}}, always at the top of the targetPage.
+		if ( outcome === "merge" ) {
+			const oldWikicode = getOldWikicode(targetPage);
+			const newWikicode = addBeingMergedFromTemplate(targetPage, sourcePage, nominationName);
+			if ( newWikicode !== oldWikicode ) {
+				saveNewWikicode(targetPage, newWikicode);
+			}
+		}
+		*/
+	}
+
+	getListOfPagesToCheck(outcome, sourcePage, targetPage, afdPage) {
+		const pagesToCheck = [];
+		
+		// If the discussion was closed as merge or redirect, add the Target page to the list, unless it doesn't exist, in which case leave it out.
+		if ( outcome === "merge" || outcome === "redirect" ) {
+			if ( pageExists(targetPage) ) {
+				pagesToCheck.push(targetPage);
+			}
+		}
+		
+		/*
+		// In addition, add to the list every page in the (Article) or Draft namespaces in the "What links here" of the AfD discussion subpage, excluding the Target page themselves.
+		const NS_MAIN = 0;
+		const NS_DRAFT = 118;
+		let listOfWhatLinksHerePages = getWhatLinksHerePagesFilteredByNamespace(afdPage, [NS_MAIN, NS_DRAFT]);
+		listOfWhatLinksHerePages = removeValuesFromArrayCaseInsensitive( listOfWhatLinksHerePages, [targetPage]);
+		pagesToCheck.push(...listOfWhatLinksHerePages);
+		*/
+
+		return pagesToCheck;
+	}
+
+	pageExists(page) {
+		// TODO
+	}
+
+	/*
+	addBeingMergedFromTemplate(targetPage, sourcePage, nominationName) {
+		const oldWikicode = getOldWikicode(targetPage);
+		const newWikicode = `{{Being merged from|${sourcePage}|afd=${nominationName}|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n` + oldWikicode;
+		return newWikicode;
+	}
+
+	removeValuesFromArrayCaseInsensitive( haystack, needles ) {
+		// TODO: remove the needles from the haystack, case insensitive, and treating space and underscore as the same character
+	}
+
+	getWhatLinksHerePagesFilteredByNamespace(pageBeingLinkedTo, allowedNamespaces) {
+		// TODO. requires API call.
+	}
+	*/
+
 	/**
 	* Look at every instance of {{Merge}}, {{merge from}}, {{Merge to}}, {{Article for deletion/dated}}, {{being merged to}}, {{being merged}}, {{being merged from}}, {{Merge portions from}}, or one of their aliases, and remove every one where the Source page or the NominationName appear {{inside it}}. Don't check the parameter names at all, just their values.
 	*
