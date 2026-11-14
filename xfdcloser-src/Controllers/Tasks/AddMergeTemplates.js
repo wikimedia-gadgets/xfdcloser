@@ -120,7 +120,9 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 				return;
 			}
 			return $.when.apply(null, existingPages.map(page =>
-				this.saveNewWikicode(page.title, sourcePage, nominationName)
+				this.saveNewWikicode(page.title, wikicode =>
+					this.removeMergeAndAfdTemplates(wikicode, sourcePage, nominationName)
+				)
 			));
 		}, (code, error) => {
 			return rejection("read", code, error);
@@ -158,7 +160,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		return pagesToCheck;
 	}
 
-	saveNewWikicode(pageTitle, sourcePage, nominationName) {
+	saveNewWikicode(pageTitle, transformWikicode) {
 		return this.api.editWithRetry(
 			pageTitle,
 			null,
@@ -167,7 +169,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 					return rejection("skipped");
 				}
 				const oldWikicode = page.content;
-				const newWikicode = this.removeMergeAndAfdTemplates(oldWikicode, sourcePage, nominationName);
+				const newWikicode = transformWikicode(oldWikicode);
 				if ( newWikicode === oldWikicode ) {
 					return rejection("skipped");
 				}
