@@ -130,7 +130,7 @@ class TaskList {
 			tasks.push(
 				new TaskItem({
 					taskName: "AddMergeTemplates",
-					relevantPageNames: mergeActionPageResults.map(result => result.pageName),
+					relaventPageNames: mergeActionPageResults.map(result => result.pageName),
 					discussion: this.discussion,
 					result: this.result,
 					options: this.options
