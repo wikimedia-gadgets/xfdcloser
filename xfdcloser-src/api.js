@@ -39,6 +39,7 @@ class API extends mw.Api {
 					const baseQuery = {
 						action: "edit",
 						title: page.title,
+						tags: "XFDcloser",
 						watchlist,
 						// Protect against errors and conflicts
 						assert: "user",

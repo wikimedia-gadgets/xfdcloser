@@ -116,7 +116,7 @@ Fails [[WP:GNG]] and [[WP:NMUSIC]] [[User:Example|Example]] ([[User talk:Example
 		assert.deepStrictEqual(Object.keys(transformed), ["section", "text", "summary"]);
 		assert.strictEqual(transformed.text, expectedText);
 		assert.strictEqual(transformed.section, 1);
-		assert.strictEqual(transformed.summary, `/* Foobar */ Closed as delete ${config.script.advert}`);
+		assert.strictEqual(transformed.summary, "/* Foobar */ Closed as delete");
 	});
 	it("Transforms a discussion and removes closing template", function() {
 		const page = {
@@ -146,7 +146,7 @@ Fails [[WP:GNG]] and [[WP:NMUSIC]] [[User:Example|Example]] ([[User talk:Example
 		assert.deepStrictEqual(Object.keys(transformed), ["section", "text", "summary"]);
 		assert.strictEqual(transformed.text, expectedText);
 		assert.strictEqual(transformed.section, 1);
-		assert.strictEqual(transformed.summary, `/* Foobar */ Closed as delete ${config.script.advert}`);
+		assert.strictEqual(transformed.summary, "/* Foobar */ Closed as delete");
 	});
 	it("does not transform an edit-conflicted discussion (time-based)", function() {
 		const page = {

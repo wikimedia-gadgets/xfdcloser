@@ -31,7 +31,6 @@ const months = ["", "January", "February", "March", "April", "May", "June", "Jul
 let config = {
 	// Script info
 	script: {
-		advert: `([[WP:XFDC#${scriptVersion}|XFDcloser]])`,
 		version: scriptVersion
 	},
 	// MobileFrontend detection, which renders discussion pages differently
