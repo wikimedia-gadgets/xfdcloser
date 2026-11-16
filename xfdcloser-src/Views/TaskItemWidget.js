@@ -11,6 +11,7 @@ import Disambiguate from "../Controllers/Tasks/Disambiguate";
 import GetRelistInfo from "../Controllers/Tasks/GetRelistInfo";
 import Redirect from "../Controllers/Tasks/Redirect";
 import RemoveCircularLinks from "../Controllers/Tasks/RemoveCircularLinks";
+import RemoveMergeTemplates from "../Controllers/Tasks/RemoveMergeTemplates";
 import RemoveNomTemplates from "../Controllers/Tasks/RemoveNomTemplates";
 import TagTalkWithSpeedy from "../Controllers/Tasks/TagTalkWithSpeedy";
 import UnlinkBacklinks from "../Controllers/Tasks/UnlinkBacklinks";
@@ -23,7 +24,7 @@ import UpdateOldLogPage from "../Controllers/Tasks/UpdateOldLogPage";
 const controllers = {
 	AddBeingDeleted, AddMergeTemplates, AddOldXfd, AddToHoldingCell, CloseDiscussion, DeletePages,
 	DeleteRedirects, DeleteTalkpages, Disambiguate, GetRelistInfo, Redirect, RemoveCircularLinks,
-	RemoveNomTemplates,	TagTalkWithSpeedy, UnlinkBacklinks, UpdateDiscussion, UpdateNewLogPage,
+	RemoveMergeTemplates, RemoveNomTemplates, TagTalkWithSpeedy, UnlinkBacklinks, UpdateDiscussion, UpdateNewLogPage,
 	UpdateNomTemplates, UpdateOldLogPage
 };
 

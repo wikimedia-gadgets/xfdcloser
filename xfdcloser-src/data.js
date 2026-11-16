@@ -487,8 +487,14 @@ const actions = [
 		name: "disambiguateAndUpdate"
 	},
 	{
+		label: "Add and remove merge templates, tag talk pages",
+		name: "mergeAndUpdate",
+		venues: ["afd"]
+	},
+	{
 		label: "Add merge templates, tag talk pages",
-		name: "mergeAndUpdate"
+		name: "mergeAndUpdate",
+		venues: ["mfd"]
 	},
 	{
 		label: "No automated actions",
@@ -668,7 +674,7 @@ const getRelevantActions = function(venueType, userIsSysop, result) {
 		console.log("No results data for", {venueType, userIsSysop, result});
 		
 	}
-	return actions.filter(action => resultData.actions.includes(action.name));
+	return actions.filter(action => resultData.actions.includes(action.name) && isRelevant(venueType, userIsSysop)(action));
 };
 
 /**

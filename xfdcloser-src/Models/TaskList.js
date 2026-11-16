@@ -127,15 +127,28 @@ class TaskList {
 			return optionValues && optionValues.action === "mergeAndUpdate";
 		});
 		if ( mergeActionPageResults.length ) {
-			tasks.push(
-				new TaskItem({
-					taskName: "AddMergeTemplates",
-					relaventPageNames: mergeActionPageResults.map(result => result.pageName),
+			const addMergeTask = new TaskItem({
+				taskName: "AddMergeTemplates",
+				relaventPageNames: mergeActionPageResults.map(result => result.pageName),
+				discussion: this.discussion,
+				result: this.result,
+				options: this.options
+			});
+			tasks.push(addMergeTask);
+			const removeMergePageResults = this.discussion.venue.type === "afd"
+				? mergeActionPageResults.filter(result => result.selectedResultName === "merge")
+				: [];
+			if ( removeMergePageResults.length ) {
+				const removeMergeTask = new TaskItem({
+					taskName: "RemoveMergeTemplates",
+					relaventPageNames: removeMergePageResults.map(result => result.pageName),
 					discussion: this.discussion,
 					result: this.result,
 					options: this.options
-				})
-			);
+				});
+				removeMergeTask.setPrecedingTask(addMergeTask, "finished");
+				tasks.push(removeMergeTask);
+			}
 		}
 	
 		// Disambiguate

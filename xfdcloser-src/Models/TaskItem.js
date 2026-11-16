@@ -47,6 +47,9 @@ class TaskItem {
 	get name() {
 		return this.taskName;
 	}
+	get finished() {
+		return this.done || this.failed;
+	}
 	get progress() {
 		if ( !this.started ) {
 			return 0; // i.e. empty progress bar
