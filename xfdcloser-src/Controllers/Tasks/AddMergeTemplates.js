@@ -249,7 +249,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 
 		// Process all other templates
 		const templatePatterns = allTemplates.map(t => t.replace(/ /g, "[_ ]")).join("|");
-		const templateOpenRegex = new RegExp(`{{(${templatePatterns})(?:\\s|\\|)?`, "i");
+		const templateOpenRegex = new RegExp(`^{{(${templatePatterns})(?:\\s|\\|)?`, "i");
 		let changed = true;
 		while (changed) {
 			changed = false;

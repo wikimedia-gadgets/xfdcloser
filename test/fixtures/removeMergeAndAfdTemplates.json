@@ -83,5 +83,11 @@
 		"sourcePage": "SAMPA",
 		"nominationName": "Wikipedia:Articles for deletion/SAMPA",
 		"expectedWikicode": "{{Short description|Computer-readable phonetic script}}{{Other uses|Sampa (disambiguation){{!}}Sampa}}\n{{No footnotes|date=May 2018}}\n"
+	},
+	"don't get confused by multiple merge templates inside an {{mi}} template": {
+		"oldWikicode": "{{Short description|Class of enzymes}}\n{{Redirect|PIK3|the Finnish sailplane|PIK-3}}\n{{mi|\n{{Merge from |1=Class III PI 3-kinase |target=Phosphoinositide 3-kinase |afd=Class III PI 3-kinase |date =November 2026 }}{{Merge from |1=Class II PI 3-kinases |target=Phosphoinositide 3-kinase |afd=Class II PI 3-kinases |date =November 2026 }}{{Merge from |1=Class I PI 3-kinases |target=Phosphoinositide 3-kinase |afd=Class I PI 3-kinases |date =November 2026 }}\n{{notability}}\n{{no sources|date=hello}}}}{{Infobox protein family\n| Symbol = PI3K}}\n",
+		"sourcePage": "Phosphoinositide 3-kinase",
+		"nominationName": "Wikipedia:Articles for deletion/Class III PI 3-kinase",
+		"expectedWikicode": "{{Short description|Class of enzymes}}\n{{Redirect|PIK3|the Finnish sailplane|PIK-3}}\n{{mi|\n{{notability}}\n{{no sources|date=hello}}}}{{Infobox protein family\n| Symbol = PI3K}}\n"
 	}
 }
