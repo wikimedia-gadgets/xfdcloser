@@ -126,13 +126,10 @@ class TaskList {
 			const optionValues = this.options.getOptionValues(result.selectedResultName);
 			return optionValues && optionValues.action === "mergeAndUpdate";
 		});
-		if ( mergeActionPageResults.length || this.discussion.venue.type === "afd" ) {
+		if ( mergeActionPageResults.length ) {
 			tasks.push(
 				new TaskItem({
 					taskName: "AddMergeTemplates",
-					relaventPageNames: this.discussion.venue.type === "afd"
-						? resultsbyPage.map(result => result.pageName)
-						: mergeActionPageResults.map(result => result.pageName),
 					discussion: this.discussion,
 					result: this.result,
 					options: this.options

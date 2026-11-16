@@ -43,16 +43,12 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 	 * @returns {Merger[]}
 	 */
 	getMergers() {
-		const mergePageResults = this.model.getPageResults().filter(pageResult => {
-			const optionValues = this.model.options.getOptionValues(pageResult.selectedResultName);
-			return optionValues && optionValues.action === "mergeAndUpdate";
-		});
 		const targets = uniqueArray(
-			mergePageResults.map(pageResult => pageResult.getFormattedTarget({raw: true}))
+			this.model.getPageResults().map(pageResult => pageResult.getFormattedTarget({raw: true}))
 		);
 		const curdate = dmyDateString(new Date());
 		return targets.map(target => {
-			const mergeFromPages = mergePageResults
+			const mergeFromPages = this.model.getPageResults()
 				.filter(pageResult => pageResult.getFormattedTarget({raw: true}) === target )
 				.map(pageResult => this.model.discussion.redirects.resolveOne(pageResult.pageName)
 				);
@@ -103,297 +99,52 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		return RemoveNomTemplates.transform(this, page, merger.mergeToTemplate);
 	}
 
-	addAndRemoveMergeTags(outcome, sourcePage, targetPage, nominationName) {
-		// Remove merge and AFD templates from multiple pages
-		const listOfPagesToCheck = this.getListOfPagesToCheck(outcome, targetPage);
-		if ( !listOfPagesToCheck.length ) {
-			this.model.trackStep("skipped");
-			return $.Deferred().resolve();
-		}
-		return this.api.queryWithContinue({
-			titles: listOfPagesToCheck,
-			prop: "info"
-		}).then(response => {
-			const existingPages = response.pages.filter(page => !page.missing);
-			if ( !existingPages.length ) {
-				this.model.trackStep("skipped");
-				return;
-			}
-			return $.when.apply(null, existingPages.map(page =>
-				this.saveNewWikicode(page.title, wikicode =>
-					this.removeMergeAndAfdTemplates(wikicode, sourcePage, nominationName)
-				)
-			));
-		}, (code, error) => {
-			return rejection("read", code, error);
-		});
-
-		/*
-		// If and only if the discussion was closed as merge, place {{Being merged from|Source article|afd=NominationName|date=Date of the closure}}, always at the top of the targetPage.
-		if ( outcome === "merge" ) {
-			const oldWikicode = targetPage.content;
-			const newWikicode = addBeingMergedFromTemplate(targetPage, sourcePage, nominationName);
-			if ( newWikicode !== oldWikicode ) {
-				saveNewWikicode(targetPage, newWikicode);
-			}
-		}
-		*/
-	}
-
-	getListOfPagesToCheck(outcome, targetPage) {
-		const pagesToCheck = [];
-
-		// If the discussion was closed as merge or redirect, add the Target page to the list, unless it doesn't exist, in which case leave it out. Existence is checked higher up.
-		if ( outcome === "merge" || outcome === "redirect" ) {
-			pagesToCheck.push(targetPage);
-		}
-
-		/*
-		// In addition, add to the list every page in the (Article) or Draft namespaces in the "What links here" of the AfD discussion subpage, excluding the Target page themselves.
-		const NS_MAIN = 0;
-		const NS_DRAFT = 118;
-		let listOfWhatLinksHerePages = getWhatLinksHerePagesFilteredByNamespace(afdPage, [NS_MAIN, NS_DRAFT]);
-		listOfWhatLinksHerePages = removeValuesFromArrayCaseInsensitive( listOfWhatLinksHerePages, [targetPage]);
-		pagesToCheck.push(...listOfWhatLinksHerePages);
-		*/
-
-		return pagesToCheck;
-	}
-
-	saveNewWikicode(pageTitle, transformWikicode) {
-		return this.api.editWithRetry(
-			pageTitle,
-			null,
-			page => {
-				if ( page.missing ) {
-					return rejection("skipped");
-				}
-				const oldWikicode = page.content;
-				const newWikicode = transformWikicode(oldWikicode);
-				if ( newWikicode === oldWikicode ) {
-					return rejection("skipped");
-				}
-				return {
-					text: newWikicode,
-					summary: this.model.getEditSummary()
-				};
-			},
-			() => this.model.trackStep(),
-			(code, error, title) => {
-				if ( code === "skipped" ) {
-					this.model.trackStep("skipped");
-				} else {
-					this.handlePageError(code, error, title);
-				}
-			}
-		);
-	}
-
-	/*
-	addBeingMergedFromTemplate(targetPage, sourcePage, nominationName) {
-		const oldWikicode = targetPage.content;
-		const newWikicode = `{{Being merged from|${sourcePage}|afd=${nominationName}|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n` + oldWikicode;
-		return newWikicode;
-	}
-
-	removeValuesFromArrayCaseInsensitive( haystack, needles ) {
-		// TODO: remove the needles from the haystack, case insensitive, and treating space and underscore as the same character
-	}
-
-	getWhatLinksHerePagesFilteredByNamespace(pageBeingLinkedTo, allowedNamespaces) {
-		// TODO. requires API call.
-	}
-	*/
-
-	/**
-	* Look at every instance of {{Merge}}, {{merge from}}, {{Merge to}}, {{Article for deletion/dated}}, {{being merged to}}, {{being merged}}, {{being merged from}}, {{Merge portions from}}, or one of their aliases, and remove every one where the Source page or the NominationName appear {{inside it}}. Don't check the parameter names at all, just their values.
-	*
-	* When removing {{Article for deletion/dated}} or one of its aliases, also remove the <!-- hidden comments --> around it.
-	*/
-	removeMergeAndAfdTemplates(oldWikicode, sourcePage, nominationName) {
-		let newWikicode = oldWikicode;
-		// {{Merge}}, {{merge from}}, {{Merge to}}, {{Article for deletion/dated}}, {{being merged to}}, {{being merged}}, {{being merged from}}, {{Merge portions from}}
-		const mergeTemplates = [
-			"Merge", /* aliases: */ "Mergedisputed", "Mergewith", "MergeDisputed", "MergeVfD", "Merge-disputed", "Merge disputed", "Merge-multiple", "Mergesplit", "MergeSplit", "Mergemulti", "Mergetomultiple-with", "Multimerge", "Proposed merge", "Merge with",
-
-			"Merge from", /* aliases: */ "Merge-from", "Include", "Mergefrom-multiple", "Multiplemergefrom", "Mergefrommulti", "Mergefrommultiple", "Multimergefrom", "Mergefrom-category", "MergeFrom", "Mergefrom", "Merge from draft", "Merge from AfD",
-
-			"Merge to", /* aliases: */ "Merge-to", "Mergeinto", "MergePartial", "MergetoCat", "Mergelist", "Mergeto-disputed", "Mergeto-multiple", "Multiplemergeinto", "Multiplemergeto", "Multiple-merge-to", "Merge into", "MergeTo", "Mergeto", "Merge to article", "Merge2", "Merge-into",
-
-			"Being merged to", /* aliases: */ "Merging to", "Being Merge to", "Being merge to", "Merging into", "Merginginto", "Mergingto", "Merging-to",
-
-			"Being merged", /* aliases: */ "Merging", "Mergingsectionto",
-
-			"Being merged from", /* aliases: */ "Merging from", "Mergingfrom", "Being Merge from", "Being merge from", "Merging-from",
-
-			"Merge portions from", /* aliases: */ "Move section portions from", "Move portions from", "Merge section portions from",
-		];
-		const afdTemplates = [
-			"Article for deletion/dated", /* aliases: */ "AfDM", "Afd/dated", "AfD/dated", "Afdm",
-		];
-		const allTemplates = mergeTemplates.concat(afdTemplates);
-		const normalizedSourcePage = this.spacesToUnderscores(sourcePage);
-		const normalizedNominationName = this.spacesToUnderscores(nominationName);
-		
-		// Process AFD templates first, since they have special comments around them that need to be removed as well
-		const afdPattern = afdTemplates.map(t => t.replace(/ /g, "[_ ]")).join("|");
-		newWikicode = newWikicode.replace(
-			new RegExp(`<!-- Please do not remove or change this AfD message until the discussion has been closed\\. -->\\s*{{(${afdPattern})(?:\\|[^}]*)?}}\\s*<!-- Once discussion is closed.*?<!-- End of AfD message.*?-->\\n`, "gis"),
-			(match) => {
-				if (this.spacesToUnderscores(match).includes(normalizedSourcePage) || this.spacesToUnderscores(match).includes(normalizedNominationName)) {
-					return "";
-				}
-				return match;
-			}
-		);
-
-		// Process all other templates
-		const templatePatterns = allTemplates.map(t => t.replace(/ /g, "[_ ]")).join("|");
-		const templateOpenRegex = new RegExp(`^{{(${templatePatterns})(?:\\s|\\|)?`, "i");
-		let changed = true;
-		while (changed) {
-			changed = false;
-			for (let i = 0; i < newWikicode.length - 1; i++) {
-				if (newWikicode[i] === "{" && newWikicode[i + 1] === "{") {
-					const fullTemplate = this.extractTemplateContent(newWikicode, i);
-					
-					if (fullTemplate && templateOpenRegex.test(fullTemplate)) {
-						// Check if this template should be removed
-						if (this.spacesToUnderscores(fullTemplate).includes(normalizedSourcePage) || this.spacesToUnderscores(fullTemplate).includes(normalizedNominationName)) {
-							const templateEnd = i + fullTemplate.length;
-							
-							// Check for preceding or trailing newline to also remove
-							let removeStart = i;
-							let removeEnd = templateEnd;
-							if (i > 0 && newWikicode[i - 1] === "\n") {
-								removeStart = i - 1;
-							} else if (i === 0 && templateEnd < newWikicode.length && newWikicode[templateEnd] === "\n") {
-								removeEnd = templateEnd + 1;
-							}
-							
-							// Get characters around the removal point
-							const charBefore = removeStart > 0 ? newWikicode[removeStart - 1] : "";
-							const charAfter = removeEnd < newWikicode.length ? newWikicode[removeEnd] : "";
-							
-							// Remove the template
-							newWikicode = newWikicode.slice(0, removeStart) + newWikicode.slice(removeEnd);
-							
-							// Add newline if needed to separate non-newline content
-							if (charBefore && charAfter && charBefore !== "\n" && charAfter !== "\n") {
-								newWikicode = newWikicode.slice(0, removeStart) + "\n" + newWikicode.slice(removeStart);
-							}
-							
-							changed = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		return newWikicode;
-	}
-
-	spacesToUnderscores(str) {
-		return str.replace(/ /g, "_").toLowerCase();
-	}
-
-	/** Function to extract template content between {{ and }} */
-	extractTemplateContent(wikicode, startIndex) {
-		let braceCount = 0;
-		let i = startIndex;
-		while (i < wikicode.length) {
-			if (wikicode[i] === "{" && i + 1 < wikicode.length && wikicode[i + 1] === "{") {
-				braceCount++;
-				i += 2;
-			} else if (wikicode[i] === "}" && i + 1 < wikicode.length && wikicode[i + 1] === "}") {
-				braceCount--;
-				i += 2;
-				if (braceCount === 0) {
-					return wikicode.slice(startIndex, i);
-				}
-			} else {
-				i++;
-			}
-		}
-		return null;
-	}
-
 	doTask() {
 		const mergers = this.getMergers();
-		const isAfd = this.model.venue.type === "afd";
-		if ( mergers.length === 0 && !isAfd ) {
+		if ( mergers.length === 0 ) {
 			this.model.addWarning("None found");
 			return rejection();
 		}
-		const cleanMergeTags = isAfd
-			? this.model.result.getResultsByPage().map(pageResult => () => this.addAndRemoveMergeTags(
-				pageResult.selectedResultName,
-				this.model.discussion.redirects.resolveOne(pageResult.pageName),
-				pageResult.getFormattedTarget({raw: true}),
-				this.model.discussion.discussionSubpageName
-			).catch((errortype, code, error) => {
-				if ( errortype === "read" ) {
-					this.model.addError(
-						`${code || "unknown"} error: Could not read pages to remove merge and AfD templates`
-					);
-					this.logError(code, error);
-				}
-			}))
-			: [];
 		// Filter out targets which are also nominated pages
 		const mergersToNotNominatedPages = mergers.filter(merger => !merger.isNominatedPage);
 
-		this.model.setTotalSteps(
-			uniqueArray(mergers.flatMap(merger => merger.from)).length +
-			mergersToNotNominatedPages.length +
-			(isAfd ? this.model.result.getResultsByPage().length : 0)
-		);
+		this.model.setTotalSteps(this.model.pageNames.length + mergersToNotNominatedPages.length);
 		this.model.setDoing();
 
-		const cleanMergeTagsInOrder = cleanMergeTags.reduce(
-			(promise, cleanMergeTag) => promise.then(cleanMergeTag),
-			$.Deferred().resolve()
-		);
-		return cleanMergeTagsInOrder.then(() => {
-			if ( !mergers.length ) {
-				return;
+		// Edit the talk pages of the merge targets which are not nominated pages
+		const editTargetsTalkPages = mergersToNotNominatedPages.length && this.api.editWithRetry(
+			mergersToNotNominatedPages.map(
+				merger => mw.Title.newFromText(merger.target).getTalkPage().getPrefixedText()
+			),
+			null,
+			page => this.transformTargetTalk(page),
+			() => this.model.trackStep(),
+			(code, error, title) => this.handlePageError(code, error, title)
+		).catch( (errortype, code, error) => {
+			if ( errortype === "read" ) {
+				this.model.addError(code, error, 
+					`Could not read contents of target talk ${mergersToNotNominatedPages.length > 1 ? "pages" : "page"}`
+				);
 			}
-			// Edit the talk pages of the merge targets which are not nominated pages
-			const editTargetsTalkPages = mergersToNotNominatedPages.length && this.api.editWithRetry(
-				mergersToNotNominatedPages.map(
-					merger => mw.Title.newFromText(merger.target).getTalkPage().getPrefixedText()
-				),
-				null,
-				page => this.transformTargetTalk(page),
-				() => this.model.trackStep(),
-				(code, error, title) => this.handlePageError(code, error, title)
-			).catch( (errortype, code, error) => {
-				if ( errortype === "read" ) {
-					this.model.addError(code, error,
-						`Could not read contents of target talk ${mergersToNotNominatedPages.length > 1 ? "pages" : "page"}`
-					);
-				}
-				// Other errors already handled above
-			} );
+			// Other errors already handled above
+		} );
 
-			const editNominatedPages = this.api.editWithRetry(
-				uniqueArray(mergers.flatMap(merger => merger.from)),
-				null,
-				page => this.transformNominatedPage(page),
-				() => this.model.trackStep(),
-				(code, error, title) => this.handlePageError(code, error, title)
-			).catch( (errortype, code, error) => {
-				if ( errortype === "read" ) {
-					this.model.addError(code, error,
-						`Could not read contents of nominated ${this.model.pageNames.length > 1 ? "pages" : "page"}`
-					);
-				}
-				// Other errors already handled above
-			} );
+		const editNominatedPages = this.api.editWithRetry(
+			this.model.getResolvedPageNames(),
+			null,
+			page => this.transformNominatedPage(page),
+			() => this.model.trackStep(),
+			(code, error, title) => this.handlePageError(code, error, title)
+		).catch( (errortype, code, error) => {
+			if ( errortype === "read" ) {
+				this.model.addError(code, error, 
+					`Could not read contents of nominated ${this.model.pageNames.length > 1 ? "pages" : "page"}`
+				);
+			}
+			// Other errors already handled above
+		} );
 
-			return $.when(editTargetsTalkPages, editNominatedPages);
-		});
+		return $.when(editTargetsTalkPages, editNominatedPages);
 	}
 }
 // </nowiki>

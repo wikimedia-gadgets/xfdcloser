@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
 import assert from "assert";
-import { $, mw } from "../globals";
+import { mw } from "../globals";
 import AddMergeTemplates from "../xfdcloser-src/Controllers/Tasks/AddMergeTemplates";
 import TaskItem from "../xfdcloser-src/Models/TaskItem";
 import Discussion from "../xfdcloser-src/Models/Discussion";
@@ -64,37 +64,6 @@ describe("AddMergeTemplates", function() {
 			options
 		});
 		task = new AddMergeTemplates(model, widgets);
-	});
-	it("removes merge tags using the current page content on each edit attempt", function() {
-		let transform;
-		task.api = {
-			queryWithContinue: () => $.Deferred().resolve({pages: [{title: "Qux"}]}),
-			editWithRetry: (title, params, callback) => {
-				assert.strictEqual(title, "Qux");
-				transform = callback;
-				return $.Deferred().resolve();
-			}
-		};
-		return task.addAndRemoveMergeTags("merge", "Foo", "Qux", "discussionName").then(() => {
-			assert.deepStrictEqual(transform({content: "{{Merge|Foo}}\nOriginal"}), {
-				text: "Original",
-				summary: model.getEditSummary()
-			});
-			assert.deepStrictEqual(transform({content: "{{Merge|Foo}}\nUpdated"}), {
-				text: "Updated",
-				summary: model.getEditSummary()
-			});
-			return $.when(
-				transform({content: "No matching template"}).then(
-					() => { throw new Error("Unchanged page should be skipped"); },
-					code => assert.strictEqual(code, "skipped")
-				),
-				transform({missing: true}).then(
-					() => { throw new Error("Missing page should be skipped"); },
-					code => assert.strictEqual(code, "skipped")
-				)
-			);
-		});
 	});
 	it("transformNominatedPage adds mergeTo template", function() {
 		const transformed = task.transformNominatedPage.call(task, {
