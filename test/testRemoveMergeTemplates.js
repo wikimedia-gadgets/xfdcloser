@@ -1,11 +1,11 @@
 /* eslint-env node, mocha */
 import assert from "assert";
-import AddMergeTemplates from "../xfdcloser-src/Controllers/Tasks/AddMergeTemplates";
+import RemoveMergeTemplates from "../xfdcloser-src/Controllers/Tasks/RemoveMergeTemplates";
 
-const fixtures = require("./fixtures/removeMergeTemplatesFromWikicode.json");
+const fixtures = require("./fixtures/removeMergeTemplates.json");
 
 // Instantiate without the full constructor since removeMergeTemplatesFromWikicode only uses prototype methods
-const task = Object.create(AddMergeTemplates.prototype);
+const task = Object.create(RemoveMergeTemplates.prototype);
 
 describe("RemoveMergeTemplates.removeMergeTemplatesFromWikicode", function() {
 	for (const [testName, testCase] of Object.entries(fixtures)) {

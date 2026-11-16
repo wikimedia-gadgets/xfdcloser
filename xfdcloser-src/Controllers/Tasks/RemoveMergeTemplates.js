@@ -1,7 +1,6 @@
-// TODO: imports
 // <nowiki>
 
-class RemoveMergeTemplates {
+export default class RemoveMergeTemplates {
 	/**
 	 * entry point
 	 */
