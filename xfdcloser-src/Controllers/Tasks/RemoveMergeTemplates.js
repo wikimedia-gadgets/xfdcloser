@@ -1,11 +1,35 @@
+import TaskItemController from "../TaskItemController";
+import { rejection, uniqueArray } from "../../util";
 // <nowiki>
 
-export default class RemoveMergeTemplates {
-	/**
-	 * entry point
-	 */
+export default class RemoveMergeTemplates extends TaskItemController {
+	constructor(model, widgets) {
+		super(model, widgets);
+		this.model.setName("Remove merge templates");
+	}
+
 	doTask() {
-		// TODO
+		const pageNames = uniqueArray(this.model.getResolvedPageNames());
+		this.model.setTotalSteps(pageNames.length);
+		this.model.setDoing();
+		return this.api.editWithRetry(
+			pageNames,
+			null,
+			page => {
+				if ( this.model.aborted ) return rejection("aborted");
+				if ( page.missing ) return rejection("doesNotExist");
+
+				const text = this.removeMergeTemplatesFromWikicode(
+					page.content,
+					page.title,
+					this.model.discussion.discussionPageName
+				);
+				if ( text === page.content ) return rejection("skippedNoneFound");
+				return { text, summary: this.model.getEditSummary() };
+			},
+			() => this.model.trackStep(),
+			(code, error, title) => this.handlePageError(code, error, title)
+		).catch((errortype, code, error) => this.handleOverallError(errortype, code, error));
 	}
 
 	/**
