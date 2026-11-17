@@ -31,9 +31,10 @@ const months = ["", "January", "February", "March", "April", "May", "June", "Jul
 let config = {
 	// Script info
 	script: {
-		advert: `([[WP:XFDC#${scriptVersion}|XFDcloser]])`,
 		version: scriptVersion
 	},
+	// API edit tag for all XFDcloser write operations
+	editTag: "XFDcloser",
 	// MobileFrontend detection, which renders discussion pages differently
 	isMobileSite: !!mw.config.get("wgMFMode"),
 	// MediaWiki configuration values

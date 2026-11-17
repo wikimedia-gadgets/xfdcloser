@@ -7,7 +7,6 @@ import Discussion from "../xfdcloser-src/Models/Discussion";
 import Venue from "../xfdcloser-src/Venue";
 import Result from "../xfdcloser-src/Models/Result";
 import Options from "../xfdcloser-src/Models/Options";
-import config from "../xfdcloser-src/config";
 import { dmyDateString } from "../xfdcloser-src/util";
 
 // Mock widgets
@@ -76,7 +75,7 @@ describe("AddMergeTemplates", function() {
 		}
 		assert.deepStrictEqual(transformed, {
 			text: `{{Afd-merge to|Qux|discussion=discussionName|date=${dmyDateString(dateNow)}}}\nLorem impsum`,
-			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
 		});
 	});
 	it("transformNominatedPage replaces nomination template with mergeTo template", function() {
@@ -94,7 +93,7 @@ Lorem impsum`
 		}
 		assert.deepStrictEqual(transformed, {
 			text: `{{Afd-merge to|Qux|discussion=discussionName|date=${dmyDateString(dateNow)}}}\nLorem impsum`,
-			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
 		});
 	});
 	it("transformNominatedPage does not edit unexpected page", function() {
@@ -138,7 +137,7 @@ Lorem impsum`
 		}
 		assert.deepStrictEqual(transformed, {
 			prependtext: `{{Afd-merge from|Foo|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n{{Afd-merge from|Bar|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n`,
-			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
 		});
 	});
 	it("transformTargetTalk does not edit unexpected target page", function() {

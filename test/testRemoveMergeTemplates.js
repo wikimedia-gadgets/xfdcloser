@@ -81,6 +81,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 			assert.strictEqual(fooEdits[1].text, "{{Afd-merge to|Target}}\nUpdated");
 			assert.strictEqual(fooEdits[1].basetimestamp, "revision2");
 			assert.strictEqual(fooEdits[1].summary, "Closing discussion");
+			assert.strictEqual(fooEdits[1].tags, "XFDcloser");
 			assert.strictEqual(edits.find(edit => edit.title === "Bar").text, "Bar");
 		});
 	});

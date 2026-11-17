@@ -19,7 +19,8 @@ export default class UpdateNewLogPage extends TaskItemController {
 			summary: `Relisting ${this.model.venue.type === "afd"
 				? `[[:${this.model.discussion.discussionPageName}]]`
 				: `"${this.model.discussion.sectionHeader}"`
-			} ${config.script.advert}`,
+			}`,
+			tags: config.editTag,
 		};
 		params[relistInfo.newLogEditType] = this.model.venue.type === "afd"
 			? relistInfo.newLogWikitext
