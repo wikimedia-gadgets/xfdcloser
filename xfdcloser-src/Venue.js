@@ -99,7 +99,13 @@ Venue.Cfd = () => {
 			nomTemplate:	/<!--\s*BEGIN CFD TEMPLATE\s*-->(?:.|\n)+<!--\s*END CFD TEMPLATE\s*-->\n*/gi,
 			relistPattern:	/ full\|day=\d\d?\|month=\w+\|year=\d{4}/gi
 		},
-		relistTasks:		["UpdateOldLogPage", "UpdateNewLogPage", "UpdateNomTemplates"]
+		relistTasks:		["UpdateOldLogPage", "UpdateNewLogPage", "UpdateNomTemplates"],
+		workingPageSectionNumber: {
+			"rename":		6,
+			"merge":		7,
+			"delete":		8,
+			"redirect":		8,
+		},
 	});
 	// Override prototype
 	cfdVenue.updateNomTemplateAfterRelist = function(wikitext, today, /*_sectionHeader*/) {

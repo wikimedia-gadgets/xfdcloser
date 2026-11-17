@@ -2,6 +2,7 @@ import { OO } from "../../globals";
 import AddBeingDeleted from "../Controllers/Tasks/AddBeingDeleted";
 import AddMergeTemplates from "../Controllers/Tasks/AddMergeTemplates";
 import AddOldXfd from "../Controllers/Tasks/AddOldXfd";
+import AddToCfdw from "../Controllers/Tasks/AddToCfdw";
 import AddToHoldingCell from "../Controllers/Tasks/AddToHoldingCell";
 import CloseDiscussion from "../Controllers/Tasks/CloseDiscussion";
 import DeletePages from "../Controllers/Tasks/DeletePages";
@@ -22,7 +23,7 @@ import UpdateOldLogPage from "../Controllers/Tasks/UpdateOldLogPage";
 // <nowiki>
 
 const controllers = {
-	AddBeingDeleted, AddMergeTemplates, AddOldXfd, AddToHoldingCell, CloseDiscussion, DeletePages,
+	AddBeingDeleted, AddMergeTemplates, AddOldXfd, AddToCfdw, AddToHoldingCell, CloseDiscussion, DeletePages,
 	DeleteRedirects, DeleteTalkpages, Disambiguate, GetRelistInfo, Redirect, RemoveCircularLinks,
 	RemoveMergeTemplates, RemoveNomTemplates, TagTalkWithSpeedy, UnlinkBacklinks, UpdateDiscussion, UpdateNewLogPage,
 	UpdateNomTemplates, UpdateOldLogPage
