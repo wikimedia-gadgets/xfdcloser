@@ -149,7 +149,7 @@ class API extends mw.Api {
 	 */
 	deleteWithRetry(pages, options, onEachSuccess, onEachFail) {
 		const deletePage = (titleOrId, isRetry) => {
-			const baseQuery = {action: "delete"};
+			const baseQuery = {action: "delete", tags: "XFDcloser"};
 			if (typeof titleOrId === "number") {
 				baseQuery.pageid = titleOrId;
 			} else {
