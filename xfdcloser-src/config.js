@@ -33,6 +33,8 @@ let config = {
 	script: {
 		version: scriptVersion
 	},
+	// API edit tag for all XFDcloser write operations
+	editTag: "XFDcloser",
 	// MobileFrontend detection, which renders discussion pages differently
 	isMobileSite: !!mw.config.get("wgMFMode"),
 	// MediaWiki configuration values

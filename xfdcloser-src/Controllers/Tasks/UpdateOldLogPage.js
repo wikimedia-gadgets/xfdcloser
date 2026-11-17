@@ -1,5 +1,6 @@
 import TaskItemController from "../TaskItemController";
 import { rejection } from "../../util";
+import config from "../../config";
 // <nowiki>
 
 export default class UpdateOldLogPage extends TaskItemController {
@@ -20,7 +21,7 @@ export default class UpdateOldLogPage extends TaskItemController {
 				? `Relisting [[:${this.model.discussion.discussionPageName}]]`
 				: `/* ${this.model.discussion.sectionHeader} */ Relisted on [[:${this.model.venue.path +
 					relistInfo.today}#${this.model.discussion.sectionHeader}|${relistInfo.today}]]`,
-			tags: "XFDcloser"
+			tags: config.editTag
 		};
 		if ( relistInfo.oldLogTimestamps ) {
 			params.basetimestamp = relistInfo.oldLogTimestamps.base;

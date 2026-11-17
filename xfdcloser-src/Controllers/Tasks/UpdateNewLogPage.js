@@ -1,5 +1,6 @@
 import TaskItemController from "../TaskItemController";
 import { rejection } from "../../util";
+import config from "../../config";
 // <nowiki>
 
 export default class UpdateNewLogPage extends TaskItemController {
@@ -19,7 +20,7 @@ export default class UpdateNewLogPage extends TaskItemController {
 				? `[[:${this.model.discussion.discussionPageName}]]`
 				: `"${this.model.discussion.sectionHeader}"`
 			}`,
-			tags: "XFDcloser",
+			tags: config.editTag,
 		};
 		params[relistInfo.newLogEditType] = this.model.venue.type === "afd"
 			? relistInfo.newLogWikitext
