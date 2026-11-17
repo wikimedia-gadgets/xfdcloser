@@ -5,7 +5,7 @@ import UpdateNewLogPage from "../xfdcloser-src/Controllers/Tasks/UpdateNewLogPag
 import UpdateOldLogPage from "../xfdcloser-src/Controllers/Tasks/UpdateOldLogPage";
 
 describe("Edit tags", function() {
-	it("tags direct discussion edits", function() {
+	it("tags discussion edits", function() {
 		const task = Object.create(UpdateDiscussion.prototype);
 		task.model = {
 			discussion: {
@@ -22,7 +22,7 @@ describe("Edit tags", function() {
 		assert.strictEqual(task.getParams().summary, "Relisting discussion");
 	});
 
-	it("tags direct new-log edits", function() {
+	it("tags new log edits", function() {
 		const task = Object.create(UpdateNewLogPage.prototype);
 		task.model = {
 			venue: {path: "Wikipedia:Articles for deletion/Log/", type: "afd"},
@@ -40,7 +40,7 @@ describe("Edit tags", function() {
 		assert.strictEqual(task.getParams().summary, "Relisting [[:Wikipedia:Articles for deletion/Foo]]");
 	});
 
-	it("tags direct old-log edits", function() {
+	it("tags old log edits", function() {
 		const task = Object.create(UpdateOldLogPage.prototype);
 		task.model = {
 			venue: {type: "afd"},
