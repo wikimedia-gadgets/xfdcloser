@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
 import assert from "assert";
-import { mw } from "../globals";
+import { $, mw } from "../globals";
 import AddMergeTemplates from "../xfdcloser-src/Controllers/Tasks/AddMergeTemplates";
 import TaskItem from "../xfdcloser-src/Models/TaskItem";
 import Discussion from "../xfdcloser-src/Models/Discussion";
@@ -164,6 +164,47 @@ Lorem impsum`
 			prependtext: "{{Being merged from|Foo|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n" +
 				"{{Being merged from|Bar|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
 			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
+		});
+	});
+
+	it("adds templates to each distinct target using its own sources", function() {
+		result.setMultimode(true);
+		result.setResultSummary("merge");
+		const [foo, bar] = result.multimodeResults.getItems();
+		foo.setSelectedResultName("merge");
+		foo.setTargetPageName("Qux");
+		bar.setSelectedResultName("merge");
+		bar.setTargetPageName("Quux");
+
+		const edits = [];
+		task.api = {
+			editWithRetry(titles, getParams, transform, onSuccess) {
+				titles.forEach(title => {
+					edits.push({title, params: transform({title, content: "Existing content"})});
+					onSuccess();
+				});
+				return $.Deferred().resolve();
+			}
+		};
+
+		return task.doTask().then(() => {
+			const targetEdits = edits.filter(edit => ["Qux", "Quux"].includes(edit.title));
+			assert.deepStrictEqual(targetEdits, [
+				{
+					title: "Qux",
+					params: {
+						prependtext: "{{Being merged from|Foo|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+						summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
+					}
+				},
+				{
+					title: "Quux",
+					params: {
+						prependtext: "{{Being merged from|Bar|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+						summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
+					}
+				}
+			]);
 		});
 	});
 
