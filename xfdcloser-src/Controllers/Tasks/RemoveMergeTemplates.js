@@ -5,7 +5,7 @@ import { rejection, uniqueArray } from "../../util";
 export default class RemoveMergeTemplates extends TaskItemController {
 	constructor(model, widgets) {
 		super(model, widgets);
-		this.model.setName("Remove merge templates");
+		this.model.setName("Removing merge templates");
 	}
 
 	doTask() {

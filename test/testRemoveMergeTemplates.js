@@ -71,7 +71,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 			return $.Deferred().resolve({edit: {result: "Success"}});
 		};
 		return controller.doTask().then(() => {
-			assert.strictEqual(model.name, "Remove merge templates");
+			assert.strictEqual(model.name, "Removing merge templates");
 			assert.strictEqual(model.total, 3);
 			assert.strictEqual(model.doing, true);
 			assert.deepStrictEqual(model.steps, {completed: 2, skipped: 0, failed: 1});
