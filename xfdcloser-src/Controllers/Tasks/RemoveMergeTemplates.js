@@ -1,4 +1,5 @@
 import TaskItemController from "../TaskItemController";
+import { mw } from "../../../globals";
 import { rejection, uniqueArray } from "../../util";
 // <nowiki>
 
@@ -9,7 +10,10 @@ export default class RemoveMergeTemplates extends TaskItemController {
 	}
 
 	doTask() {
-		const pageNames = uniqueArray(this.model.getResolvedPageNames());
+		const mergePageResults = this.model.getPageResults("merge");
+		const pageNames = uniqueArray(mergePageResults.map(pageResult =>
+			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
+		));
 		this.model.setTotalSteps(pageNames.length);
 		this.model.setDoing();
 		return this.api.editWithRetry(
@@ -19,10 +23,18 @@ export default class RemoveMergeTemplates extends TaskItemController {
 				if ( this.model.aborted ) return rejection("aborted");
 				if ( page.missing ) return rejection("doesNotExist");
 
-				const text = this.removeMergeTemplatesFromWikicode(
-					page.content,
-					page.title,
-					this.model.discussion.discussionPageName
+				const sourcePages = mergePageResults
+					.filter(pageResult => mw.Title.newFromText(
+						pageResult.getFormattedTarget({raw: true})
+					).getPrefixedText() === page.title)
+					.map(pageResult => this.model.discussion.redirects.resolveOne(pageResult.pageName));
+				const text = sourcePages.reduce(
+					(wikicode, sourcePage) => this.removeMergeTemplatesFromWikicode(
+						wikicode,
+						sourcePage,
+						this.model.discussion.discussionPageName
+					),
+					page.content
 				);
 				if ( text === page.content ) return rejection("skippedNoneFound");
 				return { text, summary: this.model.getEditSummary() };

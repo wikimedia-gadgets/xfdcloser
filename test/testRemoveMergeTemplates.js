@@ -28,6 +28,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 			aborted: false,
 			discussion: {
 				discussionPageName: "Wikipedia:Articles for deletion/Nomination",
+				redirects: {resolveOne: pageName => pageName},
 				pages: ["Foo", "Bar", "Missing"]
 			},
 			steps: { completed: 0, skipped: 0, failed: 0 },
@@ -35,7 +36,13 @@ describe("RemoveMergeTemplates.doTask", function() {
 			warnings: [],
 			connect() {},
 			setName(name) { this.name = name; },
-			getResolvedPageNames() { return ["Foo", "Foo", "Bar", "Missing"]; },
+			getPageResults() {
+				return [
+					{pageName: "Foo", getFormattedTarget: () => "Target"},
+					{pageName: "Bar", getFormattedTarget: () => "Target"},
+					{pageName: "Missing", getFormattedTarget: () => "Missing target"}
+				];
+			},
 			setTotalSteps(total) { this.total = total; },
 			setDoing() { this.doing = true; },
 			getEditSummary() { return "Closing discussion"; },
@@ -48,15 +55,15 @@ describe("RemoveMergeTemplates.doTask", function() {
 		controller.api = Object.create(API);
 	});
 
-	it("fetches each source, retries conflicts using fresh content, and reports missing pages", function() {
-		let fooReads = 0;
+	it("fetches each target, removes its merge templates, retries conflicts, and reports missing pages", function() {
+		let targetReads = 0;
 		const edits = [];
 		const getPage = title => {
-			if ( title === "Missing" ) return {title, missing: true};
-			const content = title === "Foo"
-				? `{{Merge|Foo}}\n{{Afd-merge to|Target}}\n${++fooReads === 1 ? "Original" : "Updated"}`
-				: "{{Merge|Wikipedia:Articles for deletion/Nomination}}\nBar";
-			return {title, revisions: [{timestamp: `revision${fooReads}`, slots: {main: {content}}}]};
+			if ( title === "Missing target" ) return {title, missing: true};
+			const content = "{{Being merged from|Foo|discussion=Wikipedia:Articles for deletion/Nomination}}\n" +
+				"{{Being merged from|Bar|discussion=Wikipedia:Articles for deletion/Nomination}}\n" +
+				`${++targetReads === 1 ? "Original" : "Updated"}`;
+			return {title, revisions: [{timestamp: `revision${targetReads}`, slots: {main: {content}}}]};
 		};
 		controller.api.get = query => {
 			const titles = Array.isArray(query.titles) ? query.titles : [query.titles];
@@ -65,29 +72,29 @@ describe("RemoveMergeTemplates.doTask", function() {
 		controller.api.postWithToken = (token, query) => {
 			assert.strictEqual(token, "csrf");
 			edits.push(query);
-			if ( query.title === "Foo" && edits.filter(edit => edit.title === "Foo").length === 1 ) {
+			if ( query.title === "Target" && edits.filter(edit => edit.title === "Target").length === 1 ) {
 				return $.Deferred().reject("editconflict");
 			}
 			return $.Deferred().resolve({edit: {result: "Success"}});
 		};
 		return controller.doTask().then(() => {
 			assert.strictEqual(model.name, "Removing merge templates");
-			assert.strictEqual(model.total, 3);
+			assert.strictEqual(model.total, 2);
 			assert.strictEqual(model.doing, true);
-			assert.deepStrictEqual(model.steps, {completed: 2, skipped: 0, failed: 1});
-			assert.ok(model.errors[0].includes("Missing"));
-			const fooEdits = edits.filter(edit => edit.title === "Foo");
-			assert.strictEqual(fooEdits.length, 2);
-			assert.strictEqual(fooEdits[1].text, "{{Afd-merge to|Target}}\nUpdated");
-			assert.strictEqual(fooEdits[1].basetimestamp, "revision2");
-			assert.strictEqual(fooEdits[1].summary, "Closing discussion");
-			assert.strictEqual(fooEdits[1].tags, "XFDcloser");
-			assert.strictEqual(edits.find(edit => edit.title === "Bar").text, "Bar");
+			assert.deepStrictEqual(model.steps, {completed: 1, skipped: 0, failed: 1});
+			assert.ok(model.errors[0].includes("Missing target"));
+			const targetEdits = edits.filter(edit => edit.title === "Target");
+			assert.strictEqual(targetEdits.length, 2);
+			assert.strictEqual(targetEdits[1].text, "Updated");
+			assert.strictEqual(targetEdits[1].basetimestamp, "revision2");
+			assert.strictEqual(targetEdits[1].summary, "Closing discussion");
+			assert.strictEqual(targetEdits[1].tags, "XFDcloser");
+			assert.ok(!edits.some(edit => ["Foo", "Bar", "Missing"].includes(edit.title)));
 		});
 	});
 
 	it("skips unchanged pages without saving", function() {
-		model.getResolvedPageNames = () => ["Foo"];
+		model.getPageResults = () => [{pageName: "Foo", getFormattedTarget: () => "Foo"}];
 		controller.api.get = () => $.Deferred().resolve({
 			curtimestamp: "start",
 			query: {pages: [{title: "Foo", revisions: [{timestamp: "revision", slots: {main: {content: "No templates"}}}]}]}
@@ -100,7 +107,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 	});
 
 	it("reports read failures", function() {
-		model.getResolvedPageNames = () => ["Foo"];
+		model.getPageResults = () => [{pageName: "Foo", getFormattedTarget: () => "Foo"}];
 		controller.api.get = () => $.Deferred().reject("http", {message: "Read failed"});
 		controller.logError = () => {};
 		return controller.doTask().then(
@@ -114,7 +121,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 
 	it("does not save after the task is aborted", function() {
 		model.aborted = true;
-		model.getResolvedPageNames = () => ["Foo"];
+		model.getPageResults = () => [{pageName: "Foo", getFormattedTarget: () => "Foo"}];
 		controller.api.get = () => $.Deferred().resolve({
 			curtimestamp: "start",
 			query: {pages: [{title: "Foo", revisions: [{timestamp: "revision", slots: {main: {content: "{{Merge|Foo}}"}}}]}]}
