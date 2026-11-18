@@ -63,8 +63,7 @@ On-wiki testing is conducted at the [Test Wikipedia](https://test.wikipedia.org/
    ```
 
 3. Set up mock XFD discussions. A development version of Twinkle is available as a gadget, and can be used to nominate pages for deletion.
-4. Run `npm start` in a terminal (in the directory where your local repistory is located).
-Note: You need to do `npm start` every time you update and save a file. Changes will not automatically make it into the current build.
+4. Run `npm start` in a terminal (in the directory where your local repistory is located). Keep it running while you work. Source changes are rebuilt automatically; refresh the wiki page to load them. If a build fails, check the terminal and fix the error before refreshing.
 
 ### Deploying to testwiki
 1. Comment out or remove the code that loads the development version from [your common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js)
