@@ -134,7 +134,6 @@ class TaskList {
 				result: this.result,
 				options: this.options
 			});
-			tasks.push(addMergeTask);
 			const removeMergePageResults = this.discussion.venue.type === "afd"
 				? mergeActionPageResults.filter(result => result.selectedResultName === "merge")
 				: [];
@@ -146,9 +145,12 @@ class TaskList {
 					result: this.result,
 					options: this.options
 				});
-				removeMergeTask.setPrecedingTask(addMergeTask, "finished");
+				// Always do RemoveMergeTemplates first and AddMergeTemplates second, so that our new merge templates don't get erased.
+				// TaskItemControllers are executed synchronously, therefore we can control the order here and also avoid race conditions.
 				tasks.push(removeMergeTask);
+				addMergeTask.setPrecedingTask(removeMergeTask, "finished");
 			}
+			tasks.push(addMergeTask);
 		}
 	
 		// Disambiguate

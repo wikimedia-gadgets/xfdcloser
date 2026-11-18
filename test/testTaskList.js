@@ -46,7 +46,7 @@ describe("TaskListModel", function() {
 	it("can be instantiated", function() {
 		assert.ok(model);
 	});
-	it("schedules removal after adding templates for AFD merge pages", function() {
+	it("schedules removal before adding templates for AFD merge pages", function() {
 		result.setMultimode(true);
 		result.multimodeResults.getItems()[0].setSelectedResultName("merge");
 		result.multimodeResults.getItems()[1].setSelectedResultName("keep");
@@ -56,21 +56,31 @@ describe("TaskListModel", function() {
 		assert.ok(add);
 		assert.ok(remove);
 		assert.deepStrictEqual(remove.pageNames, ["Foo"]);
-		assert.strictEqual(remove.precedingTask.task, add);
-		assert.strictEqual(remove.canProceed(), false);
-		add.trackStep();
-		add.setDone();
-		assert.strictEqual(remove.canProceed(), true);
+		assert.ok(tasks.indexOf(remove) < tasks.indexOf(add));
+		assert.strictEqual(remove.precedingTask.task, tasks[0]);
+		assert.strictEqual(add.precedingTask.task, remove);
+		assert.strictEqual(add.canProceed(), false);
+
+		tasks[0].trackStep();
+		tasks[0].setDone();
 		assert.strictEqual(remove.starting, true);
+		assert.strictEqual(add.starting, false);
+
+		remove.trackStep();
+		remove.setDone();
+		assert.strictEqual(add.canProceed(), true);
+		assert.strictEqual(add.starting, true);
 	});
-	it("starts removal after the add task fails", function() {
+	it("starts adding after the removal task fails", function() {
 		result.singleModeResult.setSelectedResultName("merge");
 		const tasks = model.makeItemsForClose();
 		const add = tasks.find(task => task.taskName === "AddMergeTemplates");
 		const remove = tasks.find(task => task.taskName === "RemoveMergeTemplates");
-		add.setFailed();
-		assert.strictEqual(remove.canProceed(), true);
-		assert.strictEqual(remove.starting, true);
+		tasks[0].trackStep();
+		tasks[0].setDone();
+		remove.setFailed();
+		assert.strictEqual(add.canProceed(), true);
+		assert.strictEqual(add.starting, true);
 	});
 	it("does not schedule removal for no automated actions or non-merge results", function() {
 		result.singleModeResult.setSelectedResultName("merge");
@@ -91,5 +101,4 @@ describe("TaskListModel", function() {
 		assert.ok(mfdTasks.some(task => task.taskName === "AddMergeTemplates"));
 		assert.ok(!mfdTasks.some(task => task.taskName === "RemoveMergeTemplates"));
 	});
-	// TODO: replace above with more useful tests 
 });
