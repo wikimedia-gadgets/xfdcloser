@@ -154,4 +154,51 @@ Lorem impsum`
 			assert.strictEqual(code, "unexpectedTarget");
 		});
 	});
+
+	it("transformTargetPage prepends {{Being merged from}} templates for AFD merges", function() {
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		assert.deepStrictEqual(transformed, {
+			prependtext: "{{Being merged from|Foo|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n" +
+				"{{Being merged from|Bar|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
+		});
+	});
+
+	it("transformTargetPage edits the whole target page when a section is specified", function() {
+		result.singleModeResult.setTargetPageName("Qux#Section");
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		assert.ok(transformed.prependtext.includes("{{Being merged from|Foo|"));
+		assert.ok(transformed.prependtext.includes("{{Being merged from|Bar|"));
+	});
+
+	it("transformTargetPage adds templates for a soft merge", function() {
+		result.singleModeResult.setSoftResult(true);
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		assert.deepStrictEqual(transformed, {
+			prependtext: "{{Being merged from|Foo|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n" +
+				"{{Being merged from|Bar|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as soft merge"
+		});
+	});
+
+	it("transformTargetPage does not add a template outside AFD", function() {
+		model.venue = Venue.Mfd();
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		return transformed.then(
+			() => { throw new Error("Transformation promise was resolved"); },
+			code => { assert.strictEqual(code, "unexpectedVenue"); }
+		);
+	});
 });
