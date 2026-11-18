@@ -11,18 +11,19 @@ export default class RemoveMergeTemplates extends TaskItemController {
 
 	doTask() {
 		const mergePageResults = this.model.getPageResults("merge");
-		const pageNames = uniqueArray(mergePageResults.map(pageResult =>
+		const targetPages = uniqueArray(mergePageResults.map(pageResult =>
 			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
 		));
-		this.model.setTotalSteps(pageNames.length);
+		this.model.setTotalSteps(targetPages.length);
 		this.model.setDoing();
 		return this.api.editWithRetry(
-			pageNames,
+			targetPages,
 			null,
 			page => {
 				if ( this.model.aborted ) return rejection("aborted");
 				if ( page.missing ) return rejection("doesNotExist");
 
+				// A target can have multiple merge sources, so remove each source's template from this page.
 				const sourcePages = mergePageResults
 					.filter(pageResult => mw.Title.newFromText(
 						pageResult.getFormattedTarget({raw: true})
