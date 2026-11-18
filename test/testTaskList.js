@@ -101,5 +101,4 @@ describe("TaskListModel", function() {
 		assert.ok(mfdTasks.some(task => task.taskName === "AddMergeTemplates"));
 		assert.ok(!mfdTasks.some(task => task.taskName === "RemoveMergeTemplates"));
 	});
-	// TODO: replace above with more useful tests 
 });
