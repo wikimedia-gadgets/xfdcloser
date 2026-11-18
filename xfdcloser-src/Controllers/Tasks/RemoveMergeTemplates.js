@@ -11,32 +11,36 @@ export default class RemoveMergeTemplates extends TaskItemController {
 
 	doTask() {
 		const mergePageResults = this.model.getPageResults("merge");
+		const sourcePages = mergePageResults.map(pageResult =>
+			this.model.discussion.redirects.resolveOne(pageResult.pageName)
+		);
+
+		// There can be multiple target pages.
 		const targetPages = uniqueArray(mergePageResults.map(pageResult =>
 			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
 		));
-		this.model.setTotalSteps(targetPages.length);
+		// Just removeMergeTemplatesFromWikicode() on target pages for now.
+		// If we need to removeMergeTemplatesFromWikicode() on more pages in the future, they can be added to this array.
+		const pagesToRemoveMergeTemplatesFrom = targetPages;
+
+		this.model.setTotalSteps(pagesToRemoveMergeTemplatesFrom.length);
 		this.model.setDoing();
 		return this.api.editWithRetry(
-			targetPages,
+			pagesToRemoveMergeTemplatesFrom,
 			null,
 			page => {
 				if ( this.model.aborted ) return rejection("aborted");
 				if ( page.missing ) return rejection("doesNotExist");
 
-				// A target can have multiple merge sources, so remove each source's template from this page.
-				const sourcePages = mergePageResults
-					.filter(pageResult => mw.Title.newFromText(
-						pageResult.getFormattedTarget({raw: true})
-					).getPrefixedText() === page.title)
-					.map(pageResult => this.model.discussion.redirects.resolveOne(pageResult.pageName));
-				const text = sourcePages.reduce(
-					(wikicode, sourcePage) => this.removeMergeTemplatesFromWikicode(
-						wikicode,
+				// There can be multiple merge sources, so remove each source's template from this page.
+				let text = page.content;
+				for (const sourcePage of sourcePages) {
+					text = this.removeMergeTemplatesFromWikicode(
+						text,
 						sourcePage,
 						this.model.discussion.discussionPageName
-					),
-					page.content
-				);
+					);
+				}
 				if ( text === page.content ) return rejection("skippedNoneFound");
 				return { text, summary: this.model.getEditSummary() };
 			},
