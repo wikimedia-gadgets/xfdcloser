@@ -90,7 +90,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 	}
 
 	/**
-	 * Add {{Being merged from}} template to merge outcomes at AFD.
+	 * Add {{Being merged from}} template to the target article(s) of merge outcomes at AFD.
 	 */
 	transformTargetPage(page) {
 		if ( this.model.aborted ) return rejection("aborted");
