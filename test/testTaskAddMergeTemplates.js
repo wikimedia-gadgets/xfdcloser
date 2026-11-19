@@ -1,13 +1,12 @@
 /* eslint-env node, mocha */
 import assert from "assert";
-import { mw } from "../globals";
+import { $, mw } from "../globals";
 import AddMergeTemplates from "../xfdcloser-src/Controllers/Tasks/AddMergeTemplates";
 import TaskItem from "../xfdcloser-src/Models/TaskItem";
 import Discussion from "../xfdcloser-src/Models/Discussion";
 import Venue from "../xfdcloser-src/Venue";
 import Result from "../xfdcloser-src/Models/Result";
 import Options from "../xfdcloser-src/Models/Options";
-import config from "../xfdcloser-src/config";
 import { dmyDateString } from "../xfdcloser-src/util";
 
 // Mock widgets
@@ -75,8 +74,8 @@ describe("AddMergeTemplates", function() {
 			throw new Error("Transformation resulted in a promise");
 		}
 		assert.deepStrictEqual(transformed, {
-			text: `{{Afd-merge to|Qux|discussionName|${dmyDateString(dateNow)}}}\nLorem impsum`,
-			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
+			text: `{{Afd-merge to|Qux|discussion=discussionName|date=${dmyDateString(dateNow)}}}\nLorem impsum`,
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
 		});
 	});
 	it("transformNominatedPage replaces nomination template with mergeTo template", function() {
@@ -93,8 +92,8 @@ Lorem impsum`
 			throw new Error("Transformation resulted in a promise");
 		}
 		assert.deepStrictEqual(transformed, {
-			text: `{{Afd-merge to|Qux|discussionName|${dmyDateString(dateNow)}}}\nLorem impsum`,
-			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
+			text: `{{Afd-merge to|Qux|discussion=discussionName|date=${dmyDateString(dateNow)}}}\nLorem impsum`,
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
 		});
 	});
 	it("transformNominatedPage does not edit unexpected page", function() {
@@ -137,8 +136,8 @@ Lorem impsum`
 			throw new Error("Transformation resulted in a promise");
 		}
 		assert.deepStrictEqual(transformed, {
-			prependtext: `{{Afd-merge from|Foo|discussionName|${dmyDateString(dateNow)}}}\n{{Afd-merge from|Bar|discussionName|${dmyDateString(dateNow)}}}\n`,
-			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge " + config.script.advert
+			prependtext: `{{Afd-merge from|Foo|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n{{Afd-merge from|Bar|discussion=discussionName|date=${dmyDateString(dateNow)}}}\n`,
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
 		});
 	});
 	it("transformTargetTalk does not edit unexpected target page", function() {
@@ -154,5 +153,93 @@ Lorem impsum`
 		}, code => {
 			assert.strictEqual(code, "unexpectedTarget");
 		});
+	});
+
+	it("transformTargetPage prepends {{Being merged from}} templates for AFD merges", function() {
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		assert.deepStrictEqual(transformed, {
+			prependtext: "{{Being merged from|Foo|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n" +
+				"{{Being merged from|Bar|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
+		});
+	});
+
+	it("adds templates to each distinct target using its own sources", function() {
+		result.setMultimode(true);
+		result.setResultSummary("merge");
+		const [foo, bar] = result.multimodeResults.getItems();
+		foo.setSelectedResultName("merge");
+		foo.setTargetPageName("Qux");
+		bar.setSelectedResultName("merge");
+		bar.setTargetPageName("Quux");
+
+		const edits = [];
+		task.api = {
+			editWithRetry(titles, getParams, transform, onSuccess) {
+				titles.forEach(title => {
+					edits.push({title, params: transform({title, content: "Existing content"})});
+					onSuccess();
+				});
+				return $.Deferred().resolve();
+			}
+		};
+
+		return task.doTask().then(() => {
+			const targetEdits = edits.filter(edit => ["Qux", "Quux"].includes(edit.title));
+			assert.deepStrictEqual(targetEdits, [
+				{
+					title: "Qux",
+					params: {
+						prependtext: "{{Being merged from|Foo|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+						summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
+					}
+				},
+				{
+					title: "Quux",
+					params: {
+						prependtext: "{{Being merged from|Bar|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+						summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as merge"
+					}
+				}
+			]);
+		});
+	});
+
+	it("transformTargetPage edits the whole target page when a section is specified", function() {
+		result.singleModeResult.setTargetPageName("Qux#Section");
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		assert.ok(transformed.prependtext.includes("{{Being merged from|Foo|"));
+		assert.ok(transformed.prependtext.includes("{{Being merged from|Bar|"));
+	});
+
+	it("transformTargetPage adds templates for a soft merge", function() {
+		result.singleModeResult.setSoftResult(true);
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		assert.deepStrictEqual(transformed, {
+			prependtext: "{{Being merged from|Foo|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n" +
+				"{{Being merged from|Bar|discussion=discussionName|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n",
+			summary: "[[Wikipedia:Articles for deletion/discussionName]] closed as soft merge"
+		});
+	});
+
+	it("transformTargetPage does not add a template outside AFD", function() {
+		model.venue = Venue.Mfd();
+		const transformed = task.transformTargetPage({
+			title: "Qux",
+			content: "Lorem impsum"
+		});
+		return transformed.then(
+			() => { throw new Error("Transformation promise was resolved"); },
+			code => { assert.strictEqual(code, "unexpectedVenue"); }
+		);
 	});
 });

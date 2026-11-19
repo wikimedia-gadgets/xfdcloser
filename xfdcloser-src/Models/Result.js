@@ -1,6 +1,6 @@
 import { $, mw, OO } from "../../globals";
 import ResultItem from "./ResultItem";
-import { getRelevantResults, makeSoftDeleteRationale, softDeletionRationaleTemplate } from "../data";
+import { getRelevantResults, makeSoftDeleteRationale, softDeletionRationaleTemplate, makeSoftMergeRationale, softMergeRationaleTemplate, softRationaleTemplateRegEx } from "../data";
 import ResultList from "./ResultList";
 // <nowiki>
 
@@ -51,7 +51,8 @@ class Result {
 		this.singleModeResult = new ResultItem({availableResults});
 		this.singleModeResult.connect(this, {
 			update: ["emit", "update"],
-			softDeleteSelect: "onSoftDeleteSelect"
+			softSelect: "onSoftSelect",
+			softUnselect: "onSoftUnselect"
 		});
 
 		this.multimodeResults = new ResultList({availableResults, pageNames: this.discussion.pagesNames});
@@ -304,14 +305,38 @@ class Result {
 		this.emit("update");
 	}
 
-	onSoftDeleteSelect() {
-		if (!this.rationale.includes(softDeletionRationaleTemplate)) {
-			const pageName = this.discussion.pages[0].getPrefixedText();
-			const nomLink = this.discussion.discussionPageLink;
-			const isMulti = this.discussion.pages.length > 1;
-			this.prependToRationale(
-				makeSoftDeleteRationale(pageName, nomLink, isMulti)
-			);
+	onSoftSelect() {
+		// Prevents doing weird things when toggling back and forth between Soft Delete and Soft Merge
+		const rationaleHasSoftMergeTemplateAndNothingElse = this.rationale.match( softRationaleTemplateRegEx );
+		if ( rationaleHasSoftMergeTemplateAndNothingElse ) {
+			this.setRationale("");
+		}
+
+		switch ( this.singleModeResult.selectedResult.name ) {
+		case "delete":
+			if (!this.rationale.includes(softDeletionRationaleTemplate)) {
+				const pageName = this.discussion.pages[0].getPrefixedText();
+				const nomLink = this.discussion.discussionPageLink;
+				const isMulti = this.discussion.pages.length > 1;
+				this.prependToRationale(
+					makeSoftDeleteRationale(pageName, nomLink, isMulti)
+				);
+			}
+			break;
+		case "merge":
+			if (!this.rationale.includes(softMergeRationaleTemplate)) {
+				this.prependToRationale(
+					makeSoftMergeRationale()
+				);
+			}
+			break;
+		}
+	}
+
+	onSoftUnselect() {
+		const rationaleHasSoftMergeTemplateAndNothingElse = this.rationale.match( softRationaleTemplateRegEx );
+		if ( rationaleHasSoftMergeTemplateAndNothingElse ) {
+			this.setRationale("");
 		}
 	}
 }

@@ -26,6 +26,10 @@ function SingleResultWidget(model, config) {
 		data: {name:"soft", prefix: "soft "},
 		label: "Soft"
 	} );
+	this.selectivelyOption = new OO.ui.CheckboxMultioptionWidget( {
+		data: {name:"selectively", suffix: " selectively"},
+		label: "Selectively"
+	} );
 	this.deleteFirstOption = new OO.ui.CheckboxMultioptionWidget( {
 		data: {name:"deleteFirst", prefix: "delete and "},
 		label: "Delete first"
@@ -34,6 +38,7 @@ function SingleResultWidget(model, config) {
 		items: [
 			this.speedyOption,
 			this.softOption,
+			this.selectivelyOption,
 			this.deleteFirstOption
 		]
 	} );

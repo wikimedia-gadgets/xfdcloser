@@ -127,15 +127,30 @@ class TaskList {
 			return optionValues && optionValues.action === "mergeAndUpdate";
 		});
 		if ( mergeActionPageResults.length ) {
-			tasks.push(
-				new TaskItem({
-					taskName: "AddMergeTemplates",
-					relaventPageNames: mergeActionPageResults.map(result => result.pageName),
+			const addMergeTask = new TaskItem({
+				taskName: "AddMergeTemplates",
+				relaventPageNames: mergeActionPageResults.map(result => result.pageName),
+				discussion: this.discussion,
+				result: this.result,
+				options: this.options
+			});
+			const removeMergePageResults = this.discussion.venue.type === "afd"
+				? mergeActionPageResults.filter(result => result.selectedResultName === "merge")
+				: [];
+			if ( removeMergePageResults.length ) {
+				const removeMergeTask = new TaskItem({
+					taskName: "RemoveMergeTemplates",
+					relaventPageNames: removeMergePageResults.map(result => result.pageName),
 					discussion: this.discussion,
 					result: this.result,
 					options: this.options
-				})
-			);
+				});
+				// Always do RemoveMergeTemplates first and AddMergeTemplates second, so that our new merge templates don't get erased.
+				// TaskItemControllers are executed synchronously, therefore we can control the order here and also avoid race conditions.
+				tasks.push(removeMergeTask);
+				addMergeTask.setPrecedingTask(removeMergeTask, "finished");
+			}
+			tasks.push(addMergeTask);
 		}
 	
 		// Disambiguate

@@ -89,6 +89,35 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		};
 	}
 
+	/**
+	 * Add {{Being merged from}} template to the target article(s) of merge outcomes at AFD.
+	 */
+	transformTargetPage(page) {
+		if ( this.model.aborted ) return rejection("aborted");
+		if ( this.model.venue.type !== "afd" ) return rejection("unexpectedVenue");
+
+		const targetPageResults = this.model.getPageResults("merge").filter(
+			pageResult => mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText() === page.title
+		);
+		if ( !targetPageResults.length ) {
+			return rejection("unexpectedTarget");
+		}
+
+		const mergeFromPages = targetPageResults
+			.map(pageResult => this.model.discussion.redirects.resolveOne(pageResult.pageName));
+		if ( !mergeFromPages.length ) {
+			return rejection("notMerge");
+		}
+
+		const beingMergedFromTemplates = mergeFromPages.map(pageName =>
+			`{{Being merged from|${pageName}|discussion=${this.model.discussion.discussionSubpageName}|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n`
+		).join("");
+		return {
+			prependtext: beingMergedFromTemplates,
+			summary: this.model.getEditSummary()
+		};
+	}
+
 	transformNominatedPage(page) {
 		if ( this.model.aborted ) return rejection("aborted");
 
@@ -107,9 +136,34 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 		}
 		// Filter out targets which are also nominated pages
 		const mergersToNotNominatedPages = mergers.filter(merger => !merger.isNominatedPage);
+		const afdMergePageResults = this.model.venue.type === "afd"
+			? this.model.getPageResults("merge")
+			: [];
+		const beingMergedFromTargets = uniqueArray(
+			afdMergePageResults.map(pageResult =>
+				mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
+			)
+		);
 
-		this.model.setTotalSteps(this.model.pageNames.length + mergersToNotNominatedPages.length);
+		this.model.setTotalSteps(
+			this.model.pageNames.length + mergersToNotNominatedPages.length + beingMergedFromTargets.length
+		);
 		this.model.setDoing();
+
+		const editTargetsPages = beingMergedFromTargets.length && this.api.editWithRetry(
+			beingMergedFromTargets,
+			null,
+			page => this.transformTargetPage(page),
+			() => this.model.trackStep(),
+			(code, error, title) => this.handlePageError(code, error, title)
+		).catch( (errortype, code, error) => {
+			if ( errortype === "read" ) {
+				this.model.addError(code, error,
+					`Could not read contents of merge target ${beingMergedFromTargets.length > 1 ? "pages" : "page"}`
+				);
+			}
+			// Other errors already handled above
+		} );
 
 		// Edit the talk pages of the merge targets which are not nominated pages
 		const editTargetsTalkPages = mergersToNotNominatedPages.length && this.api.editWithRetry(
@@ -144,7 +198,7 @@ export default class AddMergeTemplatesTask extends TaskItemController {
 			// Other errors already handled above
 		} );
 
-		return $.when(editTargetsTalkPages, editNominatedPages);
+		return $.when(editTargetsPages, editTargetsTalkPages, editNominatedPages);
 	}
 }
 // </nowiki>

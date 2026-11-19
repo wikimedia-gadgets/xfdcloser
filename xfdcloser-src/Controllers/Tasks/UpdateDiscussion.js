@@ -15,7 +15,8 @@ export default class UpdateDiscussion extends TaskItemController {
 			action: "edit",
 			title: this.model.discussion.discussionPageName,
 			text: newWikitext,
-			summary: `Relisting discussion ${config.script.advert}`,
+			summary: "Relisting discussion",
+			tags: config.editTag,
 			// Protect against errors and conflicts
 			assert: "user",
 			basetimestamp: discussionPageTimestamps.base,

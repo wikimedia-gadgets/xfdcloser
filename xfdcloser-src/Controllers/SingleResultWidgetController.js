@@ -10,6 +10,7 @@ export default class SingleResultWidgetController {
 		this.widget.buttonSelect.connect(this, {"select": "onButtonSelect"});
 		this.widget.speedyOption.connect(this, {change: "onSpeedyChange"});
 		this.widget.softOption.connect(this, {change: "onSoftChange"});
+		this.widget.selectivelyOption.connect(this, {change: "onSelectivelyChange"});
 		this.widget.deleteFirstOption.connect(this, {change: "onDeleteFirstChange"});
 		this.widget.targetInput.connect(this, {"change": "onTargetChange"});
 		this.widget.customResultInput.connect(this, {"change": "onCustomResultChange"});
@@ -35,6 +36,9 @@ export default class SingleResultWidgetController {
 		this.widget.softOption
 			.setSelected(this.model.softResult)
 			.toggle(this.model.showSoftResult);
+		this.widget.selectivelyOption
+			.setSelected(this.model.selectivelyResult)
+			.toggle(this.model.showSelectivelyResult);
 		this.widget.deleteFirstOption
 			.setSelected(this.model.deleteFirstResult)
 			.toggle(this.model.showDeleteFirstResult);
@@ -61,6 +65,10 @@ export default class SingleResultWidgetController {
 
 	onSoftChange(isSelected) {
 		this.model.setSoftResult(isSelected);
+	}
+
+	onSelectivelyChange(isSelected) {
+		this.model.setSelectivelyResult(isSelected);
 	}
 
 	onDeleteFirstChange(isSelected) {

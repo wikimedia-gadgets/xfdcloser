@@ -56,11 +56,29 @@ describe("ResultItem", function() {
 		assert.strictEqual(model.showResultOptions, true, "resultOptions are shown");
 		assert.strictEqual(model.showDeleteFirstResult, true, "delete first option is shown");
 	});
+	it("shows selectively option when AFD merge result is selected", function() {
+		model.setSelectedResultName("merge");
+		assert.strictEqual(model.showResultOptions, true, "resultOptions are shown");
+		assert.strictEqual(model.showSelectivelyResult, true, "selectively option is shown");
+	});
+	it("does not show selectively option when MFD merge result is selected", function() {
+		const mfdModel = new ResultItem({
+			availableResults: getRelevantResults("mfd", true)
+		});
+		mfdModel.setSelectedResultName("merge");
+		assert.strictEqual(mfdModel.showSelectivelyResult, false, "selectively option is not shown");
+	});
 	it("hides delete first option when relevent result is no longer selected", function() {
 		model.setSelectedResultName("redirect");
 		model.setSelectedResultName("custom");
 		assert.strictEqual(model.showResultOptions, false, "resultOptions are not shown");
 		assert.strictEqual(model.showDeleteFirstResult, false, "delete first option is not shown");
+	});
+	it("hides selectively option when merge result is no longer selected", function() {
+		model.setSelectedResultName("merge");
+		model.setSelectedResultName("custom");
+		assert.strictEqual(model.showResultOptions, false, "resultOptions are not shown");
+		assert.strictEqual(model.showSelectivelyResult, false, "selectively option is not shown");
 	});
 	it("shows target input when relevent result is selected", function() {
 		model.setSelectedResultName("redirect");
@@ -133,6 +151,21 @@ describe("ResultItem", function() {
 		assert.strictEqual(model.softResult, false);
 		assert.strictEqual(model.deleteFirstResult, false);
 	});
+	it("emits softSelect and softUnselect when toggling soft", function() {
+		let softSelectCalls = 0;
+		let softUnselectCalls = 0;
+		model.connect(null, {
+			softSelect: () => { softSelectCalls++; },
+			softUnselect: () => { softUnselectCalls++; }
+		});
+
+		model.setSelectedResultName("delete");
+		model.setSoftResult(true);
+		model.setSoftResult(false);
+
+		assert.strictEqual(softSelectCalls, 1);
+		assert.strictEqual(softUnselectCalls, 1);
+	});
 	it("formats result text", function() {
 		assert.strictEqual(model.getResultText(), "", "Empty initially");
 
@@ -148,6 +181,13 @@ describe("ResultItem", function() {
 		model.setSoftResult(true);
 		assert.equal(model.getResultText(), "soft redirect", "soft result");
 
+		model.setSelectedResultName("merge");
+		model.setSoftResult(false);
+		model.setSelectivelyResult(true);
+		assert.equal(model.getResultText(), "merge selectively", "selectively result");
+
+		model.setSelectedResultName("redirect");
+		model.setSelectivelyResult(false);
 		model.setDeleteFirstResult(true);
 		assert.equal(model.getResultText(), "delete and redirect", "delete first result");
 		

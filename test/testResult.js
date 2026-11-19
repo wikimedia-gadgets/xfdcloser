@@ -3,6 +3,7 @@ import assert from "assert";
 import Result from "../xfdcloser-src/Models/Result";
 import Discussion from "../xfdcloser-src/Models/Discussion";
 import Venue from "../xfdcloser-src/Venue";
+import { softMergeRationaleTemplate } from "../xfdcloser-src/data";
 import { mw } from "../globals";
 
 describe("Result", function() {
@@ -223,6 +224,11 @@ describe("Result", function() {
 			model.singleModeResult.setTargetPageName("Foobar");
 			assert.strictEqual(model.previewWikitext, "The result of the discussion was '''redirect''' to [[Foobar]].", "Result with target");
 
+			model.singleModeResult.setSelectedResultName("merge");
+			model.singleModeResult.setTargetPageName("");
+			model.singleModeResult.setSelectivelyResult(true);
+			assert.strictEqual(model.previewWikitext, "The result of the discussion was '''merge selectively'''.", "Selectively merge result");
+
 			model.singleModeResult.setSelectedResultName("custom");
 			model.singleModeResult.setCustomResultText("baz qux");
 			assert.strictEqual(model.previewWikitext, "The result of the discussion was '''baz qux'''.", "Custom result");
@@ -254,6 +260,11 @@ describe("Result", function() {
 
 			model.singleModeResult.setCustomResultText("Qux");
 			assert.strictEqual(model.isValid, true, "Valid with custom result and custom result text");
+		});
+		it("prepends soft merge rationale when soft merge is selected", function() {
+			model.singleModeResult.setSelectedResultName("merge");
+			model.singleModeResult.setSoftResult(true);
+			assert.ok(model.rationale.includes(softMergeRationaleTemplate));
 		});
 	});
 	describe("Closing (multimode)", function() {
