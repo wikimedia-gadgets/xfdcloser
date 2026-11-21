@@ -1,5 +1,5 @@
 import TaskItemController from "../TaskItemController";
-import { mw } from "../../../globals";
+import { $, mw } from "../../../globals";
 import { rejection, uniqueArray } from "../../util";
 // <nowiki>
 
@@ -9,44 +9,123 @@ export default class RemoveMergeTemplates extends TaskItemController {
 		this.model.setName("Removing merge templates");
 	}
 
+	/**
+	 * AFD only: Remove merge templates from target pages (for merge and redirect outcomes), and remove merge templates from AFD backlinks to the nomination page (for all outcomes).
+	 */
 	doTask() {
-		const mergePageResults = this.model.getPageResults("merge");
-		const sourcePages = mergePageResults.map(pageResult =>
+		return this.getPagesToCheck().then(result => this.makeEdits(result));
+	}
+
+	getPagesToCheck() {
+		// Each outcome may have a selected action, such as redirecting pages or "No automated actions".
+		// Exclude page results whose outcome has no action or has "No automated actions" selected.
+		const enabledPageResults = this.model.getPageResults().filter(pageResult => {
+			const action = this.model.options.getOptionValues(pageResult.selectedResultName)?.action;
+			return action && action !== "noActions";
+		});
+		if ( !enabledPageResults.length ) {
+			return $.Deferred().resolve(null).promise();
+		}
+
+		// Get target pages
+		const { targetPages, sourcePages } = this.getTargetPages(enabledPageResults);
+		const backlinkSourcePages = enabledPageResults.map(pageResult =>
 			this.model.discussion.redirects.resolveOne(pageResult.pageName)
 		);
+		this.model.setDoing();
 
-		// There can be multiple target pages.
-		const targetPages = uniqueArray(mergePageResults.map(pageResult =>
+		// Get backlink pages. Return the combined page list and source metadata.
+		return this.getBacklinkPages().then(backlinkPages => ({
+			pages: uniqueArray([...targetPages, ...backlinkPages]),
+			backlinkTitles: new Set(backlinkPages),
+			sourcePages,
+			backlinkSourcePages
+		}));
+	}
+
+	/**
+	 * Get target pages only for merge and redirect outcomes. Only for AFDs (although this is checked in a different class). It's possible to have more than one target page, so handle that.
+	 */
+	getTargetPages(enabledPageResults) {
+		const pageResults = enabledPageResults.filter(pageResult => {
+			const action = this.model.options.getOptionValues(pageResult.selectedResultName).action;
+			return (pageResult.selectedResultName === "merge" && action === "mergeAndUpdate") ||
+				(pageResult.selectedResultName === "redirect" && action === "redirectAndUpdate");
+		});
+		const sourcePages = pageResults.map(pageResult =>
+			this.model.discussion.redirects.resolveOne(pageResult.pageName)
+		);
+		const targetPages = uniqueArray(pageResults.map(pageResult =>
 			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
 		));
-		// Just removeMergeTemplatesFromWikicode() on target pages for now.
-		// If we need to removeMergeTemplatesFromWikicode() on more pages in the future, they can be added to this array.
-		const pagesToRemoveMergeTemplatesFrom = targetPages;
+		return { targetPages, sourcePages };
+	}
 
-		this.model.setTotalSteps(pagesToRemoveMergeTemplatesFrom.length);
-		this.model.setDoing();
-		return this.api.editWithRetry(
-			pagesToRemoveMergeTemplatesFrom,
-			null,
-			page => {
+	/**
+	 * Get backlink pages only for AFDs (although this is checked in a different class). Normalize titles and follow continuation until all backlinks have been fetched.
+	 */
+	getBacklinkPages() {
+		return this.api.queryWithContinue({
+			list: "backlinks",
+			bltitle: this.model.discussion.discussionPageName,
+			// Mainspace and draftspace
+			blnamespace: "0|118",
+			bllimit: "max"
+		}).then(
+			result => result.backlinks.map(page => mw.Title.newFromText(page.title).getPrefixedText()),
+			(code, error) => {
+				this.model.addError(`${code || "unknown"} error: Could not read backlinks to the discussion`);
+				this.logError(code, error);
+				return rejection(code, error);
+			}
+		);
+	}
+
+	makeEdits(result) {
+		if ( !result ) {
+			this.model.setTotalSteps(1);
+			this.model.trackStep("skipped");
+			return;
+		}
+		if ( this.model.aborted ) return rejection("aborted");
+		const { pages, backlinkTitles, sourcePages, backlinkSourcePages } = result;
+		if ( !pages.length ) {
+			this.model.setTotalSteps(1);
+			this.model.trackStep("skipped");
+			return;
+		}
+		this.model.setTotalSteps(pages.length);
+		const transform = page => {
+			if ( this.model.aborted ) return rejection("aborted");
+			if ( page.missing ) return rejection("doesNotExist");
+
+			const sourcesToCheck = backlinkTitles.has(page.title) ? backlinkSourcePages : sourcePages;
+			let text = page.content;
+			for (const sourcePage of sourcesToCheck) {
+				text = this.removeMergeTemplatesFromWikicode(
+					text,
+					sourcePage,
+					this.model.discussion.discussionPageName
+				);
+			}
+			if ( text === page.content ) return rejection("skippedNoneFound");
+			return { text, summary: this.model.getEditSummary() + " - remove merge templates" };
+		};
+		let edits = $.Deferred().resolve().promise();
+		for (let i = 0; i < pages.length; i += 50) {
+			const batch = pages.slice(i, i + 50);
+			edits = edits.then(() => {
 				if ( this.model.aborted ) return rejection("aborted");
-				if ( page.missing ) return rejection("doesNotExist");
-
-				// There can be multiple merge sources, so remove each source's template from this page.
-				let text = page.content;
-				for (const sourcePage of sourcePages) {
-					text = this.removeMergeTemplatesFromWikicode(
-						text,
-						sourcePage,
-						this.model.discussion.discussionPageName
-					);
-				}
-				if ( text === page.content ) return rejection("skippedNoneFound");
-				return { text, summary: this.model.getEditSummary() };
-			},
-			() => this.model.trackStep(),
-			(code, error, title) => this.handlePageError(code, error, title)
-		).catch((errortype, code, error) => this.handleOverallError(errortype, code, error));
+				return this.api.editWithRetry(
+					batch,
+					null,
+					transform,
+					() => this.model.trackStep(),
+					(code, error, title) => this.handlePageError(code, error, title)
+				).catch((errortype, code, error) => this.handleOverallError(errortype, code, error));
+			});
+		}
+		return edits;
 	}
 
 	/**

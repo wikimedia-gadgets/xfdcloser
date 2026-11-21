@@ -121,11 +121,24 @@ class TaskList {
 			}
 		}
 	
-		// Merge (not holding cell)
+		// AFD - Add merge templates if it closes as merge. Remove merge templates regardless of outcome.
+		// MFD - Keep the existing merge action; do not schedule merge template removal.
 		const mergeActionPageResults = resultsbyPage.filter(result => {
 			const optionValues = this.options.getOptionValues(result.selectedResultName);
 			return optionValues && optionValues.action === "mergeAndUpdate";
 		});
+		// Always do the removeMergeTask first, and the addMergeTask second. The order is important so that we don't go removing the recently added merge templates.
+		let removeMergeTask;
+		if ( this.discussion.venue.type === "afd" ) {
+			removeMergeTask = new TaskItem({
+				taskName: "RemoveMergeTemplates",
+				relaventPageNames: resultsbyPage.map(result => result.pageName),
+				discussion: this.discussion,
+				result: this.result,
+				options: this.options
+			});
+			tasks.push(removeMergeTask);
+		}
 		if ( mergeActionPageResults.length ) {
 			const addMergeTask = new TaskItem({
 				taskName: "AddMergeTemplates",
@@ -134,20 +147,7 @@ class TaskList {
 				result: this.result,
 				options: this.options
 			});
-			const removeMergePageResults = this.discussion.venue.type === "afd"
-				? mergeActionPageResults.filter(result => result.selectedResultName === "merge")
-				: [];
-			if ( removeMergePageResults.length ) {
-				const removeMergeTask = new TaskItem({
-					taskName: "RemoveMergeTemplates",
-					relaventPageNames: removeMergePageResults.map(result => result.pageName),
-					discussion: this.discussion,
-					result: this.result,
-					options: this.options
-				});
-				// Always do RemoveMergeTemplates first and AddMergeTemplates second, so that our new merge templates don't get erased.
-				// TaskItemControllers are executed synchronously, therefore we can control the order here and also avoid race conditions.
-				tasks.push(removeMergeTask);
+			if ( removeMergeTask ) {
 				addMergeTask.setPrecedingTask(removeMergeTask, "finished");
 			}
 			tasks.push(addMergeTask);
