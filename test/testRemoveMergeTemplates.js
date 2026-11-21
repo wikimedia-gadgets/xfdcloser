@@ -144,13 +144,6 @@ describe("RemoveMergeTemplates.doTask", function() {
 		);
 	});
 
-	it("does not query backlinks outside AfD", function() {
-		model.venue.type = "mfd";
-		controller.api.queryWithContinue = () => { throw new Error("Backlinks should not be queried"); };
-		controller.api.editWithRetry = () => $.Deferred().resolve();
-		return controller.doTask();
-	});
-
 	it("fetches each target, removes its merge templates, retries conflicts, and reports missing pages", function() {
 		let targetReads = 0;
 		const edits = [];

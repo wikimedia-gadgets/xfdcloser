@@ -17,51 +17,68 @@ export default class RemoveMergeTemplates extends TaskItemController {
 	}
 
 	getPagesToCheck() {
+		// Each outcome may have a selected action, such as redirecting pages or "No automated actions".
+		// Exclude page results whose outcome has no action or has "No automated actions" selected.
 		const enabledPageResults = this.model.getPageResults().filter(pageResult => {
 			const action = this.model.options.getOptionValues(pageResult.selectedResultName)?.action;
 			return action && action !== "noActions";
 		});
-		const pageResults = enabledPageResults.filter(pageResult => {
-			const action = this.model.options.getOptionValues(pageResult.selectedResultName).action;
-			return (pageResult.selectedResultName === "merge" && action === "mergeAndUpdate") ||
-				(pageResult.selectedResultName === "redirect" && action === "redirectAndUpdate");
-		});
 		if ( !enabledPageResults.length ) {
 			return $.Deferred().resolve(null).promise();
 		}
-		const sourcePages = pageResults.map(pageResult =>
-			this.model.discussion.redirects.resolveOne(pageResult.pageName)
-		);
+
+		// Get target pages
+		const { targetPages, sourcePages } = this.getTargetPages(enabledPageResults);
 		const backlinkSourcePages = enabledPageResults.map(pageResult =>
 			this.model.discussion.redirects.resolveOne(pageResult.pageName)
 		);
-		// There can be multiple target pages.
-		const targetPages = uniqueArray(pageResults.map(pageResult =>
-			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
-		));
 		this.model.setDoing();
-		const backlinksPromise = this.model.venue.type === "afd"
-			? this.api.queryWithContinue({
-				list: "backlinks",
-				bltitle: this.model.discussion.discussionPageName,
-				// Mainspace and draftspace
-				blnamespace: "0|118",
-				bllimit: "max"
-			}).then(
-				result => result.backlinks.map(page => mw.Title.newFromText(page.title).getPrefixedText()),
-				(code, error) => {
-					this.model.addError(`${code || "unknown"} error: Could not read backlinks to the discussion`);
-					this.logError(code, error);
-					return rejection(code, error);
-				}
-			)
-			: $.Deferred().resolve([]).promise();
-		return backlinksPromise.then(backlinkPages => ({
+
+		// Get backlink pages. Return the combined page list and source metadata.
+		return this.getBacklinkPages().then(backlinkPages => ({
 			pages: uniqueArray([...targetPages, ...backlinkPages]),
 			backlinkTitles: new Set(backlinkPages),
 			sourcePages,
 			backlinkSourcePages
 		}));
+	}
+
+	/**
+	 * Get target pages only for merge and redirect outcomes. Only for AFDs (although this is checked in a different class). It's possible to have more than one target page, so handle that.
+	 */
+	getTargetPages(enabledPageResults) {
+		const pageResults = enabledPageResults.filter(pageResult => {
+			const action = this.model.options.getOptionValues(pageResult.selectedResultName).action;
+			return (pageResult.selectedResultName === "merge" && action === "mergeAndUpdate") ||
+				(pageResult.selectedResultName === "redirect" && action === "redirectAndUpdate");
+		});
+		const sourcePages = pageResults.map(pageResult =>
+			this.model.discussion.redirects.resolveOne(pageResult.pageName)
+		);
+		const targetPages = uniqueArray(pageResults.map(pageResult =>
+			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
+		));
+		return { targetPages, sourcePages };
+	}
+
+	/**
+	 * Get backlink pages only for AFDs (although this is checked in a different class). Normalize titles and follow continuation until all backlinks have been fetched.
+	 */
+	getBacklinkPages() {
+		return this.api.queryWithContinue({
+			list: "backlinks",
+			bltitle: this.model.discussion.discussionPageName,
+			// Mainspace and draftspace
+			blnamespace: "0|118",
+			bllimit: "max"
+		}).then(
+			result => result.backlinks.map(page => mw.Title.newFromText(page.title).getPrefixedText()),
+			(code, error) => {
+				this.model.addError(`${code || "unknown"} error: Could not read backlinks to the discussion`);
+				this.logError(code, error);
+				return rejection(code, error);
+			}
+		);
 	}
 
 	makeEdits(result) {
