@@ -26,6 +26,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 	beforeEach(function() {
 		model = {
 			aborted: false,
+			venue: {type: "afd"},
 			discussion: {
 				discussionPageName: "Wikipedia:Articles for deletion/Nomination",
 				redirects: {resolveOne: pageName => pageName},
@@ -58,6 +59,96 @@ describe("RemoveMergeTemplates.doTask", function() {
 		};
 		controller = new RemoveMergeTemplates(model, {});
 		controller.api = Object.create(API);
+		controller.api.queryWithContinue = () => $.Deferred().resolve({backlinks: []});
+	});
+
+	it("queries all article and draft backlinks, normalizes titles and edits each page once", function() {
+		delete controller.api.queryWithContinue;
+		const queries = [];
+		controller.api.get = query => {
+			queries.push(query);
+			if ( queries.length === 1 ) {
+				return $.Deferred().resolve({
+					query: {backlinks: [{title: "Target"}, {title: "Draft:Other_page"}]},
+					continue: {continue: "-||", blcontinue: "next"}
+				});
+			}
+			return $.Deferred().resolve({query: {backlinks: [{title: "Draft:Other page"}, {title: "Another_page"}]}});
+		};
+		controller.api.editWithRetry = (titles, params, transform) => {
+			assert.deepStrictEqual(titles, ["Target", "Missing target", "Draft:Other page", "Another page"]);
+			const content = "{{Merge from|Foo|discussion=Wikipedia:Articles for deletion/Nomination}}\nText";
+			assert.strictEqual(transform({content}).text, "Text");
+			return $.Deferred().resolve();
+		};
+		return controller.doTask().then(() => {
+			assert.strictEqual(queries.length, 2);
+			assert.strictEqual(queries[0].list, "backlinks");
+			assert.strictEqual(queries[0].bltitle, "Wikipedia:Articles for deletion/Nomination");
+			assert.strictEqual(queries[0].blnamespace, "0|118");
+			assert.strictEqual(queries[0].bllimit, "max");
+			assert.strictEqual(queries[1].blcontinue, "next");
+			assert.strictEqual(model.total, 4);
+		});
+	});
+
+	it("checks backlinks for non-merge outcomes using the source and nomination names", function() {
+		model.getPageResults = () => [{pageName: "Foo", selectedResultName: "keep"}];
+		controller.api.queryWithContinue = () => $.Deferred().resolve({backlinks: [{title: "Draft:Example"}]});
+		controller.api.editWithRetry = (titles, params, transform) => {
+			assert.deepStrictEqual(titles, ["Draft:Example"]);
+			assert.strictEqual(transform({
+				title: "Draft:Example",
+				content: "{{Merge|Foo}}\n[[Wikipedia:Articles for deletion/Nomination]]"
+			}).text, "[[Wikipedia:Articles for deletion/Nomination]]");
+			assert.strictEqual(transform({
+				title: "Draft:Example",
+				content: "{{Merge|discussion=Wikipedia:Articles for deletion/Nomination}}\nText"
+			}).text, "Text");
+			return $.Deferred().resolve();
+		};
+		return controller.doTask();
+	});
+
+	it("edits large backlink lists in sequential batches of at most 50 pages", function() {
+		controller.api.queryWithContinue = () => $.Deferred().resolve({
+			backlinks: Array.from({length: 101}, (_, i) => ({title: `Backlink ${i}`}))
+		});
+		const batches = [];
+		let inProgress = false;
+		controller.api.editWithRetry = titles => {
+			assert.strictEqual(inProgress, false);
+			inProgress = true;
+			batches.push(titles);
+			const deferred = $.Deferred();
+			setTimeout(() => {
+				inProgress = false;
+				deferred.resolve();
+			}, 0);
+			return deferred.promise();
+		};
+		return controller.doTask().then(() => {
+			assert.deepStrictEqual(batches.map(batch => batch.length), [50, 50, 3]);
+			assert.strictEqual(model.total, 103);
+			assert.strictEqual(new Set(batches.flat()).size, 103);
+		});
+	});
+
+	it("reports backlink query failures without editing targets", function() {
+		controller.api.queryWithContinue = () => $.Deferred().reject("http", {message: "Read failed"});
+		controller.api.editWithRetry = () => { throw new Error("No pages should be edited"); };
+		controller.logError = () => {};
+		return controller.doTask().then(
+			() => { throw new Error("Backlink read failure should reject"); },
+			() => assert.ok(model.errors[0].includes("Could not read backlinks"))
+		);
+	});
+
+	it("does not query backlinks outside AfD", function() {
+		model.venue.type = "mfd";
+		controller.api.queryWithContinue = () => { throw new Error("Backlinks should not be queried"); };
+		controller.api.editWithRetry = () => $.Deferred().resolve();
+		return controller.doTask();
 	});
 
 	it("fetches each target, removes its merge templates, retries conflicts, and reports missing pages", function() {
@@ -129,6 +220,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 
 	it("does not edit targets when automated actions are disabled", function() {
 		model.options.getOptionValues = () => ({action: "noActions"});
+		controller.api.queryWithContinue = () => { throw new Error("Backlinks should not be queried"); };
 		controller.api.editWithRetry = () => { throw new Error("No pages should be edited"); };
 		return controller.doTask().then(() => {
 			assert.deepStrictEqual(model.steps, {completed: 0, skipped: 1, failed: 0});
@@ -182,8 +274,9 @@ describe("RemoveMergeTemplates.doTask", function() {
 			query: {pages: [{title: "Foo", revisions: [{timestamp: "revision", slots: {main: {content: "{{Merge|Foo}}"}}}]}]}
 		});
 		controller.api.postWithToken = () => { throw new Error("Aborted task should not save"); };
-		return controller.doTask().then(() => {
-			assert.deepStrictEqual(model.steps, {completed: 0, skipped: 0, failed: 1});
-		});
+		return controller.doTask().then(
+			() => { throw new Error("Aborted task should reject"); },
+			code => assert.strictEqual(code, "aborted")
+		);
 	});
 });

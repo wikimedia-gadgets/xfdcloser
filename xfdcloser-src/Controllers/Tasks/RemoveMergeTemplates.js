@@ -9,22 +9,30 @@ export default class RemoveMergeTemplates extends TaskItemController {
 		this.model.setName("Removing merge templates");
 	}
 
+	/**
+	 * AFD only: Remove merge templates from target pages (for merge and redirect outcomes), and remove merge templates from AFD backlinks to the nomination page (for all outcomes).
+	 */
 	doTask() {
 		const pagesToRemoveMergeTemplatesFrom = [];
 
-		// Add target pages for AFD merge and AFD redirect outcomes.
-		// MFD merge outcomes keep the existing merge action, so do not remove their merge templates.
-		const pageResults = this.model.getPageResults().filter(pageResult => {
+		const enabledPageResults = this.model.getPageResults().filter(pageResult => {
 			const action = this.model.options.getOptionValues(pageResult.selectedResultName)?.action;
+			return action && action !== "noActions";
+		});
+		const pageResults = enabledPageResults.filter(pageResult => {
+			const action = this.model.options.getOptionValues(pageResult.selectedResultName).action;
 			return (pageResult.selectedResultName === "merge" && action === "mergeAndUpdate") ||
 				(pageResult.selectedResultName === "redirect" && action === "redirectAndUpdate");
 		});
-		if ( !pageResults.length ) {
+		if ( !enabledPageResults.length ) {
 			this.model.setTotalSteps(1);
 			this.model.trackStep("skipped");
 			return $.Deferred().resolve().promise();
 		}
 		const sourcePages = pageResults.map(pageResult =>
+			this.model.discussion.redirects.resolveOne(pageResult.pageName)
+		);
+		const backlinkSourcePages = enabledPageResults.map(pageResult =>
 			this.model.discussion.redirects.resolveOne(pageResult.pageName)
 		);
 		// There can be multiple target pages.
@@ -33,25 +41,40 @@ export default class RemoveMergeTemplates extends TaskItemController {
 		));
 		pagesToRemoveMergeTemplatesFrom.push(...targetPages);
 
-		// For AFD only, get a list of "what links here" pages in the article and draft namespaces linking back to the nomination page.
-		// We'll use a MediaWiki API query to grab this, then we'll add them to our list of pages to check.
-		// Push pages in a way that avoids duplicates, and make sure in both sections that we're pushing pages with spaces, not underscores.
-		// TODO
-		// pagesToRemoveMergeTemplatesFrom.push(...whatLinksHerePages);
-
-		// Loop through pagesToRemoveMergeTemplatesFrom and do the task on each page.
-		this.model.setTotalSteps(pagesToRemoveMergeTemplatesFrom.length);
 		this.model.setDoing();
-		return this.api.editWithRetry(
-			pagesToRemoveMergeTemplatesFrom,
-			null,
-			page => {
+		const backlinksPromise = this.model.venue.type === "afd"
+			? this.api.queryWithContinue({
+				list: "backlinks",
+				bltitle: this.model.discussion.discussionPageName,
+				// Mainspace and draftspace
+				blnamespace: "0|118",
+				bllimit: "max"
+			}).then(
+				result => result.backlinks.map(page => mw.Title.newFromText(page.title).getPrefixedText()),
+				(code, error) => {
+					this.model.addError(`${code || "unknown"} error: Could not read backlinks to the discussion`);
+					this.logError(code, error);
+					return rejection(code, error);
+				}
+			)
+			: $.Deferred().resolve([]).promise();
+		return backlinksPromise.then(backlinkPages => {
+			if ( this.model.aborted ) return rejection("aborted");
+			const pages = uniqueArray([...pagesToRemoveMergeTemplatesFrom, ...backlinkPages]);
+			const backlinkTitles = new Set(backlinkPages);
+			if ( !pages.length ) {
+				this.model.setTotalSteps(1);
+				this.model.trackStep("skipped");
+				return;
+			}
+			this.model.setTotalSteps(pages.length);
+			const transform = page => {
 				if ( this.model.aborted ) return rejection("aborted");
 				if ( page.missing ) return rejection("doesNotExist");
 
-				// There can be multiple merge sources, so remove each source's template from this page.
+				const sourcesToCheck = backlinkTitles.has(page.title) ? backlinkSourcePages : sourcePages;
 				let text = page.content;
-				for (const sourcePage of sourcePages) {
+				for (const sourcePage of sourcesToCheck) {
 					text = this.removeMergeTemplatesFromWikicode(
 						text,
 						sourcePage,
@@ -60,10 +83,23 @@ export default class RemoveMergeTemplates extends TaskItemController {
 				}
 				if ( text === page.content ) return rejection("skippedNoneFound");
 				return { text, summary: this.model.getEditSummary() };
-			},
-			() => this.model.trackStep(),
-			(code, error, title) => this.handlePageError(code, error, title)
-		).catch((errortype, code, error) => this.handleOverallError(errortype, code, error));
+			};
+			let edits = $.Deferred().resolve().promise();
+			for (let i = 0; i < pages.length; i += 50) {
+				const batch = pages.slice(i, i + 50);
+				edits = edits.then(() => {
+					if ( this.model.aborted ) return rejection("aborted");
+					return this.api.editWithRetry(
+						batch,
+						null,
+						transform,
+						() => this.model.trackStep(),
+						(code, error, title) => this.handlePageError(code, error, title)
+					).catch((errortype, code, error) => this.handleOverallError(errortype, code, error));
+				});
+			}
+			return edits;
+		});
 	}
 
 	/**

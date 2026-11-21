@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
 import assert from "assert";
-import { mw } from "../globals";
+import { $, mw } from "../globals";
 import TaskList from "../xfdcloser-src/Models/TaskList";
 import Discussion from "../xfdcloser-src/Models/Discussion";
 import Result from "../xfdcloser-src/Models/Result";
@@ -123,6 +123,7 @@ describe("TaskListModel", function() {
 		const remove = model.makeItemsForClose().find(task => task.taskName === "RemoveMergeTemplates");
 		const controller = Object.create(RemoveMergeTemplates.prototype);
 		controller.model = remove;
+		controller.api = {queryWithContinue: () => $.Deferred().resolve({backlinks: []})};
 		return controller.doTask().then(() => {
 			remove.setDone();
 			assert.strictEqual(remove.done, true);
