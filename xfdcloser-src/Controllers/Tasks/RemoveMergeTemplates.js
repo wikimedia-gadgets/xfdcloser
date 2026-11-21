@@ -10,6 +10,8 @@ export default class RemoveMergeTemplates extends TaskItemController {
 	}
 
 	doTask() {
+		const pagesToRemoveMergeTemplatesFrom = [];
+
 		// Add target pages for AFD merge and AFD redirect outcomes.
 		// MFD merge outcomes keep the existing merge action, so do not remove their merge templates.
 		const pageResults = this.model.getPageResults().filter(pageResult => {
@@ -29,11 +31,15 @@ export default class RemoveMergeTemplates extends TaskItemController {
 		const targetPages = uniqueArray(pageResults.map(pageResult =>
 			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
 		));
+		pagesToRemoveMergeTemplatesFrom.push(...targetPages);
 
-		// Just removeMergeTemplatesFromWikicode() on target pages for now.
-		// If we need to removeMergeTemplatesFromWikicode() on more pages in the future, they can be added to this array.
-		const pagesToRemoveMergeTemplatesFrom = targetPages;
+		// For AFD only, get a list of "what links here" pages in the article and draft namespaces linking back to the nomination page.
+		// We'll use a MediaWiki API query to grab this, then we'll add them to our list of pages to check.
+		// Push pages in a way that avoids duplicates, and make sure in both sections that we're pushing pages with spaces, not underscores.
+		// TODO
+		// pagesToRemoveMergeTemplatesFrom.push(...whatLinksHerePages);
 
+		// Loop through pagesToRemoveMergeTemplatesFrom and do the task on each page.
 		this.model.setTotalSteps(pagesToRemoveMergeTemplatesFrom.length);
 		this.model.setDoing();
 		return this.api.editWithRetry(
