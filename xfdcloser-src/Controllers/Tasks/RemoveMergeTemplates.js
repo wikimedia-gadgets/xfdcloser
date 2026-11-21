@@ -13,8 +13,10 @@ export default class RemoveMergeTemplates extends TaskItemController {
 	 * AFD only: Remove merge templates from target pages (for merge and redirect outcomes), and remove merge templates from AFD backlinks to the nomination page (for all outcomes).
 	 */
 	doTask() {
-		const pagesToRemoveMergeTemplatesFrom = [];
+		return this.getPagesToCheck().then(result => this.makeEdits(result));
+	}
 
+	getPagesToCheck() {
 		const enabledPageResults = this.model.getPageResults().filter(pageResult => {
 			const action = this.model.options.getOptionValues(pageResult.selectedResultName)?.action;
 			return action && action !== "noActions";
@@ -25,9 +27,7 @@ export default class RemoveMergeTemplates extends TaskItemController {
 				(pageResult.selectedResultName === "redirect" && action === "redirectAndUpdate");
 		});
 		if ( !enabledPageResults.length ) {
-			this.model.setTotalSteps(1);
-			this.model.trackStep("skipped");
-			return $.Deferred().resolve().promise();
+			return $.Deferred().resolve(null).promise();
 		}
 		const sourcePages = pageResults.map(pageResult =>
 			this.model.discussion.redirects.resolveOne(pageResult.pageName)
@@ -39,8 +39,6 @@ export default class RemoveMergeTemplates extends TaskItemController {
 		const targetPages = uniqueArray(pageResults.map(pageResult =>
 			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
 		));
-		pagesToRemoveMergeTemplatesFrom.push(...targetPages);
-
 		this.model.setDoing();
 		const backlinksPromise = this.model.venue.type === "afd"
 			? this.api.queryWithContinue({
@@ -58,48 +56,59 @@ export default class RemoveMergeTemplates extends TaskItemController {
 				}
 			)
 			: $.Deferred().resolve([]).promise();
-		return backlinksPromise.then(backlinkPages => {
-			if ( this.model.aborted ) return rejection("aborted");
-			const pages = uniqueArray([...pagesToRemoveMergeTemplatesFrom, ...backlinkPages]);
-			const backlinkTitles = new Set(backlinkPages);
-			if ( !pages.length ) {
-				this.model.setTotalSteps(1);
-				this.model.trackStep("skipped");
-				return;
-			}
-			this.model.setTotalSteps(pages.length);
-			const transform = page => {
-				if ( this.model.aborted ) return rejection("aborted");
-				if ( page.missing ) return rejection("doesNotExist");
+		return backlinksPromise.then(backlinkPages => ({
+			pages: uniqueArray([...targetPages, ...backlinkPages]),
+			backlinkTitles: new Set(backlinkPages),
+			sourcePages,
+			backlinkSourcePages
+		}));
+	}
 
-				const sourcesToCheck = backlinkTitles.has(page.title) ? backlinkSourcePages : sourcePages;
-				let text = page.content;
-				for (const sourcePage of sourcesToCheck) {
-					text = this.removeMergeTemplatesFromWikicode(
-						text,
-						sourcePage,
-						this.model.discussion.discussionPageName
-					);
-				}
-				if ( text === page.content ) return rejection("skippedNoneFound");
-				return { text, summary: this.model.getEditSummary() };
-			};
-			let edits = $.Deferred().resolve().promise();
-			for (let i = 0; i < pages.length; i += 50) {
-				const batch = pages.slice(i, i + 50);
-				edits = edits.then(() => {
-					if ( this.model.aborted ) return rejection("aborted");
-					return this.api.editWithRetry(
-						batch,
-						null,
-						transform,
-						() => this.model.trackStep(),
-						(code, error, title) => this.handlePageError(code, error, title)
-					).catch((errortype, code, error) => this.handleOverallError(errortype, code, error));
-				});
+	makeEdits(result) {
+		if ( !result ) {
+			this.model.setTotalSteps(1);
+			this.model.trackStep("skipped");
+			return;
+		}
+		if ( this.model.aborted ) return rejection("aborted");
+		const { pages, backlinkTitles, sourcePages, backlinkSourcePages } = result;
+		if ( !pages.length ) {
+			this.model.setTotalSteps(1);
+			this.model.trackStep("skipped");
+			return;
+		}
+		this.model.setTotalSteps(pages.length);
+		const transform = page => {
+			if ( this.model.aborted ) return rejection("aborted");
+			if ( page.missing ) return rejection("doesNotExist");
+
+			const sourcesToCheck = backlinkTitles.has(page.title) ? backlinkSourcePages : sourcePages;
+			let text = page.content;
+			for (const sourcePage of sourcesToCheck) {
+				text = this.removeMergeTemplatesFromWikicode(
+					text,
+					sourcePage,
+					this.model.discussion.discussionPageName
+				);
 			}
-			return edits;
-		});
+			if ( text === page.content ) return rejection("skippedNoneFound");
+			return { text, summary: this.model.getEditSummary() };
+		};
+		let edits = $.Deferred().resolve().promise();
+		for (let i = 0; i < pages.length; i += 50) {
+			const batch = pages.slice(i, i + 50);
+			edits = edits.then(() => {
+				if ( this.model.aborted ) return rejection("aborted");
+				return this.api.editWithRetry(
+					batch,
+					null,
+					transform,
+					() => this.model.trackStep(),
+					(code, error, title) => this.handlePageError(code, error, title)
+				).catch((errortype, code, error) => this.handleOverallError(errortype, code, error));
+			});
+		}
+		return edits;
 	}
 
 	/**
