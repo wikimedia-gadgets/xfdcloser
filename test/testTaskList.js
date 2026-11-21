@@ -7,6 +7,7 @@ import Result from "../xfdcloser-src/Models/Result";
 import Options from "../xfdcloser-src/Models/Options";
 import Venue from "../xfdcloser-src/Venue";
 import { getRelevantActions } from "../xfdcloser-src/data";
+import RemoveMergeTemplates from "../xfdcloser-src/Controllers/Tasks/RemoveMergeTemplates";
 
 describe("TaskListModel", function() {
 	let model, discussion, result, options, venue, userIsSysop;
@@ -55,7 +56,7 @@ describe("TaskListModel", function() {
 		const remove = tasks.find(task => task.taskName === "RemoveMergeTemplates");
 		assert.ok(add);
 		assert.ok(remove);
-		assert.deepStrictEqual(remove.pageNames, ["Foo"]);
+		assert.deepStrictEqual(remove.pageNames, ["Foo", "Bar"]);
 		assert.ok(tasks.indexOf(remove) < tasks.indexOf(add));
 		assert.strictEqual(remove.precedingTask.task, tasks[0]);
 		assert.strictEqual(add.precedingTask.task, remove);
@@ -82,12 +83,52 @@ describe("TaskListModel", function() {
 		assert.strictEqual(add.canProceed(), true);
 		assert.strictEqual(add.starting, true);
 	});
-	it("does not schedule removal for no automated actions or non-merge results", function() {
+	it("schedules one removal task for merge and redirect actions", function() {
+		result.setMultimode(true);
+		result.multimodeResults.getItems()[0].setSelectedResultName("merge");
+		result.multimodeResults.getItems()[1].setSelectedResultName("redirect");
+		const tasks = model.makeItemsForClose();
+		const removeTasks = tasks.filter(task => task.taskName === "RemoveMergeTemplates");
+		const add = tasks.find(task => task.taskName === "AddMergeTemplates");
+		assert.strictEqual(removeTasks.length, 1);
+		assert.deepStrictEqual(removeTasks[0].pageNames, ["Foo", "Bar"]);
+		assert.strictEqual(add.precedingTask.task, removeTasks[0]);
+	});
+	it("includes pages whose selected outcome has no automated action", function() {
+		result.setMultimode(true);
+		result.multimodeResults.getItems()[0].setSelectedResultName("merge");
+		result.multimodeResults.getItems()[1].setSelectedResultName("redirect");
+		options.getOptions("merge").setSelectedActionName("noActions");
+		const tasks = model.makeItemsForClose();
+		assert.deepStrictEqual(tasks.find(task => task.taskName === "RemoveMergeTemplates").pageNames, ["Foo", "Bar"]);
+		assert.ok(!tasks.some(task => task.taskName === "AddMergeTemplates"));
+	});
+	it("schedules removal for an AFD redirect without scheduling merge addition", function() {
+		result.singleModeResult.setSelectedResultName("redirect");
+		const tasks = model.makeItemsForClose();
+		assert.deepStrictEqual(tasks.find(task => task.taskName === "RemoveMergeTemplates").pageNames, ["Foo", "Bar"]);
+		assert.ok(!tasks.some(task => task.taskName === "AddMergeTemplates"));
+		options.getItems()[0].setSelectedActionName("noActions");
+		assert.ok(model.makeItemsForClose().some(task => task.taskName === "RemoveMergeTemplates"));
+	});
+	it("schedules removal for no automated actions and non-merge results", function() {
 		result.singleModeResult.setSelectedResultName("merge");
 		options.getItems()[0].setSelectedActionName("noActions");
-		assert.ok(!model.makeItemsForClose().some(task => task.taskName === "RemoveMergeTemplates"));
+		assert.ok(model.makeItemsForClose().some(task => task.taskName === "RemoveMergeTemplates"));
 		result.singleModeResult.setSelectedResultName("keep");
-		assert.ok(!model.makeItemsForClose().some(task => task.taskName === "RemoveMergeTemplates"));
+		assert.deepStrictEqual(model.makeItemsForClose().find(task => task.taskName === "RemoveMergeTemplates").pageNames, ["Foo", "Bar"]);
+	});
+	it("marks removal as skipped rather than failed for a keep outcome", function() {
+		result.singleModeResult.setSelectedResultName("keep");
+		const remove = model.makeItemsForClose().find(task => task.taskName === "RemoveMergeTemplates");
+		const controller = Object.create(RemoveMergeTemplates.prototype);
+		controller.model = remove;
+		return controller.doTask().then(() => {
+			remove.setDone();
+			assert.strictEqual(remove.done, true);
+			assert.strictEqual(remove.failed, false);
+			assert.strictEqual(remove.steps.skipped, 1);
+		});
 	});
 	it("keeps the existing MfD merge action and does not schedule removal", function() {
 		assert.strictEqual(getRelevantActions("afd", true, "merge")[0].label, "Add and remove merge templates, tag talk pages");

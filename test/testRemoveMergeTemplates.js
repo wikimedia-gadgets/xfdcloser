@@ -34,13 +34,18 @@ describe("RemoveMergeTemplates.doTask", function() {
 			steps: { completed: 0, skipped: 0, failed: 0 },
 			errors: [],
 			warnings: [],
+			options: {
+				getOptionValues(result) {
+					return {action: result === "merge" ? "mergeAndUpdate" : "redirectAndUpdate"};
+				}
+			},
 			connect() {},
 			setName(name) { this.name = name; },
 			getPageResults() {
 				return [
-					{pageName: "Foo", getFormattedTarget: () => "Target"},
-					{pageName: "Bar", getFormattedTarget: () => "Target"},
-					{pageName: "Missing", getFormattedTarget: () => "Missing target"}
+					{pageName: "Foo", selectedResultName: "merge", getFormattedTarget: () => "Target"},
+					{pageName: "Bar", selectedResultName: "merge", getFormattedTarget: () => "Target"},
+					{pageName: "Missing", selectedResultName: "merge", getFormattedTarget: () => "Missing target"}
 				];
 			},
 			setTotalSteps(total) { this.total = total; },
@@ -93,8 +98,58 @@ describe("RemoveMergeTemplates.doTask", function() {
 		});
 	});
 
+	it("removes templates for merge and redirect sources on their targets only", function() {
+		model.getPageResults = () => [
+			{pageName: "Foo", selectedResultName: "merge", getFormattedTarget: () => "Shared target"},
+			{pageName: "Bar", selectedResultName: "redirect", getFormattedTarget: () => "Shared_target"},
+			{pageName: "Baz", selectedResultName: "redirect", getFormattedTarget: () => "Other target"},
+			{pageName: "Ignored", selectedResultName: "keep", getFormattedTarget: () => {
+				throw new Error("Unrelated outcome should not have a target");
+			}}
+		];
+		controller.api.editWithRetry = (titles, params, transform) => {
+			assert.deepStrictEqual(titles, ["Shared target", "Other target"]);
+			assert.strictEqual(transform({
+				content: "{{Merge from|Foo}}\n{{Merge from|Bar}}\n{{Merge from|Ignored}}\nText"
+			}).text, "{{Merge from|Ignored}}\nText");
+			assert.strictEqual(transform({content: "{{Merge from|Baz}}\nText"}).text, "Text");
+			return $.Deferred().resolve();
+		};
+		return controller.doTask().then(() => assert.strictEqual(model.total, 2));
+	});
+
+	it("skips when no relevant outcomes are found", function() {
+		model.getPageResults = () => [{pageName: "Foo", selectedResultName: "keep"}];
+		controller.api.editWithRetry = () => { throw new Error("No pages should be edited"); };
+		return controller.doTask().then(() => {
+			assert.strictEqual(model.total, 1);
+			assert.deepStrictEqual(model.steps, {completed: 0, skipped: 1, failed: 0});
+		});
+	});
+
+	it("does not edit targets when automated actions are disabled", function() {
+		model.options.getOptionValues = () => ({action: "noActions"});
+		controller.api.editWithRetry = () => { throw new Error("No pages should be edited"); };
+		return controller.doTask().then(() => {
+			assert.deepStrictEqual(model.steps, {completed: 0, skipped: 1, failed: 0});
+		});
+	});
+
+	it("excludes disabled outcomes while processing enabled outcomes", function() {
+		model.getPageResults = () => [
+			{pageName: "Foo", selectedResultName: "merge", getFormattedTarget: () => { throw new Error("Disabled target accessed"); }},
+			{pageName: "Bar", selectedResultName: "redirect", getFormattedTarget: () => "Target"}
+		];
+		model.options.getOptionValues = result => ({action: result === "merge" ? "noActions" : "redirectAndUpdate"});
+		controller.api.editWithRetry = titles => {
+			assert.deepStrictEqual(titles, ["Target"]);
+			return $.Deferred().resolve();
+		};
+		return controller.doTask();
+	});
+
 	it("skips unchanged pages without saving", function() {
-		model.getPageResults = () => [{pageName: "Foo", getFormattedTarget: () => "Foo"}];
+		model.getPageResults = () => [{pageName: "Foo", selectedResultName: "merge", getFormattedTarget: () => "Foo"}];
 		controller.api.get = () => $.Deferred().resolve({
 			curtimestamp: "start",
 			query: {pages: [{title: "Foo", revisions: [{timestamp: "revision", slots: {main: {content: "No templates"}}}]}]}
@@ -107,7 +162,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 	});
 
 	it("reports read failures", function() {
-		model.getPageResults = () => [{pageName: "Foo", getFormattedTarget: () => "Foo"}];
+		model.getPageResults = () => [{pageName: "Foo", selectedResultName: "merge", getFormattedTarget: () => "Foo"}];
 		controller.api.get = () => $.Deferred().reject("http", {message: "Read failed"});
 		controller.logError = () => {};
 		return controller.doTask().then(
@@ -121,7 +176,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 
 	it("does not save after the task is aborted", function() {
 		model.aborted = true;
-		model.getPageResults = () => [{pageName: "Foo", getFormattedTarget: () => "Foo"}];
+		model.getPageResults = () => [{pageName: "Foo", selectedResultName: "merge", getFormattedTarget: () => "Foo"}];
 		controller.api.get = () => $.Deferred().resolve({
 			curtimestamp: "start",
 			query: {pages: [{title: "Foo", revisions: [{timestamp: "revision", slots: {main: {content: "{{Merge|Foo}}"}}}]}]}

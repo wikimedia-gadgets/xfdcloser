@@ -1,5 +1,5 @@
 import TaskItemController from "../TaskItemController";
-import { mw } from "../../../globals";
+import { $, mw } from "../../../globals";
 import { rejection, uniqueArray } from "../../util";
 // <nowiki>
 
@@ -10,15 +10,26 @@ export default class RemoveMergeTemplates extends TaskItemController {
 	}
 
 	doTask() {
-		const mergePageResults = this.model.getPageResults("merge");
-		const sourcePages = mergePageResults.map(pageResult =>
+		// Add target pages for AFD merge and AFD redirect outcomes.
+		// MFD merge outcomes keep the existing merge action, so do not remove their merge templates.
+		const pageResults = this.model.getPageResults().filter(pageResult => {
+			const action = this.model.options.getOptionValues(pageResult.selectedResultName)?.action;
+			return (pageResult.selectedResultName === "merge" && action === "mergeAndUpdate") ||
+				(pageResult.selectedResultName === "redirect" && action === "redirectAndUpdate");
+		});
+		if ( !pageResults.length ) {
+			this.model.setTotalSteps(1);
+			this.model.trackStep("skipped");
+			return $.Deferred().resolve().promise();
+		}
+		const sourcePages = pageResults.map(pageResult =>
 			this.model.discussion.redirects.resolveOne(pageResult.pageName)
 		);
-
 		// There can be multiple target pages.
-		const targetPages = uniqueArray(mergePageResults.map(pageResult =>
+		const targetPages = uniqueArray(pageResults.map(pageResult =>
 			mw.Title.newFromText(pageResult.getFormattedTarget({raw: true})).getPrefixedText()
 		));
+
 		// Just removeMergeTemplatesFromWikicode() on target pages for now.
 		// If we need to removeMergeTemplatesFromWikicode() on more pages in the future, they can be added to this array.
 		const pagesToRemoveMergeTemplatesFrom = targetPages;
