@@ -109,7 +109,7 @@ export default class RemoveMergeTemplates extends TaskItemController {
 				);
 			}
 			if ( text === page.content ) return rejection("skippedNoneFound");
-			return { text, summary: this.model.getEditSummary() };
+			return { text, summary: this.model.getEditSummary() + " - remove merge templates" };
 		};
 		let edits = $.Deferred().resolve().promise();
 		for (let i = 0; i < pages.length; i += 50) {
