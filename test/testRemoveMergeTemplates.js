@@ -176,7 +176,7 @@ describe("RemoveMergeTemplates.doTask", function() {
 			assert.strictEqual(targetEdits.length, 2);
 			assert.strictEqual(targetEdits[1].text, "Updated");
 			assert.strictEqual(targetEdits[1].basetimestamp, "revision2");
-			assert.strictEqual(targetEdits[1].summary, "Closing discussion");
+			assert.strictEqual(targetEdits[1].summary, "Closing discussion - remove merge templates");
 			assert.strictEqual(targetEdits[1].tags, "XFDcloser");
 			assert.ok(!edits.some(edit => ["Foo", "Bar", "Missing"].includes(edit.title)));
 		});
