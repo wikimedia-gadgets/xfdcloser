@@ -44,7 +44,7 @@ export default class AddToHoldingCell extends TaskItemController {
 	transform(holdingCellPage) {
 		if ( this.model.aborted ) return rejection("aorted");
 		// Get page contents, split into section
-		const sectionsArray = holdingCellPage.content.split(/\n={3,}/).map(section => {
+		const sectionsArray = holdingCellPage.content.split(/\n={2,}/).map(section => {
 			const headingSigns = /^[^=]+(=+)\n/.exec(section);
 			if (!headingSigns) {
 				return section;
