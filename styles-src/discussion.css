@@ -38,7 +38,7 @@
 
 /* Styles for actioned (closed/relisted) discussions */
 .xfdc-actioned-heading {
-	text-decoration: line-through double var(--border-color-emphasized, #202122);
+	text-decoration: line-through double var(--color-emphasized, #101418);
 	opacity: 0.75;
 }
 .xfdc-actioned-discussion { opacity: 0.5; }
