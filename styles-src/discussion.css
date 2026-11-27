@@ -21,24 +21,24 @@
 
 .xfdc-qc-cancel {
 	cursor: pointer;
-	border: 1px solid #777;
+	border: 1px solid var(--border-color-interactive, #72777d);
 	border-radius: 10px;
 	font-weight: bold;
 	font-size: 90%;
-	color: #777;
+	color: var(--color-placeholder, #72777d);
 	padding: 0;
 	margin: 0 1px;
 }
 
 /* Style actions based on detected age */
-.xfdc-old .xfdc-action { background-color: #c6ffc6; }
-.xfdc-notOld .xfdc-action { background-color: #ffc6c6; }
-.xfdc-unknownAge .xfdc-action { background-color: #ffffc6; }
-.xfdc-notOld.xfdc-relisted .xfdc-action { background-color: #ffe9c6; }
+.xfdc-old .xfdc-action { background-color: var(--background-color-option-green, #dff2eb); }
+.xfdc-notOld .xfdc-action { background-color: var(--background-color-option-red, #ffe9e5); }
+.xfdc-unknownAge .xfdc-action { background-color: var(--background-color-option-yellow, #fdf2d5); }
+.xfdc-notOld.xfdc-relisted .xfdc-action { background-color: var(--background-color-option-orange, #ffead4); }
 
 /* Styles for actioned (closed/relisted) discussions */
 .xfdc-actioned-heading {
-	text-decoration: line-through double black;
+	text-decoration: line-through double var(--color-emphasized, #101418);
 	opacity: 0.75;
 }
 .xfdc-actioned-discussion { opacity: 0.5; }
