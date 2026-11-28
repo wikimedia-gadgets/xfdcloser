@@ -80,6 +80,8 @@ As XFDcloser is a gadget, you must have interface-admin rights to deploy to the 
 2. Create a bin/credentials.json file, following the format specified in bin/credentials.example.json
 3. `npm run deploy`. This will deploy both the beta version and the non-beta version, ensuring that both users of the gadget receive the latest updates.
 
+For OAuth 2, `bin/credentials.json` can instead contain `accessToken`. An optional `site` property specifies the API URL used by quick deployment; otherwise it defaults to enwiki. Quick deployment updates both beta and live pages.
+
 ## Planned features
 A general overview of planned features:
 - [x] Redo interface using OOUI, similar to Rater
